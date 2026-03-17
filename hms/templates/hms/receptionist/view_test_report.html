@@ -1,0 +1,151 @@
+{% extends 'hms/base.html' %}
+{% block title %}View Test Report{% endblock %}
+
+{% block content %}
+<style>
+    .page-wrap {
+        padding: 34px 0 70px;
+        background:
+            radial-gradient(circle at top left, rgba(37,99,235,.08), transparent 28%),
+            radial-gradient(circle at bottom right, rgba(56,189,248,.08), transparent 28%);
+    }
+    .hero {
+        background: linear-gradient(135deg, #0f172a 0%, #1d4ed8 55%, #38bdf8 100%);
+        color: #fff;
+        border-radius: 30px;
+        padding: 55px 40px;
+        margin-bottom: 30px;
+        box-shadow: 0 20px 50px rgba(15,23,42,.14);
+    }
+    .report-card {
+        background: #fff;
+        border: 1px solid #e5edf5;
+        border-radius: 26px;
+        box-shadow: 0 16px 36px rgba(15,23,42,.08);
+        padding: 28px;
+    }
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0,1fr));
+        gap: 14px;
+        margin-bottom: 22px;
+    }
+    .info-item {
+        background: #f8fbff;
+        border: 1px solid #e5eefb;
+        border-radius: 16px;
+        padding: 14px 16px;
+    }
+    .info-item small {
+        display: block;
+        color: #64748b;
+        margin-bottom: 5px;
+    }
+    .info-item strong {
+        color: #0f172a;
+    }
+    .section-box {
+        border: 1px solid #e8eef5;
+        border-radius: 18px;
+        padding: 18px;
+        margin-bottom: 18px;
+    }
+    .section-box h5 {
+        font-weight: 800;
+        color: #0f172a;
+        margin-bottom: 12px;
+    }
+    .test-list li {
+        padding: 8px 0;
+        border-bottom: 1px solid #eef2f7;
+    }
+    .test-list li:last-child {
+        border-bottom: none;
+    }
+    .print-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        min-height: 48px;
+        padding: 12px 18px;
+        border-radius: 14px;
+        background: linear-gradient(135deg, #0f172a, #334155);
+        color: #fff;
+        text-decoration: none;
+        font-weight: 700;
+        border: none;
+    }
+    .print-btn:hover { color: #fff; opacity: .96; }
+
+    @media print {
+        nav, footer, .no-print {
+            display: none !important;
+        }
+        body {
+            background: #fff !important;
+        }
+    }
+</style>
+
+<section class="section-space page-wrap">
+    <div class="container">
+        <div class="hero">
+            <h2>Test Report Details</h2>
+            <p class="mb-0">View patient information, selected tests, and total cost.</p>
+        </div>
+
+        <div class="d-flex justify-content-end mb-3 no-print">
+            <button type="button" onclick="window.print()" class="print-btn">Print Report</button>
+        </div>
+
+        <div class="report-card">
+            <div class="info-grid">
+                <div class="info-item">
+                    <small>Patient Name</small>
+                    <strong>{{ report.patient_name }}</strong>
+                </div>
+                <div class="info-item">
+                    <small>Age</small>
+                    <strong>{{ report.age }}</strong>
+                </div>
+                <div class="info-item">
+                    <small>Gender</small>
+                    <strong>{{ report.gender }}</strong>
+                </div>
+                <div class="info-item">
+                    <small>Contact Number</small>
+                    <strong>{{ report.contact_number }}</strong>
+                </div>
+                <div class="info-item">
+                    <small>Organization</small>
+                    <strong>{{ report.organization_name }}</strong>
+                </div>
+                <div class="info-item">
+                    <small>Date</small>
+                    <strong>{{ report.created_at|date:"M d, Y - h:i A" }}</strong>
+                </div>
+            </div>
+
+            <div class="section-box">
+                <h5>Selected Tests</h5>
+                <ul class="list-unstyled test-list mb-0">
+                    {% for item in report.items.all %}
+                        <li class="d-flex justify-content-between align-items-center">
+                            <span>{{ item.test_name }}</span>
+                            <strong>৳ {{ item.test_price }}</strong>
+                        </li>
+                    {% empty %}
+                        <li class="text-muted">No tests selected.</li>
+                    {% endfor %}
+                </ul>
+            </div>
+
+            <div class="section-box">
+                <h5>Total Cost</h5>
+                <h3 class="mb-0 text-primary">৳ {{ report.total_cost }}</h3>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

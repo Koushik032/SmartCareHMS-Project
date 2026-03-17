@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Hospital Management System{% endblock %}</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    <style>
+        :root {
+            --primary: #0f172a;
+            --primary-2: #1e293b;
+            --secondary: #2563eb;
+            --accent: #38bdf8;
+            --soft: #f8fbff;
+            --muted: #64748b;
+            --border: #e2e8f0;
+            --white: #ffffff;
+            --shadow-sm: 0 10px 25px rgba(15, 23, 42, 0.06);
+            --shadow-md: 0 18px 40px rgba(15, 23, 42, 0.10);
+            --shadow-lg: 0 25px 60px rgba(15, 23, 42, 0.14);
+            --radius-xl: 28px;
+            --radius-lg: 22px;
+            --radius-md: 16px;
+            --transition: all 0.35s ease;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background: linear-gradient(to bottom, #f8fbff 0%, #eef6ff 100%);
+            font-family: "Inter", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            color: var(--primary);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .main-navbar {
+            position: sticky;
+            top: 0;
+            z-index: 1030;
+            background: rgba(15, 23, 42, 0.88);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            box-shadow: 0 12px 30px rgba(15, 23, 42, 0.12);
+            padding: 14px 0;
+        }
+
+        .navbar-brand-custom {
+            color: #ffffff !important;
+            font-size: 1.25rem;
+            font-weight: 800;
+            letter-spacing: -0.3px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .brand-mark {
+            width: 42px;
+            height: 42px;
+            border-radius: 14px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--secondary), var(--accent));
+            color: #fff;
+            font-size: 18px;
+            box-shadow: 0 12px 28px rgba(37, 99, 235, 0.30);
+        }
+
+        .navbar-toggler {
+            border: none !important;
+            box-shadow: none !important;
+        }
+
+        .navbar-nav .nav-link {
+            color: rgba(255,255,255,0.86) !important;
+            font-weight: 600;
+            margin-left: 6px;
+            margin-right: 6px;
+            transition: var(--transition);
+            position: relative;
+            border-radius: 12px;
+            padding: 9px 14px !important;
+        }
+
+        .navbar-nav .nav-link:hover,
+        .navbar-nav .nav-link.active {
+            color: #ffffff !important;
+            background: rgba(255,255,255,0.08);
+        }
+
+        .navbar-nav .nav-link.active::after,
+        .navbar-nav .nav-link:hover::after {
+            content: "";
+            position: absolute;
+            left: 14px;
+            right: 14px;
+            bottom: 4px;
+            height: 2px;
+            background: linear-gradient(90deg, #60a5fa, #38bdf8);
+            border-radius: 999px;
+        }
+
+        .navbar-user-badge {
+            color: #ffffff;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 999px;
+            padding: 8px 14px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .btn-nav-primary {
+            background: #ffffff;
+            color: var(--primary) !important;
+            border-radius: 12px;
+            padding: 9px 18px;
+            font-weight: 700;
+            text-decoration: none;
+            border: none;
+            transition: var(--transition);
+        }
+
+        .btn-nav-primary:hover {
+            background: #e2e8f0;
+            color: var(--primary) !important;
+            transform: translateY(-1px);
+        }
+
+        .btn-nav-outline {
+            border: 1px solid rgba(255,255,255,0.24);
+            color: #ffffff !important;
+            border-radius: 12px;
+            padding: 9px 18px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .btn-nav-outline:hover {
+            background: rgba(255,255,255,0.08);
+            color: #ffffff !important;
+            transform: translateY(-1px);
+        }
+
+        .section-space {
+            padding: 60px 0;
+            flex: 1;
+        }
+
+        .card-modern {
+            border: none;
+            border-radius: 20px;
+            box-shadow: 0 16px 36px rgba(15, 23, 42, 0.08);
+        }
+
+        .btn-main {
+            background: linear-gradient(135deg, var(--secondary), var(--accent));
+            color: #fff;
+            border: none;
+            border-radius: 12px;
+            font-weight: 700;
+            transition: var(--transition);
+        }
+
+        .btn-main:hover {
+            color: #fff;
+            transform: translateY(-2px);
+        }
+
+        .flash-message {
+            border: none;
+            border-radius: 16px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .footer-section {
+            background:
+                linear-gradient(135deg, rgba(15, 23, 42, 0.96), rgba(30, 41, 59, 0.96)),
+                url('https://images.unsplash.com/photo-1579684453423-f84349ef60b0?auto=format&fit=crop&w=1600&q=80') center/cover no-repeat;
+            color: #cbd5e1;
+            margin-top: auto;
+            padding: 70px 0 24px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .footer-section::before {
+            content: "";
+            position: absolute;
+            width: 280px;
+            height: 280px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.05);
+            top: -90px;
+            right: -80px;
+        }
+
+        .footer-section::after {
+            content: "";
+            position: absolute;
+            width: 220px;
+            height: 220px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.04);
+            bottom: -80px;
+            left: -50px;
+        }
+
+        .footer-brand {
+            color: #ffffff;
+            font-size: 1.35rem;
+            font-weight: 800;
+            margin-bottom: 14px;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .footer-title {
+            color: #ffffff;
+            margin-bottom: 18px;
+            font-weight: 700;
+            font-size: 1.05rem;
+        }
+
+        .footer-text,
+        .footer-section p,
+        .footer-section li,
+        .footer-section a {
+            color: rgba(255,255,255,0.78);
+            text-decoration: none;
+            font-size: 14px;
+            line-height: 1.9;
+        }
+
+        .footer-section a {
+            transition: var(--transition);
+        }
+
+        .footer-section a:hover {
+            color: #ffffff;
+            transform: translateX(4px);
+        }
+
+        .footer-links li {
+            margin-bottom: 8px;
+        }
+
+        .footer-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 7px 12px;
+            border-radius: 999px;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.08);
+            color: #fff;
+            font-size: 13px;
+            font-weight: 600;
+            margin-right: 8px;
+            margin-bottom: 10px;
+        }
+
+        .footer-social a {
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255,255,255,0.08);
+            color: #fff;
+            text-decoration: none;
+            margin-right: 8px;
+            transition: var(--transition);
+        }
+
+        .footer-social a:hover {
+            background: rgba(255,255,255,0.16);
+            color: #fff;
+            transform: translateY(-3px);
+        }
+
+        .footer-bottom {
+            border-top: 1px solid rgba(255,255,255,0.10);
+            margin-top: 28px;
+            padding-top: 18px;
+            text-align: center;
+            font-size: 14px;
+            color: rgba(255,255,255,0.62);
+        }
+
+        .receptionist-dropdown-btn {
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.14);
+            color: #ffffff;
+            border-radius: 999px;
+            padding: 8px 16px;
+            font-weight: 600;
+            font-size: 14px;
+            transition: var(--transition);
+        }
+
+        .receptionist-dropdown-btn:hover,
+        .receptionist-dropdown-btn:focus,
+        .receptionist-dropdown-btn.show {
+            background: rgba(255,255,255,0.14);
+            color: #ffffff;
+            border-color: rgba(255,255,255,0.2);
+            box-shadow: none;
+        }
+
+        .receptionist-dropdown-menu {
+            border: none;
+            border-radius: 18px;
+            padding: 10px;
+            min-width: 230px;
+            box-shadow: 0 18px 40px rgba(15, 23, 42, 0.14);
+        }
+
+        .receptionist-dropdown-menu .dropdown-item {
+            border-radius: 12px;
+            padding: 10px 14px;
+            font-weight: 600;
+            color: #334155;
+        }
+
+        .receptionist-dropdown-menu .dropdown-item:hover {
+            background: #f1f5f9;
+            color: #0f172a;
+        }
+
+        .receptionist-dropdown-menu .dropdown-divider {
+            margin: 8px 0;
+        }
+
+        .navbar-avatar-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.14);
+            color: #ffffff;
+            border-radius: 999px;
+            padding: 8px 14px 8px 10px;
+            font-weight: 600;
+            font-size: 14px;
+            transition: var(--transition);
+        }
+
+        .navbar-avatar-btn:hover,
+        .navbar-avatar-btn:focus,
+        .navbar-avatar-btn.show {
+            background: rgba(255,255,255,0.14);
+            color: #ffffff;
+            border-color: rgba(255,255,255,0.2);
+            box-shadow: none;
+        }
+
+        .navbar-avatar-circle {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #38bdf8, #1d4ed8);
+            color: #ffffff;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 14px;
+            flex-shrink: 0;
+            box-shadow: 0 10px 22px rgba(29, 78, 216, 0.28);
+        }
+
+        @media (max-width: 991px) {
+            .navbar-nav {
+                padding-top: 14px;
+                padding-bottom: 14px;
+            }
+
+            .navbar-nav .nav-link {
+                margin: 4px 0;
+            }
+
+            .receptionist-dropdown-btn,
+            .navbar-avatar-btn {
+                margin-top: 12px;
+            }
+        }
+    </style>
+
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+    <nav class="navbar navbar-expand-lg navbar-dark main-navbar">
+        <div class="container">
+            <a class="navbar-brand-custom" href="{% url 'home' %}">
+                <span class="brand-mark"><i class="bi bi-hospital"></i></span>
+                HMS
+            </a>
+
+            <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="mainNavbar">
+
+                {% if request.user.is_authenticated %}
+
+                    {% if request.user.patient %}
+                    <ul class="navbar-nav mx-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'patient_dashboard' %}">Overview</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'patient_doctors' %}">Doctors</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'patient_hospitals' %}">Hospital</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'patient_history' %}">History</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'about' %}">About</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'contact' %}">Contact</a>
+                        </li>
+                    </ul>
+
+                    <div class="dropdown ms-auto">
+                        <button class="btn dropdown-toggle receptionist-dropdown-btn" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            {{ request.user.patient.first_name }} {{ request.user.patient.last_name }}
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end receptionist-dropdown-menu">
+                            <li>
+                                <a class="dropdown-item" href="{% url 'patient_profile' %}">Profile</a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="{% url 'book_appointment' %}">Book Appointment</a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="{% url 'patient_report_show' %}">Appointment Report</a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="{% url 'patient_prescriptions' %}">Prescriptions</a>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <a class="dropdown-item text-danger" href="{% url 'logout' %}">Logout</a>
+                            </li>
+                        </ul>
+                    </div>
+
+                    {% elif request.user.doctor %}
+                        <ul class="navbar-nav mx-auto">
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'doctor_dashboard' %}">Overview</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'doctor_appointments' %}">Appointments</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'doctor_pending_appointments' %}">Pending Appointments</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'doctor_report_show_list' %}">Report Show</a>
+                            </li>
+                        </ul>
+
+                        <div class="dropdown ms-auto">
+                            <button class="btn dropdown-toggle navbar-avatar-btn" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <span class="navbar-avatar-circle">
+                                    {{ request.user.doctor.name|slice:":1"|upper }}
+                                </span>
+                                <span>Dr. {{ request.user.doctor.name }}</span>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end receptionist-dropdown-menu">
+                                <li><a class="dropdown-item" href="{% url 'doctor_profile' %}">Profile</a></li>
+                                <li><a class="dropdown-item" href="{% url 'doctor_patients' %}">Patients</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item text-danger" href="{% url 'logout' %}">Logout</a></li>
+                            </ul>
+                        </div>
+
+                    {% elif request.user.receptionist %}
+                        <ul class="navbar-nav mx-auto">
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'receptionist_dashboard' %}">Overview</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'receptionist_doctors' %}">Doctors</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'receptionist_patients' %}">Patients</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'receptionist_all_appointments' %}">All Appointments</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'receptionist_all_test_reports' %}">All Test Reports</a>
+                            </li>
+                        </ul>
+
+                        <div class="dropdown ms-auto">
+                            <button class="btn dropdown-toggle receptionist-dropdown-btn" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                {{ request.user.receptionist.organization_name }}
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end receptionist-dropdown-menu">
+                                <li>
+                                    <a class="dropdown-item" href="{% url 'receptionist_profile' %}">Profile</a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="{% url 'receptionist_create_appointment' %}">Create Appointment</a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="{% url 'receptionist_walkin_with_appointment' %}">Walk-in + Appointment</a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="{% url 'receptionist_create_test_report' %}">Test Report</a>
+                                </li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <a class="dropdown-item text-danger" href="{% url 'logout' %}">Logout</a>
+                                </li>
+                            </ul>
+                        </div>
+
+                    {% elif request.user.is_staff %}
+                        <ul class="navbar-nav mx-auto">
+                            <li class="nav-item">
+                                <a class="nav-link {% if request.path == '/admin/dashboard/' %}active{% endif %}" href="{% url 'admin_dashboard' %}">Overview</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link {% if 'admin/patients' in request.path %}active{% endif %}" href="{% url 'admin_patient_list' %}">Patients</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link {% if 'admin/doctors' in request.path %}active{% endif %}" href="{% url 'admin_doctor_list' %}">Doctors</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link {% if 'admin/appointments' in request.path %}active{% endif %}" href="{% url 'admin_appointment_list' %}">Appointments</a>
+                            </li>
+                        </ul>
+
+                        <div class="dropdown ms-auto">
+                            <button class="btn dropdown-toggle navbar-avatar-btn" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <span class="navbar-avatar-circle">
+                                    {{ request.user.username|slice:":1"|upper }}
+                                </span>
+                                <span>Admin {{ request.user.username }}</span>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end receptionist-dropdown-menu">
+                                <li><a class="dropdown-item" href="{% url 'admin_profile' %}">Profile</a></li>
+                                <li><a class="dropdown-item" href="{% url 'admin_add_doctor' %}">Add Doctor</a></li>
+                                <li><a class="dropdown-item" href="{% url 'admin_add_receptionist' %}">Add Receptionist</a></li>
+                                <li><a class="dropdown-item" href="{% url 'admin_add_patient' %}">Add Patient</a></li>
+                                <li><a class="dropdown-item" href="{% url 'admin_doctor_requests' %}">Doctor Requests</a></li>
+                                <li><a class="dropdown-item" href="{% url 'admin_messages' %}">Messages</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item text-danger" href="{% url 'logout' %}">Logout</a></li>
+                            </ul>
+                        </div>
+                    {% endif %}
+
+                {% else %}
+                    <ul class="navbar-nav ms-auto align-items-lg-center">
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.path == '/' %}active{% endif %}" href="{% url 'home' %}">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if 'about' in request.path %}active{% endif %}" href="{% url 'about' %}">About</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if 'contact' in request.path %}active{% endif %}" href="{% url 'contact' %}">Contact</a>
+                        </li>
+                    </ul>
+                {% endif %}
+
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-3">
+        {% for message in messages %}
+            <div class="alert alert-info flash-message">{{ message }}</div>
+        {% endfor %}
+    </div>
+
+    {% block content %}{% endblock %}
+
+    <footer class="footer-section">
+        <div class="container position-relative">
+            <div class="row g-4">
+                <div class="col-lg-4">
+                    <div class="footer-brand">
+                        <span class="brand-mark"><i class="bi bi-heart-pulse"></i></span>
+                        Hospital Management System
+                    </div>
+                    <p class="footer-text">
+                        A modern digital healthcare platform for patients, doctors, receptionists, and administrators to manage hospital services efficiently and professionally.
+                    </p>
+
+                    <div class="mt-3">
+                        <span class="footer-chip"><i class="bi bi-shield-check"></i> Secure Access</span>
+                        <span class="footer-chip"><i class="bi bi-calendar2-check"></i> Smart Booking</span>
+                        <span class="footer-chip"><i class="bi bi-hospital"></i> Modern Care</span>
+                    </div>
+
+                    <div class="footer-social mt-3">
+                        <a href="#"><i class="bi bi-facebook"></i></a>
+                        <a href="#"><i class="bi bi-twitter-x"></i></a>
+                        <a href="#"><i class="bi bi-linkedin"></i></a>
+                        <a href="#"><i class="bi bi-instagram"></i></a>
+                    </div>
+                </div>
+
+                <div class="col-md-4 col-lg-2">
+                    <h5 class="footer-title">Quick Links</h5>
+                    <ul class="list-unstyled footer-links">
+                        <li><a href="{% url 'home' %}">Home</a></li>
+                        <li><a href="{% url 'about' %}">About Us</a></li>
+                        <li><a href="{% url 'contact' %}">Contact</a></li>
+                    </ul>
+                </div>
+
+                <div class="col-md-4 col-lg-3">
+                    <h5 class="footer-title">Services</h5>
+                    <ul class="list-unstyled footer-links">
+                        <li><a href="#">Doctor Consultation</a></li>
+                        <li><a href="#">Patient Appointments</a></li>
+                        <li><a href="#">Hospital Management</a></li>
+                        <li><a href="#">Reception Support</a></li>
+                    </ul>
+                </div>
+
+                <div class="col-md-4 col-lg-3">
+                    <h5 class="footer-title">Contact Info</h5>
+                    <p><i class="bi bi-envelope me-2"></i>support@hospital.com</p>
+                    <p><i class="bi bi-telephone me-2"></i>+880 1234-567890</p>
+                    <p><i class="bi bi-geo-alt me-2"></i>Dhaka, Bangladesh</p>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                &copy; 2026 Hospital Management System. All rights reserved.
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

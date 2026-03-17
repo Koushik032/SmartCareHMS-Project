@@ -1,0 +1,414 @@
+{% extends 'hms/base.html' %}
+{% block title %}Add Doctor{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --primary: #0f172a;
+        --secondary: #1d4ed8;
+        --accent: #38bdf8;
+        --muted: #64748b;
+        --border: #e6edf5;
+        --soft: #f8fbff;
+        --white: #ffffff;
+        --success-bg: #ecfdf5;
+        --success-border: #bbf7d0;
+        --success-text: #166534;
+        --shadow-sm: 0 10px 24px rgba(15, 23, 42, 0.06);
+        --shadow-md: 0 18px 40px rgba(15, 23, 42, 0.09);
+        --shadow-lg: 0 25px 60px rgba(15, 23, 42, 0.14);
+        --transition: all 0.35s ease;
+    }
+
+    .admin-form-page {
+        padding: 40px 0 70px;
+    }
+
+    .admin-form-shell {
+        background: rgba(255,255,255,0.98);
+        border: 1px solid var(--border);
+        border-radius: 30px;
+        box-shadow: var(--shadow-lg);
+        overflow: hidden;
+    }
+
+    .admin-form-top {
+        position: relative;
+        overflow: hidden;
+        background:
+            linear-gradient(135deg, rgba(15, 23, 42, 0.94) 0%, rgba(30, 64, 175, 0.86) 55%, rgba(56, 189, 248, 0.76) 100%),
+            url('https://images.unsplash.com/photo-1579684453423-f84349ef60b0?auto=format&fit=crop&w=1600&q=80') center/cover no-repeat;
+        color: #ffffff;
+        padding: 50px 42px;
+        isolation: isolate;
+    }
+
+    .admin-form-top::before,
+    .admin-form-top::after {
+        content: "";
+        position: absolute;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.08);
+        z-index: -1;
+    }
+
+    .admin-form-top::before {
+        width: 240px;
+        height: 240px;
+        top: -80px;
+        right: -70px;
+    }
+
+    .admin-form-top::after {
+        width: 170px;
+        height: 170px;
+        bottom: -50px;
+        left: -30px;
+    }
+
+    .admin-form-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 14px;
+        border-radius: 999px;
+        background: rgba(255,255,255,0.14);
+        border: 1px solid rgba(255,255,255,0.16);
+        font-size: 13px;
+        font-weight: 700;
+        margin-bottom: 14px;
+        backdrop-filter: blur(10px);
+    }
+
+    .admin-form-top h2 {
+        margin: 0 0 10px;
+        font-size: 2.2rem;
+        font-weight: 900;
+        letter-spacing: -0.5px;
+    }
+
+    .admin-form-top p {
+        margin: 0;
+        color: rgba(255,255,255,0.92);
+        line-height: 1.85;
+        max-width: 780px;
+    }
+
+    .admin-form-body {
+        padding: 36px;
+        background:
+            linear-gradient(to bottom right, rgba(255,255,255,0.98), rgba(248,251,255,0.98)),
+            url('https://images.unsplash.com/photo-1516549655169-df83a0774514?auto=format&fit=crop&w=1400&q=80') center/cover no-repeat;
+        background-blend-mode: lighten;
+    }
+
+    .form-card,
+    .success-card {
+        background: rgba(255,255,255,0.92);
+        backdrop-filter: blur(10px);
+        border: 1px solid #e8eef7;
+        border-radius: 24px;
+        padding: 28px;
+        box-shadow: var(--shadow-md);
+    }
+
+    .form-card {
+        transition: var(--transition);
+        max-width: 980px;
+        margin: 0 auto;
+    }
+
+    .form-card:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-lg);
+    }
+
+    .section-mini-title {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 1.18rem;
+        font-weight: 800;
+        color: #0f172a;
+        margin-bottom: 18px;
+    }
+
+    .title-icon {
+        width: 44px;
+        height: 44px;
+        border-radius: 14px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #dbeafe, #e0f2fe);
+        color: #1d4ed8;
+        font-size: 18px;
+        box-shadow: var(--shadow-sm);
+    }
+
+    .form-label {
+        font-weight: 700;
+        color: #334155;
+        margin-bottom: 8px;
+    }
+
+    .admin-form-body .form-control,
+    .admin-form-body .form-select,
+    .admin-form-body input,
+    .admin-form-body select,
+    .admin-form-body textarea {
+        min-height: 52px;
+        border-radius: 14px;
+        border: 1px solid #dbe3ee;
+        background: rgba(251,253,255,0.96);
+        box-shadow: none;
+        width: 100%;
+        padding: 12px 14px;
+        transition: var(--transition);
+    }
+
+    .admin-form-body textarea {
+        min-height: 120px;
+    }
+
+    .admin-form-body .form-control:focus,
+    .admin-form-body .form-select:focus,
+    .admin-form-body input:focus,
+    .admin-form-body select:focus,
+    .admin-form-body textarea:focus {
+        background: #ffffff;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.08);
+        outline: none;
+    }
+
+    .success-card {
+        background: linear-gradient(135deg, var(--success-bg), #f0fdf4);
+        border: 1px solid var(--success-border);
+        margin-bottom: 24px;
+        max-width: 980px;
+        margin-left: auto;
+        margin-right: auto;
+        margin-bottom: 24px;
+    }
+
+    .success-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 7px 12px;
+        border-radius: 999px;
+        background: #dcfce7;
+        color: var(--success-text);
+        font-size: 12px;
+        font-weight: 700;
+        margin-bottom: 12px;
+    }
+
+    .success-card h4 {
+        font-weight: 800;
+        color: var(--success-text);
+        margin-bottom: 12px;
+    }
+
+    .success-card p {
+        color: var(--success-text);
+        margin-bottom: 8px;
+        line-height: 1.75;
+    }
+
+    .action-row {
+        display: flex;
+        gap: 14px;
+        flex-wrap: wrap;
+        margin-top: 18px;
+    }
+
+    .btn-admin-main {
+        min-height: 52px;
+        padding: 12px 22px;
+        border: none;
+        border-radius: 14px;
+        background: linear-gradient(135deg, #1d4ed8, #38bdf8);
+        color: #ffffff;
+        font-weight: 700;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: var(--transition);
+        box-shadow: 0 12px 24px rgba(29, 78, 216, 0.18);
+    }
+
+    .btn-admin-main:hover {
+        color: #ffffff;
+        transform: translateY(-2px);
+    }
+
+    .btn-admin-outline {
+        min-height: 52px;
+        padding: 12px 22px;
+        border-radius: 14px;
+        border: 1px solid #dbe3ee;
+        background: #ffffff;
+        color: #0f172a;
+        font-weight: 700;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: var(--transition);
+    }
+
+    .btn-admin-outline:hover {
+        color: #0f172a;
+        background: #f8fafc;
+        transform: translateY(-2px);
+    }
+
+    .field-help {
+        color: #64748b;
+        margin-top: 6px;
+        display: block;
+        line-height: 1.7;
+        font-size: 0.9rem;
+    }
+
+    .field-error {
+        color: #dc2626;
+        margin-top: 6px;
+        display: block;
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+
+    .reveal {
+        opacity: 0;
+        transition: all 0.9s ease;
+    }
+
+    .reveal-up { transform: translateY(50px); }
+
+    .reveal.show {
+        opacity: 1;
+        transform: translate(0,0);
+    }
+
+    @media (max-width: 991px) {
+        .admin-form-top,
+        .admin-form-body {
+            padding-left: 22px;
+            padding-right: 22px;
+        }
+
+        .admin-form-top h2 {
+            font-size: 1.9rem;
+        }
+
+        .form-card,
+        .success-card {
+            padding: 22px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="admin-form-page">
+    <div class="container">
+        <div class="admin-form-shell">
+
+            <div class="admin-form-top reveal reveal-up show">
+                <span class="admin-form-badge">
+                    <i class="bi bi-person-plus"></i>
+                    Admin Action
+                </span>
+                <h2>Add Doctor</h2>
+                <p>
+                    Add a new doctor directly into the system with hospital details, specialty,
+                    consultation fee, and profile information. Doctors added by admin are approved automatically.
+                </p>
+            </div>
+
+            <div class="admin-form-body">
+
+                {% if success_doctor %}
+                    <div class="success-card reveal reveal-up">
+                        <span class="success-chip">
+                            <i class="bi bi-check2-circle"></i>
+                            Successfully Added
+                        </span>
+                        <h4>Doctor account created and approved</h4>
+                        <p><strong>Name:</strong> Dr. {{ success_doctor.name }}</p>
+                        <p><strong>Specialist:</strong> {{ success_doctor.specialist }}</p>
+                        <p><strong>Hospital:</strong> {{ success_doctor.hospital_name }}</p>
+                        <p><strong>Consultancy Fee:</strong> {{ success_doctor.consultancy_fee }}</p>
+                        <p><strong>Status:</strong> Approved and active in the system</p>
+                    </div>
+                {% endif %}
+
+                <div class="form-card reveal reveal-up">
+                    <h3 class="section-mini-title">
+                        <span class="title-icon"><i class="bi bi-heart-pulse"></i></span>
+                        Doctor Information
+                    </h3>
+
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+
+                        {% for field in form %}
+                            <div class="mb-3">
+                                <label class="form-label">{{ field.label }}</label>
+                                {{ field }}
+                                {% if field.help_text %}
+                                    <small class="field-help">{{ field.help_text }}</small>
+                                {% endif %}
+                                {% if field.errors %}
+                                    <small class="field-error">{{ field.errors|striptags }}</small>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+
+                        {% if form.non_field_errors %}
+                            <div class="alert alert-danger mt-3">
+                                {{ form.non_field_errors|striptags }}
+                            </div>
+                        {% endif %}
+
+                        <div class="action-row">
+                            <button class="btn-admin-main" type="submit">
+                                <i class="bi bi-plus-circle"></i>
+                                Add Doctor
+                            </button>
+                            <a href="{% url 'admin_dashboard' %}" class="btn-admin-outline">
+                                <i class="bi bi-arrow-left"></i>
+                                Back to Dashboard
+                            </a>
+                        </div>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const addDoctorReveal = document.querySelectorAll('.reveal');
+
+    function addDoctorRevealOnScroll() {
+        const triggerBottom = window.innerHeight * 0.9;
+        addDoctorReveal.forEach((el, index) => {
+            const top = el.getBoundingClientRect().top;
+            if (top < triggerBottom) {
+                setTimeout(() => el.classList.add('show'), index * 80);
+            }
+        });
+    }
+
+    window.addEventListener('scroll', addDoctorRevealOnScroll);
+    window.addEventListener('load', addDoctorRevealOnScroll);
+</script>
+{% endblock %}

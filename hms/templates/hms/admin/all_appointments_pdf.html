@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Appointments PDF</title>
+    <style>
+        body {
+            font-family: Helvetica, Arial, sans-serif;
+            font-size: 11px;
+            color: #111827;
+            margin: 24px;
+        }
+
+        .top-wrap {
+            text-align: center;
+            margin-bottom: 18px;
+            border-bottom: 2px solid #cbd5e1;
+            padding-bottom: 12px;
+        }
+
+        .chip {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 999px;
+            background: #e0ecff;
+            color: #1d4ed8;
+            font-size: 11px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        h2 {
+            text-align: center;
+            margin: 0 0 6px;
+            font-size: 20px;
+            color: #0f172a;
+        }
+
+        p {
+            text-align: center;
+            margin: 0;
+            color: #475569;
+            line-height: 1.6;
+        }
+
+        .summary-box {
+            margin: 16px 0 18px;
+            padding: 10px 12px;
+            border: 1px solid #dbe2ea;
+            background: #f8fbff;
+            border-radius: 8px;
+            color: #334155;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 10.5px;
+        }
+
+        th, td {
+            border: 1px solid #cbd5e1;
+            padding: 7px;
+            text-align: left;
+            vertical-align: top;
+        }
+
+        th {
+            background: #e2e8f0;
+            color: #0f172a;
+            font-weight: 700;
+        }
+
+        tbody tr:nth-child(even) {
+            background: #f8fafc;
+        }
+
+        .empty-cell {
+            text-align: center;
+            color: #64748b;
+            padding: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="top-wrap">
+        <div class="chip">Receptionist Appointment Export</div>
+        <h2>Filtered Appointments</h2>
+        <p>{{ receptionist.organization_name }}</p>
+    </div>
+
+    <div class="summary-box">
+        Exported appointment list for organizational review and record keeping.
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Patient</th>
+                <th>Doctor</th>
+                <th>Hospital</th>
+                <th>Date</th>
+                <th>Time</th>
+                <th>Status</th>
+                <th>Mode</th>
+                <th>Symptoms</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for a in appointments %}
+            <tr>
+                <td>{{ a.patient.first_name }} {{ a.patient.last_name }}</td>
+                <td>{{ a.doctor.name }}</td>
+                <td>{{ a.doctor.hospital_name }}</td>
+                <td>{{ a.appointment_date }}</td>
+                <td>{{ a.appointment_time }}</td>
+                <td>{{ a.status }}</td>
+                <td>{{ a.appointment_mode }}</td>
+                <td>{{ a.symptoms|default:"-" }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="8" class="empty-cell">No appointments found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

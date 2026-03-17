@@ -1,0 +1,400 @@
+{% extends 'hms/base.html' %}
+{% block title %}Doctors{% endblock %}
+
+{% block content %}
+<style>
+    :root {
+        --primary: #0f172a;
+        --secondary: #1d4ed8;
+        --accent: #38bdf8;
+        --muted: #64748b;
+        --border: #e6edf5;
+        --white: #ffffff;
+        --shadow-sm: 0 10px 24px rgba(15, 23, 42, 0.06);
+        --shadow-md: 0 18px 40px rgba(15, 23, 42, 0.09);
+        --shadow-lg: 0 25px 60px rgba(15, 23, 42, 0.14);
+        --transition: all 0.35s ease;
+    }
+
+    .doctor-list-page {
+        padding: 34px 0 70px;
+    }
+
+    .doctor-hero {
+        background:
+            linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(29, 78, 216, 0.84) 55%, rgba(56, 189, 248, 0.74) 100%),
+            url('https://images.unsplash.com/photo-1579684385127-1ef15d508118?auto=format&fit=crop&w=1600&q=80') center/cover no-repeat;
+        color: #ffffff;
+        border-radius: 30px;
+        padding: 58px 42px;
+        margin-bottom: 32px;
+        box-shadow: 0 20px 50px rgba(15, 23, 42, 0.14);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .doctor-hero::before,
+    .doctor-hero::after {
+        content: "";
+        position: absolute;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.08);
+    }
+
+    .doctor-hero::before {
+        width: 230px;
+        height: 230px;
+        top: -70px;
+        right: -60px;
+    }
+
+    .doctor-hero::after {
+        width: 170px;
+        height: 170px;
+        bottom: -50px;
+        left: -25px;
+    }
+
+    .hero-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 16px;
+        border-radius: 999px;
+        background: rgba(255,255,255,0.14);
+        border: 1px solid rgba(255,255,255,0.16);
+        font-size: 13px;
+        font-weight: 700;
+        margin-bottom: 16px;
+        backdrop-filter: blur(10px);
+    }
+
+    .doctor-hero h1 {
+        font-size: 2.4rem;
+        font-weight: 900;
+        margin-bottom: 10px;
+        letter-spacing: -0.4px;
+    }
+
+    .doctor-hero p {
+        color: rgba(255,255,255,0.92);
+        max-width: 760px;
+        margin-bottom: 0;
+        line-height: 1.85;
+    }
+
+    .topbar-card {
+        background: #ffffff;
+        border: 1px solid var(--border);
+        border-radius: 22px;
+        box-shadow: var(--shadow-sm);
+        padding: 20px 22px;
+        margin-bottom: 28px;
+    }
+
+    .topbar-card h2 {
+        font-weight: 800;
+        color: #0f172a;
+        margin-bottom: 6px;
+        font-size: 1.55rem;
+    }
+
+    .topbar-card p {
+        color: #64748b;
+        margin-bottom: 0;
+        line-height: 1.8;
+    }
+
+    .btn-back-modern {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 46px;
+        padding: 10px 18px;
+        border-radius: 12px;
+        background: #0f172a;
+        color: #ffffff;
+        font-weight: 700;
+        text-decoration: none;
+        transition: var(--transition);
+    }
+
+    .btn-back-modern:hover {
+        background: #1e293b;
+        color: #ffffff;
+        transform: translateY(-2px);
+    }
+
+    .doctor-card {
+        background: #ffffff;
+        border: 1px solid var(--border);
+        border-radius: 24px;
+        overflow: hidden;
+        box-shadow: 0 16px 36px rgba(15, 23, 42, 0.08);
+        height: 100%;
+        transition: all 0.35s ease;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .doctor-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 24px 50px rgba(15, 23, 42, 0.14);
+    }
+
+    .doctor-image-wrap {
+        position: relative;
+        width: 100%;
+        height: 250px;
+        overflow: hidden;
+        background: #e2e8f0;
+        flex-shrink: 0;
+    }
+
+    .doctor-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.45s ease;
+    }
+
+    .doctor-card:hover .doctor-image {
+        transform: scale(1.06);
+    }
+
+    .doctor-placeholder {
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #1d4ed8;
+        font-size: 2.5rem;
+        font-weight: 800;
+    }
+
+    .doctor-badge {
+        position: absolute;
+        top: 16px;
+        left: 16px;
+        background: rgba(15, 23, 42, 0.82);
+        color: #ffffff;
+        font-size: 12px;
+        font-weight: 700;
+        padding: 8px 12px;
+        border-radius: 999px;
+        z-index: 2;
+    }
+
+    .doctor-image-overlay {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(to top, rgba(15, 23, 42, 0.18), transparent 55%);
+        pointer-events: none;
+    }
+
+    .doctor-card-body {
+        padding: 24px;
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+    }
+
+    .doctor-name {
+        font-size: 1.3rem;
+        font-weight: 800;
+        color: #0f172a;
+        margin-bottom: 14px;
+    }
+
+    .doctor-meta-list {
+        display: grid;
+        gap: 10px;
+        margin-bottom: 16px;
+    }
+
+    .doctor-meta-item {
+        background: #f8fbff;
+        border: 1px solid #e9eff7;
+        border-radius: 14px;
+        padding: 12px 14px;
+        color: #475569;
+        line-height: 1.7;
+    }
+
+    .doctor-meta-item strong {
+        color: #0f172a;
+    }
+
+    .doctor-about {
+        color: #64748b;
+        margin-top: 2px;
+        margin-bottom: 18px;
+        line-height: 1.8;
+        min-height: 78px;
+    }
+
+    .doctor-footer {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-bottom: 16px;
+    }
+
+    .doctor-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 7px 12px;
+        border-radius: 999px;
+        background: #eff6ff;
+        color: #1d4ed8;
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    .doctor-cta {
+        margin-top: auto;
+        padding-top: 6px;
+    }
+
+    .btn-book-modern {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        min-height: 48px;
+        padding: 12px 18px;
+        border-radius: 12px;
+        background: linear-gradient(135deg, #1d4ed8, #38bdf8);
+        color: #ffffff !important;
+        font-weight: 700;
+        text-decoration: none;
+        border: none;
+        box-shadow: 0 12px 24px rgba(29, 78, 216, 0.18);
+        transition: var(--transition);
+    }
+
+    .btn-book-modern:hover {
+        color: #ffffff !important;
+        transform: translateY(-2px);
+        box-shadow: 0 16px 30px rgba(29, 78, 216, 0.22);
+    }
+
+    .empty-state-card {
+        background: #ffffff;
+        border: 1px solid var(--border);
+        border-radius: 24px;
+        box-shadow: var(--shadow-sm);
+        padding: 46px 24px;
+        text-align: center;
+    }
+
+    .empty-state-card h4 {
+        font-weight: 800;
+        color: #0f172a;
+        margin-bottom: 10px;
+    }
+
+    .empty-state-card p {
+        color: #64748b;
+        margin-bottom: 0;
+    }
+
+    @media (max-width: 991px) {
+        .doctor-hero {
+            padding: 40px 24px;
+        }
+
+        .doctor-hero h1 {
+            font-size: 2rem;
+        }
+    }
+</style>
+
+<section class="section-space doctor-list-page">
+    <div class="container">
+
+        <div class="doctor-hero">
+            <span class="hero-badge">Medical Specialist Network</span>
+            <h1>Find the Right Doctor for Your Care</h1>
+            <p>
+                Explore our trusted medical specialists, compare hospitals and consultation areas,
+                and choose the right doctor for your healthcare needs.
+            </p>
+        </div>
+
+        <div class="topbar-card">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                <div class="doctor-page-header">
+                    <h2>All Doctors</h2>
+                    <p>Browse our complete medical specialist network.</p>
+                </div>
+                <a href="{% url 'patient_dashboard' %}" class="btn-back-modern">
+                    Back to Dashboard
+                </a>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            {% for doctor in doctors %}
+                <div class="col-md-6 col-lg-4">
+                    <div class="doctor-card">
+
+                        <div class="doctor-image-wrap">
+                            {% if doctor.photo %}
+                                <img src="{{ doctor.photo.url }}" alt="{{ doctor.name }}" class="doctor-image">
+                            {% else %}
+                                <div class="doctor-placeholder">
+                                    {{ doctor.name|slice:":1" }}
+                                </div>
+                            {% endif %}
+                            <div class="doctor-image-overlay"></div>
+                            <span class="doctor-badge">{{ doctor.specialist }}</span>
+                        </div>
+
+                        <div class="doctor-card-body">
+                            <h4 class="doctor-name">Dr. {{ doctor.name }}</h4>
+
+                            <div class="doctor-meta-list">
+                                <div class="doctor-meta-item">
+                                    <strong>Hospital:</strong> {{ doctor.hospital_name }}
+                                </div>
+                                <div class="doctor-meta-item">
+                                    <strong>Location:</strong> {{ doctor.location }}
+                                </div>
+                                <div class="doctor-meta-item">
+                                    <strong>Consultation Fee:</strong> {{ doctor.consultancy_fee }}
+                                </div>
+                            </div>
+
+                            <p class="doctor-about">
+                                {{ doctor.about|default:"Experienced specialist dedicated to quality patient care and modern treatment support."|truncatewords:20 }}
+                            </p>
+
+                            <div class="doctor-footer">
+                                <span class="doctor-chip">Available Specialist</span>
+                            </div>
+
+                            <div class="doctor-cta">
+                                <a href="{% url 'book_appointment' %}?doctor={{ doctor.id }}" class="btn-book-modern">
+                                    Book Appointment
+                                </a>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            {% empty %}
+                <div class="col-12">
+                    <div class="empty-state-card">
+                        <h4>No Doctors Found</h4>
+                        <p>No doctors are available right now. Please check again later.</p>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}

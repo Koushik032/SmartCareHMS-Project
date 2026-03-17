@@ -1,0 +1,277 @@
+{% extends 'hms/base.html' %}
+{% block title %}Write Prescription{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --primary: #0f172a;
+        --secondary: #1d4ed8;
+        --accent: #38bdf8;
+        --muted: #64748b;
+        --border: #e6edf5;
+        --shadow-sm: 0 10px 24px rgba(15, 23, 42, 0.06);
+        --shadow-md: 0 18px 40px rgba(15, 23, 42, 0.09);
+        --shadow-lg: 0 25px 60px rgba(15, 23, 42, 0.14);
+        --transition: all 0.35s ease;
+    }
+
+    .prescription-page { padding: 40px 0 70px; }
+
+    .prescription-shell {
+        background: rgba(255,255,255,0.98);
+        border: 1px solid var(--border);
+        border-radius: 30px;
+        box-shadow: var(--shadow-lg);
+        overflow: hidden;
+    }
+
+    .prescription-top {
+        position: relative;
+        overflow: hidden;
+        background:
+            linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(30, 64, 175, 0.84) 55%, rgba(56, 189, 248, 0.74) 100%),
+            url('https://images.unsplash.com/photo-1580281657527-47cfaae0af34?auto=format&fit=crop&w=1600&q=80') center/cover no-repeat;
+        color: #ffffff;
+        padding: 46px 40px;
+        isolation: isolate;
+    }
+
+    .prescription-top::before,
+    .prescription-top::after {
+        content: "";
+        position: absolute;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.08);
+        z-index: -1;
+    }
+
+    .prescription-top::before {
+        width: 220px;
+        height: 220px;
+        top: -70px;
+        right: -60px;
+    }
+
+    .prescription-top::after {
+        width: 150px;
+        height: 150px;
+        bottom: -45px;
+        left: -25px;
+    }
+
+    .prescription-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 14px;
+        border-radius: 999px;
+        background: rgba(255,255,255,0.14);
+        border: 1px solid rgba(255,255,255,0.16);
+        font-size: 13px;
+        font-weight: 700;
+        margin-bottom: 14px;
+        backdrop-filter: blur(10px);
+    }
+
+    .prescription-top h2 {
+        font-size: 2.05rem;
+        font-weight: 900;
+        margin-bottom: 10px;
+        letter-spacing: -0.3px;
+    }
+
+    .prescription-top p {
+        margin: 0;
+        color: rgba(255,255,255,0.92);
+        line-height: 1.85;
+    }
+
+    .prescription-body { padding: 36px; background: linear-gradient(to bottom right, #ffffff, #fbfdff); }
+
+    .info-card, .form-card {
+        background: #f8fbff;
+        border: 1px solid #e8eef7;
+        border-radius: 24px;
+        padding: 24px;
+        height: 100%;
+        box-shadow: var(--shadow-sm);
+        transition: var(--transition);
+    }
+
+    .info-card:hover, .form-card:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-md);
+    }
+
+    .section-title {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 1.15rem;
+        font-weight: 800;
+        color: #0f172a;
+        margin-bottom: 18px;
+    }
+
+    .title-icon {
+        width: 42px;
+        height: 42px;
+        border-radius: 14px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #dbeafe, #e0f2fe);
+        color: #1d4ed8;
+        font-size: 18px;
+    }
+
+    .info-card p {
+        color: #475569;
+        line-height: 1.8;
+        margin-bottom: 10px;
+    }
+
+    .form-label {
+        font-weight: 700;
+        color: #334155;
+        margin-bottom: 8px;
+    }
+
+    .prescription-body .form-control,
+    .prescription-body textarea,
+    .prescription-body input {
+        border-radius: 14px;
+        border: 1px solid #dbe3ee;
+        background: #fbfdff;
+        box-shadow: none;
+        width: 100%;
+        padding: 12px 14px;
+        transition: var(--transition);
+    }
+
+    .prescription-body .form-control:focus,
+    .prescription-body textarea:focus,
+    .prescription-body input:focus {
+        background: #ffffff;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.08);
+        outline: none;
+    }
+
+    .btn-prescription-main {
+        min-height: 52px;
+        padding: 12px 22px;
+        border: none;
+        border-radius: 14px;
+        background: linear-gradient(135deg, #1d4ed8, #38bdf8);
+        color: #ffffff;
+        font-weight: 700;
+        box-shadow: 0 12px 24px rgba(29, 78, 216, 0.18);
+        transition: var(--transition);
+    }
+
+    .btn-prescription-main:hover {
+        color: #ffffff;
+        transform: translateY(-2px);
+    }
+
+    .field-error {
+        color: #dc2626;
+        margin-top: 6px;
+        display: block;
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+
+    .reveal {
+        opacity: 0;
+        transition: all 0.9s ease;
+    }
+
+    .reveal-up { transform: translateY(50px); }
+    .reveal.show { opacity: 1; transform: translate(0,0); }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="prescription-page">
+  <div class="container">
+    <div class="prescription-shell">
+      <div class="prescription-top reveal reveal-up show">
+        <span class="prescription-badge">
+            <i class="bi bi-journal-medical"></i>
+            Doctor Prescription
+        </span>
+        <h2>Online Appointment Prescription</h2>
+        <p>Review patient symptoms and write a professional prescription.</p>
+      </div>
+
+      <div class="prescription-body">
+        <div class="row g-4">
+          <div class="col-lg-4">
+            <div class="info-card reveal reveal-up">
+              <h4 class="section-title">
+                <span class="title-icon"><i class="bi bi-person-vcard"></i></span>
+                Patient Case
+              </h4>
+              <p><strong>Patient:</strong> {{ appointment.patient.first_name }} {{ appointment.patient.last_name }}</p>
+              <p><strong>Email:</strong> {{ appointment.patient.user.email }}</p>
+              <p><strong>Contact:</strong> {{ appointment.patient.contact }}</p>
+              <p><strong>Date:</strong> {{ appointment.appointment_date }}</p>
+              <p><strong>Time:</strong> {{ appointment.appointment_time }}</p>
+              <p><strong>Mode:</strong> {{ appointment.appointment_mode }}</p>
+              <p class="mb-0"><strong>Symptoms:</strong> {{ appointment.symptoms|default:"No symptoms provided." }}</p>
+            </div>
+          </div>
+
+          <div class="col-lg-8">
+            <div class="form-card reveal reveal-up">
+              <h4 class="section-title">
+                <span class="title-icon"><i class="bi bi-file-earmark-medical"></i></span>
+                Write Prescription
+              </h4>
+              <form method="post">
+                {% csrf_token %}
+                <div class="mb-3">
+                  <label class="form-label">{{ form.prescription_text.label }}</label>
+                  {{ form.prescription_text }}
+                  {% if form.prescription_text.errors %}<small class="field-error">{{ form.prescription_text.errors|striptags }}</small>{% endif %}
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">{{ form.advice.label }}</label>
+                  {{ form.advice }}
+                  {% if form.advice.errors %}<small class="field-error">{{ form.advice.errors|striptags }}</small>{% endif %}
+                </div>
+                <button type="submit" class="btn-prescription-main">
+                    <i class="bi bi-check2-circle me-1"></i>
+                    Save Prescription
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const writePrescriptionReveal = document.querySelectorAll('.reveal');
+
+    function writePrescriptionRevealOnScroll() {
+        const triggerBottom = window.innerHeight * 0.9;
+        writePrescriptionReveal.forEach((el, index) => {
+            const top = el.getBoundingClientRect().top;
+            if (top < triggerBottom) {
+                setTimeout(() => el.classList.add('show'), index * 80);
+            }
+        });
+    }
+
+    window.addEventListener('scroll', writePrescriptionRevealOnScroll);
+    window.addEventListener('load', writePrescriptionRevealOnScroll);
+</script>
+{% endblock %}

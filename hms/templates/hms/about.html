@@ -1,0 +1,508 @@
+{% extends 'hms/base.html' %}
+{% load static %}
+{% block title %}About{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --primary: #0f172a;
+        --secondary: #1d4ed8;
+        --accent: #38bdf8;
+        --muted: #64748b;
+        --soft: #f8fbff;
+        --white: #ffffff;
+        --border: #e2e8f0;
+        --shadow-sm: 0 10px 25px rgba(15, 23, 42, 0.06);
+        --shadow-md: 0 18px 40px rgba(15, 23, 42, 0.09);
+        --shadow-lg: 0 25px 60px rgba(15, 23, 42, 0.14);
+        --transition: all 0.35s ease;
+    }
+
+    .about-hero {
+        position: relative;
+        overflow: hidden;
+        border-radius: 34px;
+        padding: 90px 55px;
+        margin-bottom: 40px;
+        background:
+            linear-gradient(120deg, rgba(15, 23, 42, 0.92), rgba(29, 78, 216, 0.82)),
+            url('https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&w=1600&q=80') center/cover no-repeat;
+        color: #fff;
+        box-shadow: var(--shadow-lg);
+    }
+
+    .about-hero::before {
+        content: "";
+        position: absolute;
+        width: 360px;
+        height: 360px;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.08);
+        top: -120px;
+        right: -80px;
+    }
+
+    .badge-soft {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(255,255,255,0.14);
+        border: 1px solid rgba(255,255,255,0.16);
+        padding: 8px 16px;
+        border-radius: 999px;
+        font-size: 13px;
+        font-weight: 700;
+        margin-bottom: 18px;
+    }
+
+    .about-hero h1 {
+        font-size: 3rem;
+        font-weight: 900;
+        line-height: 1.1;
+        margin-bottom: 18px;
+        letter-spacing: -1px;
+    }
+
+    .about-hero p {
+        max-width: 760px;
+        color: rgba(255,255,255,0.92);
+        line-height: 1.9;
+        font-size: 1.05rem;
+        margin-bottom: 0;
+    }
+
+    .section-title {
+        font-size: 2.2rem;
+        font-weight: 800;
+        color: var(--primary);
+        margin-bottom: 12px;
+        letter-spacing: -0.5px;
+    }
+
+    .section-subtitle {
+        max-width: 760px;
+        color: var(--muted);
+        line-height: 1.85;
+        margin: 0 auto 34px;
+    }
+
+    .mini-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 16px;
+        background: #eaf4ff;
+        color: var(--secondary);
+        border-radius: 999px;
+        font-size: 13px;
+        font-weight: 700;
+        margin-bottom: 15px;
+    }
+
+    .info-card,
+    .value-card,
+    .timeline-card,
+    .metric-card {
+        background: rgba(255,255,255,0.96);
+        border: 1px solid #edf2f7;
+        border-radius: 24px;
+        box-shadow: var(--shadow-md);
+        transition: var(--transition);
+        height: 100%;
+    }
+
+    .info-card:hover,
+    .value-card:hover,
+    .timeline-card:hover,
+    .metric-card:hover {
+        transform: translateY(-7px);
+        box-shadow: var(--shadow-lg);
+    }
+
+    .info-card,
+    .value-card,
+    .timeline-card {
+        padding: 30px;
+    }
+
+    .metric-card {
+        padding: 28px 20px;
+        text-align: center;
+    }
+
+    .card-icon {
+        width: 62px;
+        height: 62px;
+        border-radius: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 18px;
+        font-size: 24px;
+        color: var(--secondary);
+        background: linear-gradient(135deg, #dbeafe, #e0f2fe);
+        box-shadow: var(--shadow-sm);
+    }
+
+    .info-card h5,
+    .value-card h5,
+    .timeline-card h5 {
+        font-weight: 800;
+        color: var(--primary);
+        margin-bottom: 12px;
+    }
+
+    .info-card p,
+    .value-card p,
+    .timeline-card p {
+        color: var(--muted);
+        line-height: 1.85;
+        margin: 0;
+    }
+
+    .metric-card .number {
+        font-size: 2rem;
+        font-weight: 900;
+        color: var(--secondary);
+        margin-bottom: 8px;
+    }
+
+    .metric-card p {
+        margin: 0;
+        color: var(--muted);
+        font-weight: 600;
+    }
+
+    .split-image {
+        position: relative;
+        min-height: 100%;
+        border-radius: 28px;
+        overflow: hidden;
+        background:
+            linear-gradient(to top, rgba(15,23,42,0.80), rgba(15,23,42,0.10)),
+            url('https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&w=1400&q=80') center/cover no-repeat;
+        box-shadow: var(--shadow-lg);
+    }
+
+    .split-image-content {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        padding: 30px;
+        color: #fff;
+    }
+
+    .split-image-content h4 {
+        font-weight: 800;
+        margin-bottom: 10px;
+    }
+
+    .split-image-content p {
+        color: rgba(255,255,255,0.88);
+        margin: 0;
+        line-height: 1.85;
+    }
+
+    .timeline-card ul {
+        padding-left: 18px;
+        margin: 0;
+        color: var(--muted);
+    }
+
+    .timeline-card li {
+        margin-bottom: 10px;
+        line-height: 1.8;
+    }
+
+    .cta-box {
+        position: relative;
+        overflow: hidden;
+        border-radius: 30px;
+        padding: 54px 40px;
+        background:
+            linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(29, 78, 216, 0.86)),
+            url('https://images.unsplash.com/photo-1584515933487-779824d29309?auto=format&fit=crop&w=1600&q=80') center/cover no-repeat;
+        color: #fff;
+        box-shadow: var(--shadow-lg);
+    }
+
+    .cta-box h2 {
+        font-weight: 900;
+        margin-bottom: 12px;
+    }
+
+    .cta-box p {
+        color: rgba(255,255,255,0.90);
+        line-height: 1.9;
+        margin-bottom: 0;
+    }
+
+    .btn-light-premium {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: #fff;
+        color: var(--primary);
+        text-decoration: none;
+        border-radius: 14px;
+        padding: 13px 22px;
+        font-weight: 700;
+        transition: var(--transition);
+    }
+
+    .btn-light-premium:hover {
+        color: var(--primary);
+        transform: translateY(-2px);
+        background: #eef4ff;
+    }
+
+    .reveal {
+        opacity: 0;
+        transition: all 0.9s ease;
+    }
+
+    .reveal-left { transform: translateX(-70px); }
+    .reveal-right { transform: translateX(70px); }
+    .reveal-up { transform: translateY(55px); }
+
+    .reveal.show {
+        opacity: 1;
+        transform: translate(0,0);
+    }
+
+    .delay-1 { transition-delay: 0.08s; }
+    .delay-2 { transition-delay: 0.16s; }
+    .delay-3 { transition-delay: 0.24s; }
+    .delay-4 { transition-delay: 0.32s; }
+
+    @media (max-width: 991px) {
+        .about-hero {
+            padding: 60px 28px;
+        }
+
+        .about-hero h1 {
+            font-size: 2.3rem;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .about-hero {
+            padding: 48px 22px;
+            border-radius: 26px;
+        }
+
+        .about-hero h1 {
+            font-size: 2rem;
+        }
+
+        .section-title {
+            font-size: 1.8rem;
+        }
+
+        .cta-box {
+            padding: 40px 24px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="section-space">
+    <div class="container">
+
+        <div class="about-hero reveal reveal-up show">
+            <span class="badge-soft"><i class="bi bi-hospital"></i> About SmartCare HMS</span>
+            <h1>Building a More Modern, Connected & Professional Healthcare Experience</h1>
+            <p>
+                SmartCare HMS is designed to digitize hospital workflows with clarity, security, and
+                professional presentation. It creates one connected environment where patients, doctors,
+                receptionists, and administrators can work together through a modern system.
+            </p>
+        </div>
+
+        <div class="row g-4 mb-5">
+            <div class="col-md-3">
+                <div class="metric-card reveal reveal-left delay-1">
+                    <div class="number">24/7</div>
+                    <p>Patient Access</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="metric-card reveal reveal-up delay-2">
+                    <div class="number">4+</div>
+                    <p>Role Portals</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="metric-card reveal reveal-up delay-3">
+                    <div class="number">Smart</div>
+                    <p>Appointment Flow</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="metric-card reveal reveal-right delay-4">
+                    <div class="number">Secure</div>
+                    <p>System Access</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="text-center mb-4 reveal reveal-up">
+            <span class="mini-badge"><i class="bi bi-stars"></i> Our Mission</span>
+            <h2 class="section-title">Why We Built This Platform</h2>
+            <p class="section-subtitle">
+                We believe healthcare platforms should feel efficient, easy to use, role-specific,
+                and visually trustworthy. SmartCare HMS was built to improve operations while also
+                creating a premium digital identity for modern hospitals and clinics.
+            </p>
+        </div>
+
+        <div class="row g-4 mb-5">
+            <div class="col-md-4">
+                <div class="info-card reveal reveal-left delay-1">
+                    <div class="card-icon"><i class="bi bi-person-heart"></i></div>
+                    <h5>Patient-First Experience</h5>
+                    <p>
+                        Patients can access doctors, book appointments, and manage interactions
+                        through a clean and approachable digital interface.
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="info-card reveal reveal-up delay-2">
+                    <div class="card-icon"><i class="bi bi-diagram-3"></i></div>
+                    <h5>Operational Clarity</h5>
+                    <p>
+                        Each hospital role gets focused tools and visibility, helping streamline
+                        work without unnecessary complexity.
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="info-card reveal reveal-right delay-3">
+                    <div class="card-icon"><i class="bi bi-shield-check"></i></div>
+                    <h5>Secure Coordination</h5>
+                    <p>
+                        Role-based access keeps information protected while maintaining
+                        smooth collaboration across departments and workflows.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4 align-items-stretch mb-5">
+            <div class="col-lg-6">
+                <div class="split-image reveal reveal-left">
+                    <div class="split-image-content">
+                        <h4>A Platform Ready for Hospitals, Clinics & Healthcare Networks</h4>
+                        <p>
+                            SmartCare HMS can present hospitals with a more polished digital face
+                            while simplifying internal coordination and service delivery.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-6">
+                <div class="row g-4 h-100">
+                    <div class="col-12">
+                        <div class="value-card reveal reveal-right delay-1">
+                            <div class="card-icon"><i class="bi bi-bullseye"></i></div>
+                            <h5>Our Vision</h5>
+                            <p>
+                                To help healthcare institutions move toward modern, connected,
+                                and efficient digital operations with a premium user experience.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="col-12">
+                        <div class="timeline-card reveal reveal-right delay-2">
+                            <div class="card-icon"><i class="bi bi-rocket-takeoff"></i></div>
+                            <h5>What SmartCare HMS Supports</h5>
+                            <ul>
+                                <li>Doctor discovery and appointment booking</li>
+                                <li>Doctor-specific schedule and patient visibility</li>
+                                <li>Reception workflow and hospital service coordination</li>
+                                <li>Admin-level monitoring and system control</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="text-center mb-4 reveal reveal-up">
+            <span class="mini-badge"><i class="bi bi-gem"></i> Core Values</span>
+            <h2 class="section-title">What Makes Our Platform Professional</h2>
+            <p class="section-subtitle">
+                Our system is built around usability, trust, speed, clarity, and a presentable
+                digital healthcare identity.
+            </p>
+        </div>
+
+        <div class="row g-4 mb-5">
+            <div class="col-md-4">
+                <div class="value-card reveal reveal-left delay-1">
+                    <div class="card-icon"><i class="bi bi-lightning-charge"></i></div>
+                    <h5>Efficiency</h5>
+                    <p>Reduce workflow friction with simpler navigation, cleaner dashboards, and focused role access.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="value-card reveal reveal-up delay-2">
+                    <div class="card-icon"><i class="bi bi-eye"></i></div>
+                    <h5>Visibility</h5>
+                    <p>Maintain a clearer view of doctors, appointments, patients, and coordination activities.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="value-card reveal reveal-right delay-3">
+                    <div class="card-icon"><i class="bi bi-palette2"></i></div>
+                    <h5>Presentation</h5>
+                    <p>Deliver a polished healthcare interface that is suitable for local operations and client presentation.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="cta-box reveal reveal-up">
+            <div class="row align-items-center g-4">
+                <div class="col-lg-8">
+                    <h2>Want to Learn More About SmartCare HMS?</h2>
+                    <p>
+                        Contact us to discuss hospital digital transformation, modern workflow design,
+                        and how SmartCare HMS can support a stronger healthcare platform experience.
+                    </p>
+                </div>
+                <div class="col-lg-4 text-lg-end">
+                    <a href="{% url 'contact' %}" class="btn-light-premium">
+                        <i class="bi bi-envelope-paper"></i>
+                        Contact Us
+                    </a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const aboutReveal = document.querySelectorAll('.reveal');
+
+    function aboutRevealOnScroll() {
+        const triggerBottom = window.innerHeight * 0.88;
+        aboutReveal.forEach(el => {
+            const top = el.getBoundingClientRect().top;
+            if (top < triggerBottom) {
+                el.classList.add('show');
+            }
+        });
+    }
+
+    window.addEventListener('scroll', aboutRevealOnScroll);
+    window.addEventListener('load', aboutRevealOnScroll);
+</script>
+{% endblock %}

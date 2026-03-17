@@ -1,0 +1,329 @@
+{% extends 'hms/base.html' %}
+{% block title %}Prescription Details{% endblock %}
+
+{% block content %}
+<style>
+    .prescription-detail-page {
+        padding: 34px 0 70px;
+    }
+
+    .prescription-detail-hero {
+        background:
+            linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(29, 78, 216, 0.84) 55%, rgba(56, 189, 248, 0.74) 100%),
+            url('https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&w=1600&q=80') center/cover no-repeat;
+        color: #ffffff;
+        border-radius: 30px;
+        padding: 52px 40px;
+        margin-bottom: 28px;
+        box-shadow: 0 20px 50px rgba(15, 23, 42, 0.14);
+        position: relative;
+        overflow: hidden;
+        isolation: isolate;
+    }
+
+    .prescription-detail-hero::before,
+    .prescription-detail-hero::after {
+        content: "";
+        position: absolute;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.08);
+        z-index: -1;
+    }
+
+    .prescription-detail-hero::before {
+        width: 220px;
+        height: 220px;
+        top: -70px;
+        right: -60px;
+    }
+
+    .prescription-detail-hero::after {
+        width: 150px;
+        height: 150px;
+        bottom: -45px;
+        left: -25px;
+    }
+
+    .hero-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 16px;
+        border-radius: 999px;
+        background: rgba(255,255,255,0.14);
+        border: 1px solid rgba(255,255,255,0.16);
+        font-size: 13px;
+        font-weight: 700;
+        margin-bottom: 16px;
+        backdrop-filter: blur(10px);
+    }
+
+    .prescription-detail-hero h2 {
+        font-size: 2.1rem;
+        font-weight: 900;
+        margin-bottom: 10px;
+        letter-spacing: -0.4px;
+    }
+
+    .prescription-detail-hero p {
+        color: rgba(255,255,255,0.92);
+        max-width: 760px;
+        margin-bottom: 0;
+        line-height: 1.85;
+    }
+
+    .info-card,
+    .content-card {
+        background: #ffffff;
+        border: 1px solid #e7edf5;
+        border-radius: 24px;
+        box-shadow: 0 16px 36px rgba(15, 23, 42, 0.08);
+        transition: all 0.35s ease;
+    }
+
+    .info-card:hover,
+    .content-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 22px 44px rgba(15, 23, 42, 0.12);
+    }
+
+    .info-card,
+    .content-card {
+        padding: 24px;
+        height: 100%;
+    }
+
+    .section-title {
+        font-size: 1.18rem;
+        font-weight: 800;
+        color: #0f172a;
+        margin-bottom: 16px;
+    }
+
+    .info-list {
+        display: grid;
+        gap: 12px;
+    }
+
+    .info-item {
+        background: #f8fbff;
+        border: 1px solid #e9eff7;
+        border-radius: 16px;
+        padding: 14px 16px;
+        line-height: 1.75;
+        color: #475569;
+        transition: 0.3s ease;
+    }
+
+    .info-item:hover {
+        background: #ffffff;
+        transform: translateX(2px);
+    }
+
+    .info-item strong {
+        color: #0f172a;
+    }
+
+    .content-card {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .content-box {
+        background: #f8fbff;
+        border: 1px solid #e9eff7;
+        border-radius: 18px;
+        padding: 18px;
+        color: #334155;
+        line-height: 1.95;
+        white-space: pre-line;
+        min-height: 180px;
+        flex: 1;
+    }
+
+    .content-muted {
+        color: #64748b;
+    }
+
+    .top-actions {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-top: 22px;
+    }
+
+    .btn-detail-outline,
+    .btn-detail-print {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 46px;
+        padding: 10px 18px;
+        border-radius: 12px;
+        text-decoration: none;
+        font-weight: 700;
+        transition: all 0.3s ease;
+        border: none;
+    }
+
+    .btn-detail-outline {
+        background: #ffffff;
+        border: 1px solid #dbe3ee;
+        color: #0f172a;
+    }
+
+    .btn-detail-outline:hover {
+        background: #f8fafc;
+        color: #0f172a;
+        transform: translateY(-2px);
+    }
+
+    .btn-detail-print {
+        background: #0f172a;
+        color: #ffffff;
+    }
+
+    .btn-detail-print:hover {
+        color: #ffffff;
+        background: #1e293b;
+        transform: translateY(-2px);
+    }
+
+    .reveal {
+        opacity: 0;
+        transition: all 0.9s ease;
+    }
+
+    .reveal-up {
+        transform: translateY(40px);
+    }
+
+    .reveal.show {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    @media print {
+        nav,
+        footer,
+        .top-actions,
+        .prescription-detail-hero {
+            display: none !important;
+        }
+
+        body {
+            background: #ffffff !important;
+        }
+
+        .info-card,
+        .content-card {
+            box-shadow: none !important;
+            border: 1px solid #dbe3ee !important;
+        }
+    }
+
+    @media (max-width: 991px) {
+        .prescription-detail-hero {
+            padding: 40px 24px;
+        }
+
+        .prescription-detail-hero h2 {
+            font-size: 1.85rem;
+        }
+
+        .content-box {
+            min-height: 140px;
+        }
+    }
+</style>
+
+<section class="section-space prescription-detail-page">
+    <div class="container">
+
+        <div class="prescription-detail-hero reveal reveal-up show">
+            <span class="hero-chip">
+                <i class="bi bi-file-earmark-medical"></i>
+                Prescription Details
+            </span>
+            <h2>Your Prescription Record</h2>
+            <p>
+                Review the prescription and doctor advice provided for your appointment in a clean and professional layout.
+            </p>
+        </div>
+
+        <div class="row g-4 align-items-stretch">
+            <div class="col-lg-4">
+                <div class="info-card reveal reveal-up">
+                    <h4 class="section-title">Appointment Information</h4>
+
+                    <div class="info-list">
+                        <div class="info-item">
+                            <strong>Doctor:</strong> Dr. {{ prescription.doctor.name }}
+                        </div>
+                        <div class="info-item">
+                            <strong>Patient:</strong> {{ prescription.patient.first_name }} {{ prescription.patient.last_name }}
+                        </div>
+                        <div class="info-item">
+                            <strong>Appointment Date:</strong> {{ prescription.appointment.appointment_date }}
+                        </div>
+                        <div class="info-item">
+                            <strong>Appointment Time:</strong> {{ prescription.appointment.appointment_time }}
+                        </div>
+                        <div class="info-item">
+                            <strong>Consultation Mode:</strong> {{ prescription.appointment.appointment_mode }}
+                        </div>
+                        <div class="info-item">
+                            <strong>Created:</strong> {{ prescription.created_at|date:"M d, Y h:i A" }}
+                        </div>
+                    </div>
+
+                    <div class="top-actions">
+                        <a href="{% url 'patient_history' %}" class="btn-detail-outline">Back</a>
+                        <button onclick="window.print()" class="btn-detail-print" type="button">Print</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-8">
+                <div class="row g-4 h-100">
+                    <div class="col-12">
+                        <div class="content-card reveal reveal-up">
+                            <h4 class="section-title">Prescription</h4>
+                            <div class="content-box {% if not prescription.prescription_text %}content-muted{% endif %}">
+                                {{ prescription.prescription_text|default:"No prescription text available." }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-12">
+                        <div class="content-card reveal reveal-up">
+                            <h4 class="section-title">Doctor Advice</h4>
+                            <div class="content-box {% if not prescription.advice %}content-muted{% endif %}">
+                                {{ prescription.advice|default:"No additional advice provided." }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+<script>
+    const prescriptionDetailReveal = document.querySelectorAll('.reveal');
+
+    function prescriptionDetailRevealOnScroll() {
+        const triggerBottom = window.innerHeight * 0.9;
+        prescriptionDetailReveal.forEach((el, index) => {
+            const top = el.getBoundingClientRect().top;
+            if (top < triggerBottom) {
+                setTimeout(() => el.classList.add('show'), index * 70);
+            }
+        });
+    }
+
+    window.addEventListener('scroll', prescriptionDetailRevealOnScroll);
+    window.addEventListener('load', prescriptionDetailRevealOnScroll);
+</script>
+{% endblock %}

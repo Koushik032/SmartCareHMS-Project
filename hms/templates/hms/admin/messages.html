@@ -1,0 +1,300 @@
+{% extends 'hms/base.html' %}
+{% block title %}Messages{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --primary: #0f172a;
+        --secondary: #1d4ed8;
+        --accent: #38bdf8;
+        --muted: #64748b;
+        --border: #e6edf5;
+        --soft: #f8fbff;
+        --white: #ffffff;
+        --shadow-sm: 0 10px 24px rgba(15, 23, 42, 0.06);
+        --shadow-md: 0 18px 40px rgba(15, 23, 42, 0.09);
+        --shadow-lg: 0 25px 60px rgba(15, 23, 42, 0.14);
+        --transition: all 0.35s ease;
+    }
+
+    .messages-page {
+        padding: 34px 0 70px;
+    }
+
+    .page-hero {
+        position: relative;
+        overflow: hidden;
+        background:
+            linear-gradient(135deg, rgba(15, 23, 42, 0.94) 0%, rgba(29, 78, 216, 0.84) 58%, rgba(56, 189, 248, 0.76) 100%),
+            url('https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=1600&q=80') center/cover no-repeat;
+        color: #ffffff;
+        border-radius: 30px;
+        padding: 52px 40px;
+        margin-bottom: 30px;
+        box-shadow: var(--shadow-lg);
+        isolation: isolate;
+    }
+
+    .page-hero::before,
+    .page-hero::after {
+        content: "";
+        position: absolute;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.08);
+        z-index: -1;
+    }
+
+    .page-hero::before {
+        width: 230px;
+        height: 230px;
+        top: -70px;
+        right: -60px;
+    }
+
+    .page-hero::after {
+        width: 160px;
+        height: 160px;
+        bottom: -45px;
+        left: -25px;
+    }
+
+    .hero-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 16px;
+        border-radius: 999px;
+        background: rgba(255,255,255,0.14);
+        border: 1px solid rgba(255,255,255,0.16);
+        font-size: 13px;
+        font-weight: 700;
+        margin-bottom: 16px;
+        backdrop-filter: blur(10px);
+    }
+
+    .page-hero h2 {
+        font-size: 2.2rem;
+        font-weight: 900;
+        margin-bottom: 10px;
+        letter-spacing: -0.5px;
+    }
+
+    .page-hero p {
+        color: rgba(255,255,255,0.92);
+        margin-bottom: 0;
+        line-height: 1.85;
+        max-width: 760px;
+    }
+
+    .search-shell {
+        background: rgba(255,255,255,0.97);
+        border: 1px solid var(--border);
+        border-radius: 24px;
+        padding: 24px;
+        box-shadow: var(--shadow-md);
+        margin-bottom: 28px;
+    }
+
+    .search-shell .form-control {
+        min-height: 56px;
+        border-radius: 14px;
+        background: #f8fafc;
+        border: 1px solid #dbe2ea;
+        box-shadow: none;
+    }
+
+    .search-shell .form-control:focus {
+        background: #ffffff;
+        border-color: #2563eb;
+        box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.08);
+    }
+
+    .btn-search-modern {
+        min-height: 56px;
+        border-radius: 14px;
+        border: none;
+        background: linear-gradient(135deg, #1d4ed8, #38bdf8);
+        color: #ffffff;
+        font-weight: 700;
+        box-shadow: 0 12px 24px rgba(29, 78, 216, 0.18);
+        transition: var(--transition);
+    }
+
+    .btn-search-modern:hover {
+        color: #ffffff;
+        transform: translateY(-2px);
+    }
+
+    .messages-card {
+        background: rgba(255,255,255,0.98);
+        border: 1px solid var(--border);
+        border-radius: 24px;
+        box-shadow: var(--shadow-md);
+        padding: 22px;
+    }
+
+    .table {
+        margin-bottom: 0;
+    }
+
+    .table thead th {
+        background: #f1f7ff;
+        color: #0f172a;
+        font-weight: 800;
+        border-bottom: 1px solid #dbe5f0;
+        padding: 14px 12px;
+    }
+
+    .table tbody td {
+        vertical-align: top;
+        color: #475569;
+        padding: 14px 12px;
+        line-height: 1.8;
+        border-color: #edf2f7;
+    }
+
+    .message-name {
+        font-weight: 800;
+        color: #0f172a;
+    }
+
+    .message-body {
+        max-width: 340px;
+        white-space: normal;
+        word-break: break-word;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 48px 18px;
+    }
+
+    .empty-icon {
+        width: 76px;
+        height: 76px;
+        border-radius: 22px;
+        background: linear-gradient(135deg, #dbeafe, #e0f2fe);
+        color: #1d4ed8;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 30px;
+        margin: 0 auto 18px;
+    }
+
+    .empty-state h4 {
+        font-weight: 800;
+        color: #0f172a;
+        margin-bottom: 10px;
+    }
+
+    .empty-state p {
+        color: #64748b;
+        margin: 0;
+        line-height: 1.8;
+    }
+
+    .reveal {
+        opacity: 0;
+        transition: all 0.9s ease;
+    }
+
+    .reveal-up { transform: translateY(50px); }
+
+    .reveal.show {
+        opacity: 1;
+        transform: translate(0,0);
+    }
+
+    @media (max-width: 991px) {
+        .page-hero {
+            padding: 38px 24px;
+        }
+
+        .page-hero h2 {
+            font-size: 1.9rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="section-space messages-page">
+  <div class="container">
+    <div class="page-hero reveal reveal-up show">
+      <span class="hero-chip">
+        <i class="bi bi-envelope-paper"></i>
+        Admin Messages
+      </span>
+      <h2>Messages</h2>
+      <p>Search and review submitted messages from users through a clean and professional communication view.</p>
+    </div>
+
+    <form method="get" class="row g-2 mb-4 search-shell reveal reveal-up">
+      <div class="col-md-10">
+        <input type="text" name="q" class="form-control" value="{{ query }}" placeholder="Enter Contact Number">
+      </div>
+      <div class="col-md-2">
+        <button class="btn btn-search-modern w-100">
+          <i class="bi bi-search me-1"></i>
+          Search
+        </button>
+      </div>
+    </form>
+
+    <div class="messages-card reveal reveal-up">
+      <div class="table-responsive">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Full Name</th>
+              <th>Email</th>
+              <th>Contact</th>
+              <th>Message</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for m in messages_list %}
+            <tr>
+              <td class="message-name">{{ m.name }}</td>
+              <td>{{ m.email }}</td>
+              <td>{{ m.contact }}</td>
+              <td class="message-body">{{ m.message }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="4">
+                <div class="empty-state">
+                  <div class="empty-icon"><i class="bi bi-chat-dots"></i></div>
+                  <h4>No messages found</h4>
+                  <p>No messages matched your current search.</p>
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const messagesReveal = document.querySelectorAll('.reveal');
+
+    function messagesRevealOnScroll() {
+        const triggerBottom = window.innerHeight * 0.9;
+        messagesReveal.forEach((el, index) => {
+            const top = el.getBoundingClientRect().top;
+            if (top < triggerBottom) {
+                setTimeout(() => el.classList.add('show'), index * 80);
+            }
+        });
+    }
+
+    window.addEventListener('scroll', messagesRevealOnScroll);
+    window.addEventListener('load', messagesRevealOnScroll);
+</script>
+{% endblock %}

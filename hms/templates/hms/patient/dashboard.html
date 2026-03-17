@@ -1,0 +1,1170 @@
+{% extends 'hms/base.html' %}
+{% block title %}Patient Dashboard{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --primary: #0f172a;
+        --secondary: #1d4ed8;
+        --accent: #38bdf8;
+        --muted: #64748b;
+        --border: #e6edf5;
+        --soft: #f8fbff;
+        --white: #ffffff;
+        --shadow-sm: 0 10px 24px rgba(15, 23, 42, 0.06);
+        --shadow-md: 0 18px 40px rgba(15, 23, 42, 0.09);
+        --shadow-lg: 0 25px 60px rgba(15, 23, 42, 0.14);
+        --transition: all 0.35s ease;
+    }
+
+    .patient-dashboard-page {
+        padding: 34px 0 70px;
+    }
+
+    .patient-hero {
+        background:
+            linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(29, 78, 216, 0.84) 55%, rgba(56, 189, 248, 0.74) 100%),
+            url('https://images.unsplash.com/photo-1584515933487-779824d29309?auto=format&fit=crop&w=1600&q=80') center/cover no-repeat;
+        color: #ffffff;
+        border-radius: 30px;
+        padding: 60px 42px;
+        margin-bottom: 32px;
+        box-shadow: 0 20px 50px rgba(15, 23, 42, 0.14);
+        position: relative;
+        overflow: hidden;
+        isolation: isolate;
+    }
+
+    .patient-hero::before,
+    .patient-hero::after {
+        content: "";
+        position: absolute;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.08);
+        z-index: -1;
+    }
+
+    .patient-hero::before {
+        width: 240px;
+        height: 240px;
+        top: -70px;
+        right: -60px;
+    }
+
+    .patient-hero::after {
+        width: 180px;
+        height: 180px;
+        bottom: -60px;
+        left: -30px;
+    }
+
+    .hero-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 16px;
+        border-radius: 999px;
+        background: rgba(255,255,255,0.14);
+        border: 1px solid rgba(255,255,255,0.16);
+        font-size: 14px;
+        font-weight: 700;
+        margin-bottom: 18px;
+        backdrop-filter: blur(10px);
+    }
+
+    .patient-hero h1 {
+        font-size: 2.45rem;
+        font-weight: 900;
+        margin-bottom: 10px;
+        letter-spacing: -0.4px;
+    }
+
+    .patient-hero p {
+        color: rgba(255,255,255,0.92);
+        max-width: 760px;
+        margin-bottom: 0;
+        line-height: 1.85;
+    }
+
+    .hero-pills {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 22px;
+    }
+
+    .hero-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 14px;
+        border-radius: 999px;
+        background: rgba(255,255,255,0.10);
+        border: 1px solid rgba(255,255,255,0.14);
+        color: #fff;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .dashboard-stat-card,
+    .dashboard-card,
+    .doctor-card,
+    .hospital-info-card,
+    .hospital-showcase-card,
+    .membership-status-card,
+    .membership-benefit-card,
+    .recent-shell,
+    .quick-action-card,
+    .wellness-card {
+        background: #ffffff;
+        border: 1px solid var(--border);
+        border-radius: 24px;
+        box-shadow: 0 16px 36px rgba(15, 23, 42, 0.08);
+        transition: var(--transition);
+    }
+
+    .dashboard-stat-card:hover,
+    .dashboard-card:hover,
+    .doctor-card:hover,
+    .hospital-info-card:hover,
+    .hospital-showcase-card:hover,
+    .membership-status-card:hover,
+    .membership-benefit-card:hover,
+    .recent-shell:hover,
+    .quick-action-card:hover,
+    .wellness-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--shadow-lg);
+    }
+
+    .dashboard-stat-card {
+        padding: 26px 22px;
+        text-align: left;
+        height: 100%;
+        position: relative;
+        overflow: hidden;
+        background: linear-gradient(180deg, #ffffff, #f9fcff);
+    }
+
+    .dashboard-stat-card::after {
+        content: "";
+        position: absolute;
+        right: -30px;
+        bottom: -30px;
+        width: 110px;
+        height: 110px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(56,189,248,0.10), transparent 70%);
+    }
+
+    .stat-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 14px;
+        margin-bottom: 12px;
+    }
+
+    .stat-icon {
+        width: 54px;
+        height: 54px;
+        border-radius: 16px;
+        background: linear-gradient(135deg, #dbeafe, #e0f2fe);
+        color: #1d4ed8;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 22px;
+        box-shadow: var(--shadow-sm);
+        flex-shrink: 0;
+    }
+
+    .dashboard-stat-card h3 {
+        font-size: 2rem;
+        font-weight: 800;
+        color: #1d4ed8;
+        margin-bottom: 8px;
+        word-break: break-word;
+    }
+
+    .dashboard-stat-card p {
+        color: #64748b;
+        margin-bottom: 0;
+        font-weight: 600;
+    }
+
+    .dashboard-card,
+    .hospital-info-card {
+        padding: 28px;
+    }
+
+    .section-title {
+        font-size: 1.45rem;
+        font-weight: 800;
+        color: #0f172a;
+        margin-bottom: 8px;
+    }
+
+    .section-subtitle {
+        color: #64748b;
+        margin-bottom: 22px;
+        line-height: 1.8;
+    }
+
+    .section-topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 14px;
+        margin-bottom: 18px;
+    }
+
+    .btn-section-view {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 44px;
+        padding: 10px 16px;
+        border-radius: 12px;
+        background: #0f172a;
+        color: #ffffff;
+        font-weight: 700;
+        text-decoration: none;
+        transition: 0.25s ease;
+    }
+
+    .btn-section-view:hover {
+        color: #ffffff;
+        background: #1e293b;
+        transform: translateY(-2px);
+    }
+
+    .modern-table {
+        margin-bottom: 0;
+        vertical-align: middle;
+    }
+
+    .modern-table thead th {
+        background: #f8fafc;
+        color: #0f172a;
+        font-weight: 700;
+        border-bottom: none;
+        padding: 14px 12px;
+    }
+
+    .modern-table tbody td {
+        padding: 14px 12px;
+        color: #475569;
+        border-color: #eef2f7;
+    }
+
+    .status-badge {
+        display: inline-block;
+        padding: 7px 12px;
+        border-radius: 999px;
+        font-size: 13px;
+        font-weight: 700;
+    }
+
+    .status-booked { background: #dbeafe; color: #1d4ed8; }
+    .status-completed { background: #dcfce7; color: #166534; }
+    .status-cancelled { background: #fee2e2; color: #b91c1c; }
+    .status-missed { background: #fef3c7; color: #b45309; }
+
+    .doctor-card {
+        overflow: hidden;
+        height: 100%;
+    }
+
+    .doctor-image {
+        width: 100%;
+        height: 220px;
+        object-fit: cover;
+        background: #e2e8f0;
+        transition: var(--transition);
+    }
+
+    .doctor-card:hover .doctor-image {
+        transform: scale(1.05);
+    }
+
+    .doctor-placeholder {
+        width: 100%;
+        height: 220px;
+        background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #1d4ed8;
+        font-size: 2rem;
+        font-weight: 800;
+    }
+
+    .doctor-content {
+        padding: 22px;
+    }
+
+    .doctor-content h5 {
+        font-weight: 800;
+        color: #0f172a;
+        margin-bottom: 8px;
+    }
+
+    .doctor-content p {
+        color: #64748b;
+        margin-bottom: 8px;
+        line-height: 1.7;
+    }
+
+    .btn-visit {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: #0f172a;
+        color: #ffffff;
+        text-decoration: none;
+        border-radius: 12px;
+        padding: 10px 16px;
+        font-weight: 700;
+        margin-top: 8px;
+        transition: 0.25s ease;
+    }
+
+    .btn-visit:hover {
+        color: #ffffff;
+        background: #1e293b;
+        transform: translateY(-2px);
+    }
+
+    .membership-shell {
+        background:
+            linear-gradient(135deg, rgba(248,251,255,0.95), rgba(238,245,255,0.95)),
+            url('https://images.unsplash.com/photo-1516549655169-df83a0774514?auto=format&fit=crop&w=1600&q=80') center/cover no-repeat;
+        border: 1px solid #e2ebf6;
+        border-radius: 24px;
+        padding: 28px;
+        overflow: hidden;
+    }
+
+    .membership-status-card,
+    .membership-benefit-card {
+        padding: 24px;
+        height: 100%;
+    }
+
+    .membership-label {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 7px 12px;
+        border-radius: 999px;
+        background: #eff6ff;
+        color: #1d4ed8;
+        font-size: 12px;
+        font-weight: 700;
+        margin-bottom: 14px;
+    }
+
+    .membership-level-box {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 18px;
+        flex-wrap: wrap;
+        margin-bottom: 18px;
+    }
+
+    .membership-level-name h4 {
+        font-size: 1.65rem;
+        font-weight: 800;
+        color: #0f172a;
+        margin-bottom: 4px;
+    }
+
+    .membership-level-name p {
+        margin-bottom: 0;
+        color: #64748b;
+    }
+
+    .discount-circle {
+        width: 88px;
+        height: 88px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #1d4ed8, #38bdf8);
+        color: #ffffff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.35rem;
+        font-weight: 800;
+        box-shadow: 0 14px 28px rgba(29, 78, 216, 0.18);
+    }
+
+    .membership-mini-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 14px;
+        margin-top: 18px;
+    }
+
+    .membership-mini-box {
+        background: #f8fafc;
+        border: 1px solid #e7edf5;
+        border-radius: 16px;
+        padding: 16px;
+        transition: var(--transition);
+    }
+
+    .membership-mini-box:hover {
+        transform: translateY(-3px);
+        background: #fff;
+    }
+
+    .membership-mini-box h5 {
+        margin: 0 0 6px;
+        color: #1d4ed8;
+        font-size: 1.25rem;
+        font-weight: 800;
+    }
+
+    .membership-mini-box p {
+        margin: 0;
+        color: #64748b;
+        font-weight: 600;
+    }
+
+    .benefit-list,
+    .service-list,
+    .location-list,
+    .wellness-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .benefit-list li,
+    .wellness-list li {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 0;
+        border-bottom: 1px solid #edf2f7;
+        color: #475569;
+        line-height: 1.7;
+    }
+
+    .benefit-list li:last-child,
+    .service-list li:last-child,
+    .location-list li:last-child,
+    .wellness-list li:last-child {
+        border-bottom: none;
+    }
+
+    .benefit-dot,
+    .wellness-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #1d4ed8, #38bdf8);
+        flex-shrink: 0;
+    }
+
+    .recent-shell {
+        padding: 28px;
+        overflow: hidden;
+    }
+
+    .recent-chip {
+        display: inline-flex;
+        align-items: center;
+        padding: 7px 12px;
+        border-radius: 999px;
+        background: #eff6ff;
+        color: #1d4ed8;
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    .recent-table-wrap {
+        border: 1px solid #edf2f7;
+        border-radius: 18px;
+        overflow: hidden;
+    }
+
+    .quick-action-card {
+        padding: 22px;
+        text-align: center;
+        height: 100%;
+        background: linear-gradient(180deg, #ffffff, #f9fcff);
+    }
+
+    .quick-action-icon {
+        width: 56px;
+        height: 56px;
+        border-radius: 16px;
+        margin: 0 auto 14px;
+        background: linear-gradient(135deg, #dbeafe, #e0f2fe);
+        color: #1d4ed8;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 22px;
+        box-shadow: var(--shadow-sm);
+    }
+
+    .quick-action-card h5 {
+        font-weight: 800;
+        color: #0f172a;
+        margin-bottom: 8px;
+    }
+
+    .quick-action-card p {
+        color: #64748b;
+        line-height: 1.7;
+        margin-bottom: 14px;
+        font-size: 0.95rem;
+    }
+
+    .quick-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 44px;
+        padding: 10px 16px;
+        border-radius: 12px;
+        background: linear-gradient(135deg, #1d4ed8, #38bdf8);
+        color: #fff;
+        text-decoration: none;
+        font-weight: 700;
+        transition: 0.25s ease;
+    }
+
+    .quick-btn:hover {
+        color: #fff;
+        transform: translateY(-2px);
+    }
+
+    .hospital-showcase-card {
+        overflow: hidden;
+        height: 100%;
+    }
+
+    .hospital-cover {
+        position: relative;
+        min-height: 190px;
+        background:
+            linear-gradient(135deg, rgba(15, 23, 42, 0.92), rgba(29, 78, 216, 0.78)),
+            url('https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&w=1200&q=80') center/cover no-repeat;
+        display: flex;
+        align-items: flex-end;
+        padding: 24px;
+        overflow: hidden;
+    }
+
+    .hospital-cover-image {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        z-index: 1;
+        transition: transform 0.45s ease;
+    }
+
+    .hospital-cover-overlay {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(135deg, rgba(15, 23, 42, 0.72), rgba(29, 78, 216, 0.38));
+        z-index: 2;
+    }
+
+    .hospital-showcase-card:hover .hospital-cover-image {
+        transform: scale(1.06);
+    }
+
+    .hospital-cover::before,
+    .hospital-cover::after {
+        content: "";
+        position: absolute;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.08);
+        z-index: 2;
+    }
+
+    .hospital-cover::before {
+        width: 150px;
+        height: 150px;
+        top: -40px;
+        right: -35px;
+    }
+
+    .hospital-cover::after {
+        width: 110px;
+        height: 110px;
+        bottom: -30px;
+        left: -20px;
+    }
+
+    .hospital-letter {
+        width: 64px;
+        height: 64px;
+        border-radius: 18px;
+        background: rgba(255,255,255,0.14);
+        border: 1px solid rgba(255,255,255,0.18);
+        color: #ffffff;
+        font-size: 1.8rem;
+        font-weight: 800;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        z-index: 3;
+    }
+
+    .hospital-content-wrap {
+        padding: 24px;
+    }
+
+    .hospital-meta {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: #eff6ff;
+        color: #1d4ed8;
+        border-radius: 999px;
+        padding: 6px 12px;
+        font-size: 12px;
+        font-weight: 700;
+        margin-bottom: 10px;
+    }
+
+    .hospital-content-wrap h5 {
+        font-weight: 800;
+        color: #0f172a;
+        margin-bottom: 14px;
+    }
+
+    .hospital-detail-list {
+        display: grid;
+        gap: 10px;
+        margin-bottom: 18px;
+    }
+
+    .hospital-detail-item {
+        background: #f8fafc;
+        border: 1px solid #e8eef6;
+        border-radius: 14px;
+        padding: 12px 14px;
+        color: #475569;
+        line-height: 1.7;
+        transition: var(--transition);
+    }
+
+    .hospital-detail-item:hover {
+        background: #fff;
+        transform: translateX(2px);
+    }
+
+    .hospital-detail-item strong {
+        color: #0f172a;
+    }
+
+    .btn-view-modern {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 46px;
+        padding: 10px 18px;
+        border-radius: 12px;
+        background: linear-gradient(135deg, #1d4ed8, #38bdf8);
+        color: #ffffff;
+        font-weight: 700;
+        text-decoration: none;
+        border: none;
+        box-shadow: 0 12px 24px rgba(29, 78, 216, 0.16);
+        transition: 0.25s ease;
+    }
+
+    .btn-view-modern:hover {
+        color: #ffffff;
+        transform: translateY(-2px);
+        box-shadow: 0 16px 30px rgba(29, 78, 216, 0.22);
+    }
+
+    .hospital-info-card h4,
+    .wellness-card h4 {
+        font-size: 1.35rem;
+        font-weight: 800;
+        color: #0f172a;
+        margin-bottom: 16px;
+    }
+
+    .hospital-info-card,
+    .wellness-card {
+        padding: 28px;
+        height: 100%;
+    }
+
+    .service-list li,
+    .location-list li {
+        padding: 11px 0;
+        border-bottom: 1px solid #eef2f7;
+        color: #475569;
+        line-height: 1.75;
+    }
+
+    .reveal {
+        opacity: 0;
+        transition: all 0.9s ease;
+    }
+
+    .reveal-up {
+        transform: translateY(45px);
+    }
+
+    .reveal.show {
+        opacity: 1;
+        transform: translate(0, 0);
+    }
+
+    @media (max-width: 991px) {
+        .patient-hero {
+            padding: 40px 24px;
+        }
+
+        .patient-hero h1 {
+            font-size: 1.95rem;
+        }
+
+        .membership-mini-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="section-space patient-dashboard-page">
+    <div class="container">
+
+        <div class="patient-hero reveal reveal-up show">
+            <span class="hero-badge">
+                <i class="bi bi-heart-pulse"></i>
+                Patient Portal
+            </span>
+            <h1>Welcome, {{ patient.first_name }} {{ patient.last_name }}</h1>
+            <p>
+                Access your appointment history, explore specialist doctors, monitor your consultation activity,
+                and stay connected with trusted hospital services through a modern digital healthcare experience.
+            </p>
+
+            <div class="hero-pills">
+                <span class="hero-pill"><i class="bi bi-calendar2-check"></i> Smart Appointments</span>
+                <span class="hero-pill"><i class="bi bi-shield-check"></i> Secure Profile</span>
+                <span class="hero-pill"><i class="bi bi-stars"></i> Membership Benefits</span>
+                <span class="hero-pill"><i class="bi bi-hospital"></i> Trusted Hospitals</span>
+            </div>
+        </div>
+
+        <div class="row g-4 mb-4">
+            <div class="col-md-4">
+                <div class="dashboard-stat-card reveal reveal-up">
+                    <div class="stat-top">
+                        <div>
+                            <h3>{{ total_appointments }}</h3>
+                            <p>Total Appointments</p>
+                        </div>
+                        <div class="stat-icon"><i class="bi bi-calendar2-check"></i></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="dashboard-stat-card reveal reveal-up">
+                    <div class="stat-top">
+                        <div>
+                            <h3>{{ pending_appointments }}</h3>
+                            <p>Pending Bookings</p>
+                        </div>
+                        <div class="stat-icon"><i class="bi bi-hourglass-split"></i></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="dashboard-stat-card reveal reveal-up">
+                    <div class="stat-top">
+                        <div>
+                            <h3>{{ completed_appointments }}</h3>
+                            <p>Completed</p>
+                        </div>
+                        <div class="stat-icon"><i class="bi bi-check2-circle"></i></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4 mb-4">
+            <div class="col-md-4">
+                <div class="dashboard-stat-card reveal reveal-up">
+                    <div class="stat-top">
+                        <div>
+                            <h3>{{ completed_percentage }}%</h3>
+                            <p>Completion Rate</p>
+                        </div>
+                        <div class="stat-icon"><i class="bi bi-graph-up-arrow"></i></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="dashboard-stat-card reveal reveal-up">
+                    <div class="stat-top">
+                        <div>
+                            <h3>{{ level_name }}</h3>
+                            <p>Patient Level</p>
+                        </div>
+                        <div class="stat-icon"><i class="bi bi-award"></i></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="dashboard-stat-card reveal reveal-up">
+                    <div class="stat-top">
+                        <div>
+                            <h3>{{ discount_percent }}%</h3>
+                            <p>Discount</p>
+                        </div>
+                        <div class="stat-icon"><i class="bi bi-percent"></i></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mb-4 reveal reveal-up">
+            <div class="section-topbar">
+                <div>
+                    <h3 class="section-title mb-1">Quick Actions</h3>
+                    <p class="section-subtitle mb-0">
+                        Fast access to the most useful things in your patient panel.
+                    </p>
+                </div>
+            </div>
+
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="quick-action-card">
+                        <div class="quick-action-icon"><i class="bi bi-plus-circle"></i></div>
+                        <h5>Book New Appointment</h5>
+                        <p>Find a specialist doctor and schedule your next consultation quickly.</p>
+                        <a href="{% url 'book_appointment' %}" class="quick-btn">Book Now</a>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="quick-action-card">
+                        <div class="quick-action-icon"><i class="bi bi-clock-history"></i></div>
+                        <h5>Appointment History</h5>
+                        <p>Check your previous bookings, consultation dates, and status updates.</p>
+                        <a href="{% url 'patient_history' %}" class="quick-btn">View History</a>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="quick-action-card">
+                        <div class="quick-action-icon"><i class="bi bi-person-badge"></i></div>
+                        <h5>Manage Profile</h5>
+                        <p>Update your personal details, contact information, and account settings.</p>
+                        <a href="{% url 'patient_profile' %}" class="quick-btn">Open Profile</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="membership-shell mb-4 reveal reveal-up">
+            <h3 class="section-title">Membership Level & Benefits</h3>
+            <p class="section-subtitle">
+                Your completed consultations unlock better membership benefits and consultation discounts over time.
+            </p>
+
+            <div class="row g-4">
+                <div class="col-lg-6">
+                    <div class="membership-status-card">
+                        <span class="membership-label"><i class="bi bi-award"></i> Current Membership</span>
+
+                        <div class="membership-level-box">
+                            <div class="membership-level-name">
+                                <h4>{{ level_name }}</h4>
+                                <p>Based on your completed appointments and active engagement.</p>
+                            </div>
+                            <div class="discount-circle">
+                                {{ discount_percent }}%
+                            </div>
+                        </div>
+
+                        <div class="membership-mini-grid">
+                            <div class="membership-mini-box">
+                                <h5>{{ completed_appointments }}</h5>
+                                <p>Completed Visits</p>
+                            </div>
+                            <div class="membership-mini-box">
+                                <h5>{{ discount_percent }}%</h5>
+                                <p>Current Discount</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-6">
+                    <div class="membership-benefit-card">
+                        <span class="membership-label"><i class="bi bi-stars"></i> Benefit Tiers</span>
+                        <ul class="benefit-list">
+                            <li><span class="benefit-dot"></span> Starter — 0% consultation discount</li>
+                            <li><span class="benefit-dot"></span> Bronze — 5% discount after 3 completed bookings</li>
+                            <li><span class="benefit-dot"></span> Silver — 10% discount after 6 completed bookings</li>
+                            <li><span class="benefit-dot"></span> Gold — 15% discount after 10 completed bookings</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="recent-shell mb-4 reveal reveal-up">
+            <div class="section-topbar">
+                <div>
+                    <h3 class="section-title mb-1">Recent Appointments</h3>
+                    <p class="section-subtitle mb-0">
+                        Review your latest consultation activity and recent booking updates.
+                    </p>
+                </div>
+                <div class="d-flex align-items-center gap-2 flex-wrap">
+                    <span class="recent-chip">Latest 3 Records</span>
+                    <a href="{% url 'patient_history' %}" class="btn-section-view">View All</a>
+                </div>
+            </div>
+
+            <div class="recent-table-wrap">
+                <div class="table-responsive">
+                    <table class="table modern-table">
+                        <thead>
+                            <tr>
+                                <th>Doctor</th>
+                                <th>Date</th>
+                                <th>Time</th>
+                                <th>Mode</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for a in recent_appointments|slice:":3" %}
+                            <tr>
+                                <td>Dr. {{ a.doctor.name }}</td>
+                                <td>{{ a.appointment_date }}</td>
+                                <td>{{ a.appointment_time }}</td>
+                                <td>{{ a.appointment_mode }}</td>
+                                <td>
+                                    {% if a.status == 'Completed' %}
+                                        <span class="status-badge status-completed">{{ a.status }}</span>
+                                    {% elif a.status == 'Booked' %}
+                                        <span class="status-badge status-booked">{{ a.status }}</span>
+                                    {% elif a.status == 'Missed' %}
+                                        <span class="status-badge status-missed">{{ a.status }}</span>
+                                    {% else %}
+                                        <span class="status-badge status-cancelled">{{ a.status }}</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="5" class="text-center text-muted py-4">
+                                    No appointments found.
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4 mb-4 reveal reveal-up">
+            <div class="col-lg-6">
+                <div class="wellness-card">
+                    <h4>Patient Tips</h4>
+                    <ul class="wellness-list">
+                        <li><span class="wellness-dot"></span> Keep your contact number updated for appointment notifications.</li>
+                        <li><span class="wellness-dot"></span> Book early for specialist consultations to avoid delays.</li>
+                        <li><span class="wellness-dot"></span> Review your history regularly to track care continuity.</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="wellness-card">
+                    <h4>Suggested Next Steps</h4>
+                    <ul class="wellness-list">
+                        <li><span class="wellness-dot"></span> Browse doctors and compare specialties before booking.</li>
+                        <li><span class="wellness-dot"></span> Use your membership discount on future completed consultations.</li>
+                        <li><span class="wellness-dot"></span> Check hospitals for available branches and support contact info.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="mb-4 reveal reveal-up">
+            <div class="section-topbar">
+                <div>
+                    <h3 class="section-title mb-1">Our Doctors</h3>
+                    <p class="section-subtitle mb-0">
+                        Meet experienced specialists available for consultation and hospital care.
+                    </p>
+                </div>
+                <a href="{% url 'patient_doctors' %}" class="btn-section-view">View All</a>
+            </div>
+
+            <div class="row g-4">
+                {% for doctor in doctors|slice:":3" %}
+                <div class="col-md-6 col-lg-4">
+                    <div class="doctor-card">
+                        {% if doctor.photo %}
+                            <img src="{{ doctor.photo.url }}" alt="{{ doctor.name }}" class="doctor-image">
+                        {% else %}
+                            <div class="doctor-placeholder">
+                                {{ doctor.name|slice:":1" }}
+                            </div>
+                        {% endif %}
+
+                        <div class="doctor-content">
+                            <h5>Dr. {{ doctor.name }}</h5>
+                            <p><strong>Specialist:</strong> {{ doctor.specialist }}</p>
+                            <p><strong>Hospital:</strong> {{ doctor.hospital_name }}</p>
+                            <p><strong>Location:</strong> {{ doctor.location }}</p>
+                            <a href="{% url 'book_appointment' %}?doctor={{ doctor.id }}" class="btn-visit">Book Appointment</a>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="col-12">
+                    <div class="dashboard-card text-center p-4">
+                        <p class="mb-0 text-muted">No doctors available right now.</p>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="mb-4 reveal reveal-up">
+            <div class="section-topbar">
+                <div>
+                    <h3 class="section-title mb-1">Our Hospitals</h3>
+                    <p class="section-subtitle mb-0">
+                        Explore our connected hospital organizations, branch support, and healthcare availability.
+                    </p>
+                </div>
+                <a href="{% url 'patient_hospitals' %}" class="btn-section-view">View All</a>
+            </div>
+
+            <div class="row g-4">
+                {% for org in organizations|slice:":3" %}
+                <div class="col-md-6 col-lg-4">
+                    <div class="hospital-showcase-card">
+                        <div class="hospital-cover">
+                            {% if org.organization_photo %}
+                                <img src="{{ org.organization_photo.url }}" alt="{{ org.organization_name }}" class="hospital-cover-image">
+                            {% endif %}
+
+                            <div class="hospital-cover-overlay"></div>
+
+                            <div class="hospital-letter">
+                                {{ org.organization_name|slice:":1" }}
+                            </div>
+                        </div>
+
+                        <div class="hospital-content-wrap">
+                            <span class="hospital-meta"><i class="bi bi-hospital"></i> Healthcare Organization</span>
+                            <h5>{{ org.organization_name }}</h5>
+
+                            <div class="hospital-detail-list">
+                                <div class="hospital-detail-item">
+                                    <strong>Branch Address:</strong> {{ org.branch_address|default:"Address not provided" }}
+                                </div>
+                                <div class="hospital-detail-item">
+                                    <strong>Opening Hours:</strong> 24/7 Available
+                                </div>
+                                <div class="hospital-detail-item">
+                                    <strong>Support Contact:</strong> {{ org.contact|default:"Not available" }}
+                                </div>
+                            </div>
+
+                            <a href="{% url 'patient_hospital_doctors' org.organization_name %}" class="btn-view-modern">
+                                View Doctors
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="col-12">
+                    <div class="dashboard-card text-center p-4">
+                        <p class="mb-0 text-muted">No hospital organization information available right now.</p>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="row g-4 reveal reveal-up">
+            <div class="col-lg-4">
+                <div class="hospital-info-card h-100">
+                    <h4>About Our Hospitals</h4>
+                    <p class="text-muted mb-0" style="line-height: 1.9;">
+                        Our healthcare organizations are committed to providing trusted treatment support,
+                        specialist access, responsive appointment coordination, and patient-focused care
+                        through a modern hospital management experience.
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="hospital-info-card h-100">
+                    <h4>Services</h4>
+                    <ul class="service-list">
+                        <li>Specialist Consultation & Follow-up Care</li>
+                        <li>Online and Offline Appointment Booking</li>
+                        <li>Prescription Management & Patient Support</li>
+                        <li>Diagnostic Guidance and Front Desk Coordination</li>
+                        <li>Integrated Doctor and Hospital Access</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="hospital-info-card h-100">
+                    <h4>Opening Hours & Locations</h4>
+                    <ul class="location-list">
+                        <li><strong>Opening Hours:</strong> 24/7 Available</li>
+                        <li><strong>Emergency Support:</strong> All Day Active</li>
+                        <li><strong>Branch Access:</strong> Multiple Organization Service Points</li>
+                        <li><strong>Appointment Support:</strong> Online and Front Desk Coordination</li>
+                        <li><strong>Care Coverage:</strong> City-wide Specialist Service Network</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const patientDashboardReveal = document.querySelectorAll('.reveal');
+
+    function patientDashboardRevealOnScroll() {
+        const triggerBottom = window.innerHeight * 0.9;
+        patientDashboardReveal.forEach((el, index) => {
+            const top = el.getBoundingClientRect().top;
+            if (top < triggerBottom) {
+                setTimeout(() => el.classList.add('show'), index * 70);
+            }
+        });
+    }
+
+    window.addEventListener('scroll', patientDashboardRevealOnScroll);
+    window.addEventListener('load', patientDashboardRevealOnScroll);
+</script>
+{% endblock %}

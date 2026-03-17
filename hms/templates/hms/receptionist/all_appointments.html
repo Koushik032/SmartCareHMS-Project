@@ -1,0 +1,521 @@
+{% extends 'hms/base.html' %}
+{% block title %}All Appointments{% endblock %}
+
+{% block content %}
+<style>
+    .appointments-page {
+        padding: 34px 0 70px;
+    }
+
+    .appointments-hero {
+        background:
+            linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(29, 78, 216, 0.84) 55%, rgba(56, 189, 248, 0.74) 100%),
+            url('https://images.unsplash.com/photo-1516549655669-df8f4c5d1f3d?auto=format&fit=crop&w=1600&q=80') center/cover no-repeat;
+        color: #ffffff;
+        border-radius: 30px;
+        padding: 56px 40px;
+        margin-bottom: 30px;
+        box-shadow: 0 20px 50px rgba(15, 23, 42, 0.14);
+        position: relative;
+        overflow: hidden;
+        isolation: isolate;
+    }
+
+    .appointments-hero::before,
+    .appointments-hero::after {
+        content: "";
+        position: absolute;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.08);
+        z-index: -1;
+    }
+
+    .appointments-hero::before {
+        width: 220px;
+        height: 220px;
+        top: -70px;
+        right: -60px;
+    }
+
+    .appointments-hero::after {
+        width: 150px;
+        height: 150px;
+        bottom: -45px;
+        left: -25px;
+    }
+
+    .hero-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 16px;
+        border-radius: 999px;
+        background: rgba(255,255,255,0.14);
+        border: 1px solid rgba(255,255,255,0.16);
+        font-size: 13px;
+        font-weight: 700;
+        margin-bottom: 16px;
+        backdrop-filter: blur(10px);
+    }
+
+    .appointments-hero h2 {
+        font-size: 2.2rem;
+        font-weight: 900;
+        margin-bottom: 10px;
+        letter-spacing: -0.4px;
+    }
+
+    .appointments-hero p {
+        color: rgba(255,255,255,0.92);
+        margin-bottom: 0;
+        line-height: 1.85;
+        max-width: 760px;
+    }
+
+    .filter-card,
+    .appointment-card,
+    .empty-state-card {
+        background: #ffffff;
+        border: 1px solid #e7edf5;
+        border-radius: 24px;
+        box-shadow: 0 16px 36px rgba(15, 23, 42, 0.08);
+    }
+
+    .filter-card {
+        padding: 24px;
+        margin-bottom: 28px;
+    }
+
+    .filter-title {
+        font-size: 1.1rem;
+        font-weight: 800;
+        color: #0f172a;
+        margin-bottom: 16px;
+    }
+
+    .filter-card .form-control {
+        min-height: 54px;
+        border-radius: 14px;
+        background: #f8fafc;
+        border: 1px solid #dbe2ea;
+        box-shadow: none;
+    }
+
+    .filter-card .form-control:focus {
+        background: #ffffff;
+        border-color: #2563eb;
+        box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.08);
+    }
+
+    .btn-search-modern,
+    .btn-reset-modern {
+        min-height: 54px;
+        border-radius: 14px;
+        font-weight: 700;
+        border: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+        transition: all 0.3s ease;
+    }
+
+    .btn-search-modern {
+        background: linear-gradient(135deg, #1d4ed8, #38bdf8);
+        color: #ffffff;
+        box-shadow: 0 12px 24px rgba(29, 78, 216, 0.18);
+    }
+
+    .btn-search-modern:hover {
+        color: #ffffff;
+        transform: translateY(-2px);
+    }
+
+    .btn-reset-modern {
+        background: #0f172a;
+        color: #ffffff;
+    }
+
+    .btn-reset-modern:hover {
+        color: #ffffff;
+        background: #1e293b;
+        transform: translateY(-2px);
+    }
+
+    .appointment-card {
+        overflow: hidden;
+        transition: all 0.35s ease;
+        height: 100%;
+    }
+
+    .appointment-card:hover {
+        transform: translateY(-7px);
+        box-shadow: 0 24px 50px rgba(15, 23, 42, 0.14);
+    }
+
+    .appointment-top {
+        position: relative;
+        padding: 20px 22px;
+        background: linear-gradient(135deg, #eff6ff, #f8fbff);
+        border-bottom: 1px solid #e8eef7;
+    }
+
+    .appointment-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: #dbeafe;
+        color: #1d4ed8;
+        border-radius: 999px;
+        padding: 6px 12px;
+        font-size: 12px;
+        font-weight: 700;
+        margin-bottom: 10px;
+    }
+
+    .appointment-top h4 {
+        font-size: 1.18rem;
+        font-weight: 800;
+        color: #0f172a;
+        margin-bottom: 4px;
+    }
+
+    .appointment-top p {
+        color: #64748b;
+        margin-bottom: 0;
+    }
+
+    .appointment-body {
+        padding: 22px;
+    }
+
+    .patient-block {
+        display: flex;
+        gap: 14px;
+        align-items: center;
+        margin-bottom: 18px;
+    }
+
+    .patient-photo {
+        width: 72px;
+        height: 72px;
+        border-radius: 18px;
+        object-fit: cover;
+        background: #e2e8f0;
+        flex-shrink: 0;
+        box-shadow: 0 10px 22px rgba(15, 23, 42, 0.08);
+    }
+
+    .patient-placeholder {
+        width: 72px;
+        height: 72px;
+        border-radius: 18px;
+        background: linear-gradient(135deg, #1d4ed8, #38bdf8);
+        color: #ffffff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        font-weight: 800;
+        flex-shrink: 0;
+        box-shadow: 0 10px 22px rgba(15, 23, 42, 0.08);
+    }
+
+    .patient-block h5 {
+        margin: 0 0 4px;
+        font-size: 1.08rem;
+        font-weight: 800;
+        color: #0f172a;
+    }
+
+    .patient-block p {
+        margin: 0;
+        color: #64748b;
+        line-height: 1.65;
+    }
+
+    .meta-grid {
+        display: grid;
+        gap: 10px;
+    }
+
+    .meta-item {
+        background: #f8fbff;
+        border: 1px solid #e8eef7;
+        border-radius: 14px;
+        padding: 12px 14px;
+        color: #475569;
+        line-height: 1.7;
+        transition: all 0.3s ease;
+    }
+
+    .meta-item:hover {
+        background: #ffffff;
+        transform: translateX(2px);
+    }
+
+    .meta-item strong {
+        color: #0f172a;
+    }
+
+    .status-badge,
+    .payment-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 7px 12px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    .status-booked {
+        background: #dbeafe;
+        color: #1d4ed8;
+    }
+
+    .status-completed {
+        background: #dcfce7;
+        color: #166534;
+    }
+
+    .status-cancelled {
+        background: #fee2e2;
+        color: #b91c1c;
+    }
+
+    .status-missed {
+        background: #fef3c7;
+        color: #b45309;
+    }
+
+    .payment-paid {
+        background: #dcfce7;
+        color: #166534;
+    }
+
+    .payment-unpaid {
+        background: #fee2e2;
+        color: #b91c1c;
+    }
+
+    .payment-pending {
+        background: #fef3c7;
+        color: #92400e;
+    }
+
+    .empty-state-card {
+        padding: 46px 24px;
+        text-align: center;
+    }
+
+    .empty-state-icon {
+        width: 74px;
+        height: 74px;
+        border-radius: 20px;
+        margin: 0 auto 16px;
+        background: linear-gradient(135deg, #dbeafe, #e0f2fe);
+        color: #1d4ed8;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 30px;
+    }
+
+    .empty-state-card h4 {
+        color: #0f172a;
+        font-weight: 800;
+        margin-bottom: 8px;
+    }
+
+    .empty-state-card p {
+        color: #64748b;
+        margin-bottom: 0;
+    }
+
+    .reveal {
+        opacity: 0;
+        transition: all 0.9s ease;
+    }
+
+    .reveal-up {
+        transform: translateY(40px);
+    }
+
+    .reveal.show {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    @media (max-width: 991px) {
+        .appointments-hero {
+            padding: 40px 24px;
+        }
+
+        .appointments-hero h2 {
+            font-size: 1.9rem;
+        }
+    }
+</style>
+
+<section class="section-space appointments-page">
+    <div class="container">
+
+        <div class="appointments-hero reveal reveal-up show">
+            <span class="hero-chip">
+                <i class="bi bi-calendar-week"></i>
+                Receptionist Portal
+            </span>
+            <h2>All Appointments</h2>
+            <p>
+                Search appointments by doctor or patient, filter by date range, and review payment,
+                booking, and patient details from one organized appointment dashboard.
+            </p>
+        </div>
+
+        <div class="filter-card reveal reveal-up">
+            <h4 class="filter-title">Filter Appointments</h4>
+
+            <form method="get" class="row g-3">
+                <div class="col-md-4">
+                    <input
+                        type="text"
+                        name="q"
+                        class="form-control"
+                        value="{{ query }}"
+                        placeholder="Search by doctor, patient, contact, hospital"
+                    >
+                </div>
+
+                <div class="col-md-3">
+                    <input
+                        type="date"
+                        name="from_date"
+                        class="form-control"
+                        value="{{ from_date }}"
+                    >
+                </div>
+
+                <div class="col-md-3">
+                    <input
+                        type="date"
+                        name="to_date"
+                        class="form-control"
+                        value="{{ to_date }}"
+                    >
+                </div>
+
+                <div class="col-md-1">
+                    <button class="btn btn-search-modern w-100">
+                        <i class="bi bi-search"></i>
+                    </button>
+                </div>
+
+                <div class="col-md-1">
+                    <a href="{% url 'receptionist_all_appointments' %}" class="btn btn-reset-modern w-100">
+                        <i class="bi bi-arrow-counterclockwise"></i>
+                    </a>
+                </div>
+            </form>
+        </div>
+
+        <div class="row g-4">
+            {% for a in appointments %}
+            <div class="col-md-6 col-xl-4">
+                <div class="appointment-card reveal reveal-up">
+                    <div class="appointment-top">
+                        <span class="appointment-chip">
+                            <i class="bi bi-file-medical"></i>
+                            Appointment Record
+                        </span>
+                        <h4>Dr. {{ a.doctor.name }}</h4>
+                        <p>{{ a.doctor.hospital_name }}</p>
+                    </div>
+
+                    <div class="appointment-body">
+                        <div class="patient-block">
+                            {% if a.patient.photo %}
+                                <img src="{{ a.patient.photo.url }}" alt="{{ a.patient.first_name }}" class="patient-photo">
+                            {% else %}
+                                <div class="patient-placeholder">
+                                    {{ a.patient.first_name|slice:":1" }}
+                                </div>
+                            {% endif %}
+
+                            <div>
+                                <h5>{{ a.patient.first_name }} {{ a.patient.last_name }}</h5>
+                                <p>{{ a.patient.user.email|default:"No email" }}</p>
+                                <p>{{ a.patient.contact|default:"No contact" }}</p>
+                            </div>
+                        </div>
+
+                        <div class="meta-grid">
+                            <div class="meta-item"><strong>Date:</strong> {{ a.appointment_date }}</div>
+                            <div class="meta-item"><strong>Time:</strong> {{ a.appointment_time }}</div>
+                            <div class="meta-item"><strong>Mode:</strong> {{ a.appointment_mode }}</div>
+                            <div class="meta-item"><strong>Category:</strong> {{ a.problem_category|default:"-" }}</div>
+                            <div class="meta-item"><strong>Symptoms:</strong> {{ a.symptoms|default:"-" }}</div>
+                            <div class="meta-item">
+                                <strong>Status:</strong>
+                                {% if a.status == 'Booked' %}
+                                    <span class="status-badge status-booked">{{ a.status }}</span>
+                                {% elif a.status == 'Completed' %}
+                                    <span class="status-badge status-completed">{{ a.status }}</span>
+                                {% elif a.status == 'Missed' %}
+                                    <span class="status-badge status-missed">{{ a.status }}</span>
+                                {% else %}
+                                    <span class="status-badge status-cancelled">{{ a.status }}</span>
+                                {% endif %}
+                            </div>
+
+                            <div class="meta-item"><strong>Consultancy Fee:</strong> {{ a.consultancy_fee }}</div>
+                            <div class="meta-item"><strong>Payment Method:</strong> {{ a.payment_method|default:"-" }}</div>
+                            <div class="meta-item">
+                                <strong>Payment Status:</strong>
+                                {% if a.payment_status == 'Paid' %}
+                                    <span class="payment-badge payment-paid">{{ a.payment_status }}</span>
+                                {% elif a.payment_status == 'Pending' %}
+                                    <span class="payment-badge payment-pending">{{ a.payment_status }}</span>
+                                {% else %}
+                                    <span class="payment-badge payment-unpaid">{{ a.payment_status|default:"Unpaid" }}</span>
+                                {% endif %}
+                            </div>
+                            <div class="meta-item"><strong>bKash Number:</strong> {{ a.payment_number|default:"-" }}</div>
+                            <div class="meta-item"><strong>Transaction ID:</strong> {{ a.transaction_id|default:"-" }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12">
+                <div class="empty-state-card reveal reveal-up">
+                    <div class="empty-state-icon">
+                        <i class="bi bi-calendar-x"></i>
+                    </div>
+                    <h4>No Appointments Found</h4>
+                    <p>No appointment matched your current search or date range.</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+    </div>
+</section>
+
+<script>
+    const receptionistAppointmentsReveal = document.querySelectorAll('.reveal');
+
+    function receptionistAppointmentsRevealOnScroll() {
+        const triggerBottom = window.innerHeight * 0.9;
+        receptionistAppointmentsReveal.forEach((el, index) => {
+            const top = el.getBoundingClientRect().top;
+            if (top < triggerBottom) {
+                setTimeout(() => el.classList.add('show'), index * 70);
+            }
+        });
+    }
+
+    window.addEventListener('scroll', receptionistAppointmentsRevealOnScroll);
+    window.addEventListener('load', receptionistAppointmentsRevealOnScroll);
+</script>
+{% endblock %}

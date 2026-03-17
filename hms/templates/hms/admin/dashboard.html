@@ -1,0 +1,974 @@
+{% extends 'hms/base.html' %}
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --primary: #0f172a;
+        --secondary: #1d4ed8;
+        --accent: #38bdf8;
+        --muted: #64748b;
+        --soft: #f8fbff;
+        --white: #ffffff;
+        --border: #e8eef5;
+        --shadow-sm: 0 10px 24px rgba(15, 23, 42, 0.06);
+        --shadow-md: 0 18px 40px rgba(15, 23, 42, 0.09);
+        --shadow-lg: 0 25px 60px rgba(15, 23, 42, 0.14);
+        --transition: all 0.35s ease;
+    }
+
+    .admin-dashboard {
+        padding: 34px 0 70px;
+    }
+
+    .admin-hero {
+        position: relative;
+        overflow: hidden;
+        background:
+            linear-gradient(135deg, rgba(15, 23, 42, 0.94) 0%, rgba(29, 78, 216, 0.84) 58%, rgba(56, 189, 248, 0.76) 100%),
+            url('https://images.unsplash.com/photo-1579684453423-f84349ef60b0?auto=format&fit=crop&w=1600&q=80') center/cover no-repeat;
+        color: #ffffff;
+        border-radius: 30px;
+        padding: 60px 42px;
+        margin-bottom: 30px;
+        box-shadow: var(--shadow-lg);
+        isolation: isolate;
+    }
+
+    .admin-hero::before,
+    .admin-hero::after {
+        content: "";
+        position: absolute;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.08);
+        z-index: -1;
+    }
+
+    .admin-hero::before {
+        width: 250px;
+        height: 250px;
+        top: -80px;
+        right: -80px;
+    }
+
+    .admin-hero::after {
+        width: 180px;
+        height: 180px;
+        bottom: -60px;
+        left: -40px;
+    }
+
+    .admin-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 16px;
+        border-radius: 999px;
+        background: rgba(255,255,255,0.14);
+        border: 1px solid rgba(255,255,255,0.16);
+        font-size: 13px;
+        font-weight: 700;
+        margin-bottom: 18px;
+        backdrop-filter: blur(10px);
+    }
+
+    .admin-hero h2 {
+        font-size: 2.5rem;
+        font-weight: 900;
+        margin-bottom: 10px;
+        letter-spacing: -0.7px;
+    }
+
+    .admin-hero p {
+        color: rgba(255,255,255,0.92);
+        margin-bottom: 0;
+        line-height: 1.85;
+        max-width: 820px;
+    }
+
+    .hero-quick-pills {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 22px;
+    }
+
+    .hero-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 14px;
+        border-radius: 999px;
+        background: rgba(255,255,255,0.10);
+        border: 1px solid rgba(255,255,255,0.12);
+        color: #fff;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .admin-stat-card,
+    .admin-feature-card,
+    .admin-analytics-card,
+    .admin-info-box,
+    .admin-progress-card {
+        background: rgba(255,255,255,0.96);
+        border: 1px solid var(--border);
+        border-radius: 24px;
+        box-shadow: var(--shadow-md);
+    }
+
+    .admin-stat-card,
+    .admin-feature-card,
+    .admin-progress-card,
+    .admin-analytics-card {
+        transition: var(--transition);
+    }
+
+    .admin-stat-card:hover,
+    .admin-feature-card:hover,
+    .admin-progress-card:hover,
+    .admin-analytics-card:hover {
+        transform: translateY(-6px);
+        box-shadow: var(--shadow-lg);
+    }
+
+    .admin-stat-card {
+        padding: 26px 22px;
+        height: 100%;
+        position: relative;
+        overflow: hidden;
+        text-align: left;
+    }
+
+    .admin-stat-card::after {
+        content: "";
+        position: absolute;
+        right: -35px;
+        bottom: -35px;
+        width: 130px;
+        height: 130px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(56,189,248,0.12), transparent 70%);
+    }
+
+    .stat-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 14px;
+        margin-bottom: 16px;
+    }
+
+    .stat-icon {
+        width: 58px;
+        height: 58px;
+        border-radius: 18px;
+        background: linear-gradient(135deg, #dbeafe, #e0f2fe);
+        color: var(--secondary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        box-shadow: var(--shadow-sm);
+        flex-shrink: 0;
+    }
+
+    .admin-stat-card h3 {
+        font-size: 2rem;
+        font-weight: 900;
+        color: #1d4ed8;
+        margin-bottom: 6px;
+    }
+
+    .admin-stat-card p {
+        color: #64748b;
+        margin-bottom: 0;
+        font-weight: 600;
+    }
+
+    .admin-mini-label {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 12px;
+        border-radius: 999px;
+        background: #eff6ff;
+        color: #1d4ed8;
+        font-size: 12px;
+        font-weight: 700;
+        margin-bottom: 12px;
+    }
+
+    .admin-section-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-bottom: 18px;
+    }
+
+    .admin-section-top h3 {
+        font-size: 1.45rem;
+        font-weight: 800;
+        color: #0f172a;
+        margin: 0;
+        letter-spacing: -0.3px;
+    }
+
+    .admin-section-top p {
+        margin: 6px 0 0;
+        color: #64748b;
+        line-height: 1.75;
+    }
+
+    .admin-feature-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 24px;
+        width: 100%;
+        margin-bottom: 28px;
+    }
+
+    .admin-feature-card {
+        padding: 28px 24px;
+        min-height: 290px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        position: relative;
+        overflow: hidden;
+        background: linear-gradient(180deg, #ffffff, #f9fcff);
+    }
+
+    .admin-feature-card::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(135deg, #1d4ed8, #38bdf8);
+        opacity: 0;
+        transition: opacity 0.35s ease;
+        z-index: 0;
+    }
+
+    .admin-feature-card::after {
+        content: "";
+        position: absolute;
+        width: 140px;
+        height: 140px;
+        border-radius: 50%;
+        top: -40px;
+        right: -40px;
+        background: radial-gradient(circle, rgba(56,189,248,0.16), transparent 70%);
+        transition: var(--transition);
+        z-index: 0;
+    }
+
+    .admin-feature-card:hover::before {
+        opacity: 1;
+    }
+
+    .admin-feature-card:hover::after {
+        transform: scale(1.15);
+    }
+
+    .admin-feature-card > * {
+        position: relative;
+        z-index: 1;
+    }
+
+    .admin-feature-icon {
+        width: 66px;
+        height: 66px;
+        border-radius: 18px;
+        background: linear-gradient(135deg, #1d4ed8, #38bdf8);
+        color: #ffffff;
+        font-size: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 18px;
+        flex-shrink: 0;
+        transition: var(--transition);
+        box-shadow: 0 12px 24px rgba(29, 78, 216, 0.20);
+    }
+
+    .admin-feature-card:hover .admin-feature-icon {
+        background: rgba(255,255,255,0.16);
+        border: 1px solid rgba(255,255,255,0.22);
+        box-shadow: none;
+    }
+
+    .admin-feature-card h4 {
+        font-weight: 800;
+        color: #0f172a;
+        margin-bottom: 12px;
+        font-size: 1.18rem;
+        transition: color 0.35s ease;
+    }
+
+    .admin-feature-card p {
+        color: #64748b;
+        line-height: 1.8;
+        margin-bottom: 22px;
+        flex-grow: 1;
+        transition: color 0.35s ease;
+    }
+
+    .admin-feature-card:hover h4,
+    .admin-feature-card:hover p {
+        color: #ffffff;
+    }
+
+    .admin-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        background: #0f172a;
+        color: #ffffff;
+        text-decoration: none;
+        border-radius: 12px;
+        padding: 11px 18px;
+        font-weight: 700;
+        min-height: 46px;
+        transition: var(--transition);
+        align-self: flex-start;
+    }
+
+    .admin-btn:hover {
+        background: #1e293b;
+        color: #ffffff;
+        transform: translateY(-2px);
+    }
+
+    .admin-feature-card:hover .admin-btn {
+        background: #ffffff;
+        color: #1d4ed8;
+    }
+
+    .admin-feature-card:hover .admin-btn:hover {
+        background: #e0f2fe;
+        color: #1d4ed8;
+    }
+
+    .admin-analytics-card,
+    .admin-progress-card,
+    .admin-info-box {
+        padding: 28px;
+        height: 100%;
+    }
+
+    .analytics-grid {
+        display: grid;
+        grid-template-columns: 1.2fr 1fr;
+        gap: 24px;
+        margin-bottom: 24px;
+    }
+
+    .usage-bars {
+        display: grid;
+        gap: 18px;
+    }
+
+    .usage-row .label-wrap {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 8px;
+        color: #334155;
+        font-weight: 700;
+    }
+
+    .bar-track {
+        width: 100%;
+        height: 12px;
+        border-radius: 999px;
+        background: #e2e8f0;
+        overflow: hidden;
+    }
+
+    .bar-fill {
+        height: 100%;
+        border-radius: 999px;
+        background: linear-gradient(135deg, #1d4ed8, #38bdf8);
+        box-shadow: 0 8px 18px rgba(29, 78, 216, 0.16);
+    }
+
+    .mini-chart-wrap {
+        display: flex;
+        align-items: end;
+        gap: 16px;
+        min-height: 230px;
+        padding-top: 18px;
+    }
+
+    .mini-chart-col {
+        flex: 1;
+        text-align: center;
+    }
+
+    .mini-chart-bar {
+        width: 100%;
+        border-radius: 16px 16px 8px 8px;
+        background: linear-gradient(180deg, #38bdf8, #1d4ed8);
+        min-height: 40px;
+        box-shadow: 0 10px 18px rgba(29, 78, 216, 0.16);
+        transition: var(--transition);
+    }
+
+    .mini-chart-col:hover .mini-chart-bar {
+        transform: translateY(-4px);
+    }
+
+    .mini-chart-value {
+        margin-bottom: 8px;
+        font-weight: 800;
+        color: #0f172a;
+    }
+
+    .mini-chart-label {
+        margin-top: 10px;
+        color: #64748b;
+        font-weight: 700;
+        font-size: 14px;
+    }
+
+    .summary-progress {
+        display: grid;
+        gap: 18px;
+    }
+
+    .summary-progress-box {
+        padding: 18px;
+        border-radius: 18px;
+        background: #f8fafc;
+        border: 1px solid #e7edf5;
+        transition: var(--transition);
+    }
+
+    .summary-progress-box:hover {
+        background: #ffffff;
+        transform: translateY(-2px);
+    }
+
+    .summary-progress-box h5 {
+        font-size: 1.05rem;
+        font-weight: 800;
+        color: #0f172a;
+        margin-bottom: 8px;
+    }
+
+    .summary-progress-box p {
+        color: #64748b;
+        margin-bottom: 12px;
+        line-height: 1.75;
+    }
+
+    .admin-info-box {
+        position: relative;
+        overflow: hidden;
+        background:
+            linear-gradient(135deg, rgba(255,255,255,0.98), rgba(248,251,255,0.98)),
+            url('https://images.unsplash.com/photo-1516549655169-df83a0774514?auto=format&fit=crop&w=1600&q=80') center/cover no-repeat;
+    }
+
+    .admin-info-box::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(135deg, rgba(255,255,255,0.95), rgba(248,251,255,0.98));
+    }
+
+    .admin-info-box > * {
+        position: relative;
+        z-index: 1;
+    }
+
+    .admin-info-box h4 {
+        font-weight: 800;
+        color: #0f172a;
+        margin-bottom: 12px;
+    }
+
+    .admin-info-box p {
+        color: #64748b;
+        margin-bottom: 0;
+        line-height: 1.85;
+    }
+
+    .admin-note-list {
+        list-style: none;
+        padding: 0;
+        margin: 18px 0 0;
+    }
+
+    .admin-note-list li {
+        padding: 12px 0;
+        border-bottom: 1px solid #edf2f7;
+        color: #475569;
+        line-height: 1.8;
+        display: flex;
+        gap: 10px;
+        align-items: flex-start;
+    }
+
+    .admin-note-list li::before {
+        content: "•";
+        color: #1d4ed8;
+        font-weight: 900;
+        line-height: 1.4;
+    }
+
+    .admin-note-list li:last-child {
+        border-bottom: none;
+    }
+
+    .reveal {
+        opacity: 0;
+        transition: all 0.9s ease;
+    }
+
+    .reveal-left { transform: translateX(-60px); }
+    .reveal-right { transform: translateX(60px); }
+    .reveal-up { transform: translateY(50px); }
+
+    .reveal.show {
+        opacity: 1;
+        transform: translate(0, 0);
+    }
+
+    @media (max-width: 1199px) {
+        .admin-feature-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .analytics-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @media (max-width: 767px) {
+        .admin-feature-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .admin-feature-card {
+            min-height: auto;
+        }
+
+        .admin-hero {
+            padding: 42px 24px;
+        }
+
+        .admin-hero h2 {
+            font-size: 1.95rem;
+        }
+
+        .admin-analytics-card,
+        .admin-progress-card,
+        .admin-info-box {
+            padding: 22px;
+        }
+
+        .mini-chart-wrap {
+            min-height: 180px;
+            gap: 12px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="section-space admin-dashboard">
+    <div class="container">
+
+        <div class="admin-hero reveal reveal-up show">
+            <span class="admin-badge">
+                <i class="bi bi-shield-check"></i>
+                Administration Control Center
+            </span>
+            <h2>Welcome Admin</h2>
+            <p>
+                Manage doctors, patients, appointments, requests, hospitals, and communication from one centralized
+                healthcare dashboard designed for clarity, speed, and professional hospital operations.
+            </p>
+
+            <div class="hero-quick-pills">
+                <span class="hero-pill"><i class="bi bi-hospital"></i> Multi-Hospital Control</span>
+                <span class="hero-pill"><i class="bi bi-people"></i> User Oversight</span>
+                <span class="hero-pill"><i class="bi bi-clipboard2-pulse"></i> Appointment Visibility</span>
+                <span class="hero-pill"><i class="bi bi-graph-up-arrow"></i> Live Insights</span>
+            </div>
+        </div>
+
+        <div class="row g-4 mb-4">
+            <div class="col-md-3">
+                <div class="admin-stat-card reveal reveal-left">
+                    <div class="stat-top">
+                        <div>
+                            <h3>{{ doctor_count }}</h3>
+                            <p>Total Doctors</p>
+                        </div>
+                        <div class="stat-icon"><i class="bi bi-heart-pulse"></i></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="admin-stat-card reveal reveal-up">
+                    <div class="stat-top">
+                        <div>
+                            <h3>{{ patient_count }}</h3>
+                            <p>Total Patients</p>
+                        </div>
+                        <div class="stat-icon"><i class="bi bi-person-circle"></i></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="admin-stat-card reveal reveal-up">
+                    <div class="stat-top">
+                        <div>
+                            <h3>{{ appointment_count }}</h3>
+                            <p>Appointments</p>
+                        </div>
+                        <div class="stat-icon"><i class="bi bi-calendar2-check"></i></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="admin-stat-card reveal reveal-right">
+                    <div class="stat-top">
+                        <div>
+                            <h3>{{ message_count }}</h3>
+                            <p>Messages</p>
+                        </div>
+                        <div class="stat-icon"><i class="bi bi-chat-dots"></i></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4 mb-4">
+            <div class="col-md-3">
+                <div class="admin-stat-card reveal reveal-left">
+                    <span class="admin-mini-label"><i class="bi bi-diagram-3"></i> Operations</span>
+                    <div class="stat-top mb-0">
+                        <div>
+                            <h3>{{ receptionist_count }}</h3>
+                            <p>Receptionists</p>
+                        </div>
+                        <div class="stat-icon"><i class="bi bi-headset"></i></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="admin-stat-card reveal reveal-up">
+                    <span class="admin-mini-label"><i class="bi bi-building"></i> Network</span>
+                    <div class="stat-top mb-0">
+                        <div>
+                            <h3>{{ hospital_count }}</h3>
+                            <p>Hospitals</p>
+                        </div>
+                        <div class="stat-icon"><i class="bi bi-hospital"></i></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="admin-stat-card reveal reveal-up">
+                    <span class="admin-mini-label"><i class="bi bi-hourglass-split"></i> Pending</span>
+                    <div class="stat-top mb-0">
+                        <div>
+                            <h3>{{ pending_appointments }}</h3>
+                            <p>Open Appointments</p>
+                        </div>
+                        <div class="stat-icon"><i class="bi bi-clock-history"></i></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="admin-stat-card reveal reveal-right">
+                    <span class="admin-mini-label"><i class="bi bi-check2-circle"></i> Success</span>
+                    <div class="stat-top mb-0">
+                        <div>
+                            <h3>{{ completion_rate }}%</h3>
+                            <p>Completion Rate</p>
+                        </div>
+                        <div class="stat-icon"><i class="bi bi-graph-up-arrow"></i></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="analytics-grid">
+            <div class="admin-analytics-card reveal reveal-left">
+                <div class="admin-section-top">
+                    <div>
+                        <h3>Platform Usage Overview</h3>
+                        <p>User category distribution across the HMS system.</p>
+                    </div>
+                </div>
+
+                <div class="usage-bars">
+                    <div class="usage-row">
+                        <div class="label-wrap">
+                            <span>Doctors</span>
+                            <span>{{ doctor_usage_percent }}%</span>
+                        </div>
+                        <div class="bar-track">
+                            <div class="bar-fill" style="width: {{ doctor_usage_percent }}%;"></div>
+                        </div>
+                    </div>
+
+                    <div class="usage-row">
+                        <div class="label-wrap">
+                            <span>Patients</span>
+                            <span>{{ patient_usage_percent }}%</span>
+                        </div>
+                        <div class="bar-track">
+                            <div class="bar-fill" style="width: {{ patient_usage_percent }}%;"></div>
+                        </div>
+                    </div>
+
+                    <div class="usage-row">
+                        <div class="label-wrap">
+                            <span>Receptionists</span>
+                            <span>{{ receptionist_usage_percent }}%</span>
+                        </div>
+                        <div class="bar-track">
+                            <div class="bar-fill" style="width: {{ receptionist_usage_percent }}%;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="admin-analytics-card reveal reveal-right">
+                <div class="admin-section-top">
+                    <div>
+                        <h3>Service Capacity Graph</h3>
+                        <p>Quick visual summary of hospital resources.</p>
+                    </div>
+                </div>
+
+                <div class="mini-chart-wrap">
+                    <div class="mini-chart-col">
+                        <div class="mini-chart-value">{{ doctor_count }}</div>
+                        <div class="mini-chart-bar" style="height: {% widthratio doctor_count 1 8 %}px;"></div>
+                        <div class="mini-chart-label">Doctors</div>
+                    </div>
+                    <div class="mini-chart-col">
+                        <div class="mini-chart-value">{{ patient_count }}</div>
+                        <div class="mini-chart-bar" style="height: {% widthratio patient_count 1 2 %}px;"></div>
+                        <div class="mini-chart-label">Patients</div>
+                    </div>
+                    <div class="mini-chart-col">
+                        <div class="mini-chart-value">{{ hospital_count }}</div>
+                        <div class="mini-chart-bar" style="height: {% widthratio hospital_count 1 28 %}px;"></div>
+                        <div class="mini-chart-label">Hospitals</div>
+                    </div>
+                    <div class="mini-chart-col">
+                        <div class="mini-chart-value">{{ receptionist_count }}</div>
+                        <div class="mini-chart-bar" style="height: {% widthratio receptionist_count 1 12 %}px;"></div>
+                        <div class="mini-chart-label">Reception</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4 mb-4">
+            <div class="col-lg-6">
+                <div class="admin-progress-card reveal reveal-left">
+                    <div class="admin-section-top">
+                        <div>
+                            <h3>Appointment Performance</h3>
+                            <p>Operational performance and flow summary.</p>
+                        </div>
+                    </div>
+
+                    <div class="summary-progress">
+                        <div class="summary-progress-box">
+                            <h5>Completed Appointments</h5>
+                            <p>{{ completed_appointments }} successfully completed appointments are recorded in the system.</p>
+                            <div class="bar-track">
+                                <div class="bar-fill" style="width: {{ completion_rate }}%;"></div>
+                            </div>
+                        </div>
+
+                        <div class="summary-progress-box">
+                            <h5>Open / Pending Appointments</h5>
+                            <p>{{ pending_appointments }} appointments are still active and require operational follow-up.</p>
+                            <div class="bar-track">
+                                <div class="bar-fill" style="width: {% if appointment_count %}{% widthratio pending_appointments appointment_count 100 %}{% else %}0{% endif %}%;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-6">
+                <div class="admin-progress-card reveal reveal-right">
+                    <div class="admin-section-top">
+                        <div>
+                            <h3>Top Hospital Coverage</h3>
+                            <p>Organizations with active front desk coverage.</p>
+                        </div>
+                    </div>
+
+                    <div class="summary-progress">
+                        {% for item in top_hospitals %}
+                        <div class="summary-progress-box">
+                            <h5>{{ item.organization_name }}</h5>
+                            <p>{{ item.total }} receptionist account{{ item.total|pluralize }} connected to this hospital organization.</p>
+                            <div class="bar-track">
+                                <div class="bar-fill" style="width: {% widthratio item.total receptionist_count 100 %}%;"></div>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <div class="summary-progress-box">
+                            <h5>No Hospital Data</h5>
+                            <p>No receptionist-linked hospital data is available yet.</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="admin-section-top reveal reveal-up">
+            <div>
+                <h3>Administrative Tools</h3>
+                <p>Core workflows to manage healthcare operations professionally.</p>
+            </div>
+        </div>
+
+        <div class="admin-feature-grid">
+            <div class="admin-feature-card reveal reveal-left">
+                <div>
+                    <div class="admin-feature-icon"><i class="bi bi-heart-pulse"></i></div>
+                    <h4>Doctor Management</h4>
+                    <p>
+                        View approved doctors, monitor specialist information, manage profiles,
+                        and keep hospital resource data structured and consistent.
+                    </p>
+                </div>
+                <a href="{% url 'admin_doctor_list' %}" class="admin-btn">
+                    <i class="bi bi-arrow-right-circle"></i>
+                    View Doctors
+                </a>
+            </div>
+
+            <div class="admin-feature-card reveal reveal-up">
+                <div>
+                    <div class="admin-feature-icon"><i class="bi bi-person-vcard"></i></div>
+                    <h4>Patient Records</h4>
+                    <p>
+                        Access registered patient information, search patient records,
+                        and review system-wide patient history from one location.
+                    </p>
+                </div>
+                <a href="{% url 'admin_patient_list' %}" class="admin-btn">
+                    <i class="bi bi-arrow-right-circle"></i>
+                    View Patients
+                </a>
+            </div>
+
+            <div class="admin-feature-card reveal reveal-right">
+                <div>
+                    <div class="admin-feature-icon"><i class="bi bi-calendar2-check"></i></div>
+                    <h4>Appointments</h4>
+                    <p>
+                        Monitor all appointment activity, review patient-doctor schedules,
+                        and maintain visibility into healthcare operations.
+                    </p>
+                </div>
+                <a href="{% url 'admin_appointment_list' %}" class="admin-btn">
+                    <i class="bi bi-arrow-right-circle"></i>
+                    View Appointments
+                </a>
+            </div>
+
+            <div class="admin-feature-card reveal reveal-left">
+                <div>
+                    <div class="admin-feature-icon"><i class="bi bi-person-plus"></i></div>
+                    <h4>Add Doctor</h4>
+                    <p>
+                        Onboard new doctors into the system with hospital details,
+                        specialties, consultancy fees, and secure account information.
+                    </p>
+                </div>
+                <a href="{% url 'admin_add_doctor' %}" class="admin-btn">
+                    <i class="bi bi-plus-circle"></i>
+                    Add Doctor
+                </a>
+            </div>
+
+            <div class="admin-feature-card reveal reveal-up">
+                <div>
+                    <div class="admin-feature-icon"><i class="bi bi-headset"></i></div>
+                    <h4>Add Receptionist</h4>
+                    <p>
+                        Create new receptionist accounts and connect them with hospital organizations
+                        to support branch-level appointment coordination.
+                    </p>
+                </div>
+                <a href="{% url 'admin_add_receptionist' %}" class="admin-btn">
+                    <i class="bi bi-plus-circle"></i>
+                    Add Receptionist
+                </a>
+            </div>
+
+            <div class="admin-feature-card reveal reveal-right">
+                <div>
+                    <div class="admin-feature-icon"><i class="bi bi-person-circle"></i></div>
+                    <h4>Add Patient</h4>
+                    <p>
+                        Register patient accounts directly from the administrative panel
+                        for structured onboarding and faster healthcare access.
+                    </p>
+                </div>
+                <a href="{% url 'admin_add_patient' %}" class="admin-btn">
+                    <i class="bi bi-plus-circle"></i>
+                    Add Patient
+                </a>
+            </div>
+        </div>
+
+        <div class="admin-info-box reveal reveal-up">
+            <h4>Hospital Administration Overview</h4>
+            <p>
+                This dashboard is designed to give administrators a centralized command center for hospital operations.
+                From doctor approvals and patient management to appointment monitoring, hospital coverage, and service communication,
+                every core workflow can be managed from here in a structured and professional way for enterprise-level healthcare delivery.
+            </p>
+
+            <ul class="admin-note-list">
+                <li>Use the top navigation for core operational data: doctors, patients, and appointments.</li>
+                <li>Use the profile dropdown for administrative actions such as requests, messages, adding new accounts, and password updates.</li>
+                <li>The analytics and graph sections help you quickly understand usage, resource coverage, and system performance.</li>
+            </ul>
+        </div>
+
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const adminRevealItems = document.querySelectorAll('.reveal');
+
+    function adminRevealOnScroll() {
+        const triggerBottom = window.innerHeight * 0.88;
+        adminRevealItems.forEach((el, index) => {
+            const top = el.getBoundingClientRect().top;
+            if (top < triggerBottom) {
+                setTimeout(() => {
+                    el.classList.add('show');
+                }, index * 60);
+            }
+        });
+    }
+
+    window.addEventListener('scroll', adminRevealOnScroll);
+    window.addEventListener('load', adminRevealOnScroll);
+</script>
+{% endblock %}

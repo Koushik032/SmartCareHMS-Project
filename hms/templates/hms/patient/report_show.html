@@ -1,0 +1,281 @@
+{% extends 'hms/base.html' %}
+{% block title %}Appointment Report{% endblock %}
+
+{% block content %}
+<style>
+    .report-page {
+        padding: 34px 0 70px;
+        background:
+            radial-gradient(circle at top left, rgba(37, 99, 235, 0.08), transparent 28%),
+            radial-gradient(circle at bottom right, rgba(56, 189, 248, 0.08), transparent 28%);
+    }
+
+    .report-hero {
+        background: linear-gradient(135deg, #0f172a 0%, #1d4ed8 55%, #38bdf8 100%);
+        color: #fff;
+        border-radius: 30px;
+        padding: 55px 40px;
+        margin-bottom: 30px;
+        box-shadow: 0 20px 50px rgba(15, 23, 42, 0.14);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .report-hero::before,
+    .report-hero::after {
+        content: "";
+        position: absolute;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.08);
+    }
+
+    .report-hero::before {
+        width: 220px;
+        height: 220px;
+        top: -70px;
+        right: -60px;
+    }
+
+    .report-hero::after {
+        width: 160px;
+        height: 160px;
+        bottom: -50px;
+        left: -30px;
+    }
+
+    .report-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 16px;
+        border-radius: 999px;
+        background: rgba(255,255,255,0.14);
+        border: 1px solid rgba(255,255,255,0.16);
+        font-size: 13px;
+        font-weight: 700;
+        margin-bottom: 16px;
+    }
+
+    .report-hero h2 {
+        font-size: 2.2rem;
+        font-weight: 800;
+        margin-bottom: 10px;
+    }
+
+    .report-hero p {
+        margin-bottom: 0;
+        color: rgba(255,255,255,0.92);
+        line-height: 1.8;
+        max-width: 760px;
+    }
+
+    .report-card,
+    .doctor-history-card {
+        background: #fff;
+        border: 1px solid #e5edf5;
+        border-radius: 26px;
+        box-shadow: 0 16px 36px rgba(15, 23, 42, 0.08);
+        padding: 28px;
+    }
+
+    .doctor-history-card {
+        margin-top: 24px;
+    }
+
+    .form-label {
+        font-weight: 700;
+        color: #334155;
+        margin-bottom: 8px;
+    }
+
+    .form-control {
+        min-height: 52px;
+        border-radius: 14px;
+        background: #f8fafc;
+        border: 1px solid #dbe2ea;
+        box-shadow: none !important;
+        transition: all 0.35s ease;
+        width: 100%;
+        padding: 12px 14px;
+    }
+
+    .form-control:focus {
+        background: #ffffff;
+        border-color: #2563eb;
+        box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.08) !important;
+        outline: none;
+    }
+
+    textarea.form-control {
+        min-height: 120px;
+        resize: vertical;
+    }
+
+    input[type="file"].form-control {
+        padding: 12px 14px;
+    }
+
+    .submit-btn {
+        min-height: 52px;
+        border: none;
+        border-radius: 14px;
+        color: #fff;
+        font-weight: 700;
+        width: 100%;
+        background: linear-gradient(135deg, #1d4ed8, #38bdf8);
+        box-shadow: 0 14px 28px rgba(29, 78, 216, 0.20);
+        transition: all 0.35s ease;
+    }
+
+    .submit-btn:hover {
+        color: #fff;
+        transform: translateY(-2px);
+        box-shadow: 0 18px 34px rgba(29, 78, 216, 0.28);
+    }
+
+    .info-input {
+        background: #eef6ff !important;
+        color: #0f172a;
+        font-weight: 700;
+    }
+
+    .table thead th {
+        background: #f8fafc;
+        color: #0f172a;
+        font-weight: 700;
+        border-bottom: none;
+        padding: 14px 12px;
+    }
+
+    .table tbody td {
+        padding: 14px 12px;
+        color: #475569;
+        border-color: #eef2f7;
+        vertical-align: middle;
+    }
+
+    .helper-text {
+        display: block;
+        margin-top: 6px;
+        color: #64748b;
+        font-size: 0.84rem;
+    }
+
+    @media (max-width: 991px) {
+        .report-hero {
+            padding: 40px 24px;
+        }
+
+        .report-hero h2 {
+            font-size: 1.9rem;
+        }
+    }
+</style>
+
+<section class="section-space report-page">
+    <div class="container">
+        <div class="report-hero">
+            <span class="report-badge">
+                <i class="bi bi-file-earmark-medical"></i>
+                Appointment Report
+            </span>
+            <h2>Submit Follow-up Report</h2>
+            <p class="mb-0">
+                Select your previous doctor, upload your previous prescription and one report file,
+                then submit it for doctor review.
+            </p>
+        </div>
+
+        <div class="report-card">
+            <h4 class="fw-bold mb-3">Report Submission Form</h4>
+
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+
+                <div class="mb-3">
+                    <label class="form-label">Your Name</label>
+                    <input type="text" class="form-control info-input"
+                           value="{{ patient.first_name }} {{ patient.last_name }}" readonly>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">{{ form.doctor.label }}</label>
+                    {{ form.doctor }}
+                    {% if form.doctor.errors %}
+                        <small class="text-danger">{{ form.doctor.errors|striptags }}</small>
+                    {% endif %}
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Previous Prescription Upload</label>
+                    {{ form.previous_prescription }}
+                    <small class="helper-text">Upload your previous prescription file if available.</small>
+                    {% if form.previous_prescription.errors %}
+                        <small class="text-danger">{{ form.previous_prescription.errors|striptags }}</small>
+                    {% endif %}
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Report File Upload</label>
+                    {{ form.report_file }}
+                    <small class="helper-text">Upload a single report file.</small>
+                    {% if form.report_file.errors %}
+                        <small class="text-danger">{{ form.report_file.errors|striptags }}</small>
+                    {% endif %}
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Report Note</label>
+                    {{ form.report_note }}
+                    {% if form.report_note.errors %}
+                        <small class="text-danger">{{ form.report_note.errors|striptags }}</small>
+                    {% endif %}
+                </div>
+
+                {% if form.non_field_errors %}
+                    <div class="mb-3">
+                        <small class="text-danger">{{ form.non_field_errors|striptags }}</small>
+                    </div>
+                {% endif %}
+
+                <button type="submit" class="btn submit-btn">Submit Report</button>
+            </form>
+        </div>
+
+        <div class="doctor-history-card">
+            <h5 class="fw-bold mb-3">Previous Doctor History</h5>
+
+            <div class="table-responsive">
+                <table class="table mb-0">
+                    <thead>
+                        <tr>
+                            <th>Doctor</th>
+                            <th>Date</th>
+                            <th>Time</th>
+                            <th>Mode</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for a in previous_doctors %}
+                        <tr>
+                            <td>Dr. {{ a.doctor.name }}</td>
+                            <td>{{ a.appointment_date }}</td>
+                            <td>{{ a.appointment_time }}</td>
+                            <td>{{ a.appointment_mode }}</td>
+                            <td>{{ a.status }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" class="text-center text-muted py-4">
+                                No previous doctor history found.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

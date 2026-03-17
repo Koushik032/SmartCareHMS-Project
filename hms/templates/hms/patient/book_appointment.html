@@ -1,0 +1,827 @@
+{% extends 'hms/base.html' %}
+{% block title %}Book Appointment{% endblock %}
+
+{% block content %}
+<style>
+    .appointment-page {
+        padding: 40px 0 70px;
+    }
+
+    .appointment-shell {
+        background: #ffffff;
+        border: 1px solid #e9eef5;
+        border-radius: 30px;
+        box-shadow: 0 20px 50px rgba(15, 23, 42, 0.08);
+        overflow: hidden;
+    }
+
+    .appointment-top {
+        background:
+            linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(30, 64, 175, 0.84) 55%, rgba(56, 189, 248, 0.74) 100%),
+            url('https://images.unsplash.com/photo-1584515933487-779824d29309?auto=format&fit=crop&w=1600&q=80') center/cover no-repeat;
+        color: #ffffff;
+        padding: 48px 40px;
+        position: relative;
+        overflow: hidden;
+        isolation: isolate;
+    }
+
+    .appointment-top::before,
+    .appointment-top::after {
+        content: "";
+        position: absolute;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.08);
+        z-index: -1;
+    }
+
+    .appointment-top::before {
+        width: 220px;
+        height: 220px;
+        top: -60px;
+        right: -60px;
+    }
+
+    .appointment-top::after {
+        width: 150px;
+        height: 150px;
+        bottom: -40px;
+        left: -20px;
+    }
+
+    .appointment-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 14px;
+        border-radius: 999px;
+        background: rgba(255,255,255,0.14);
+        border: 1px solid rgba(255,255,255,0.16);
+        font-size: 13px;
+        font-weight: 700;
+        margin-bottom: 14px;
+        backdrop-filter: blur(10px);
+    }
+
+    .appointment-top h2 {
+        margin: 0 0 10px;
+        font-size: 2.15rem;
+        font-weight: 900;
+        letter-spacing: -0.4px;
+    }
+
+    .appointment-top p {
+        margin: 0;
+        color: rgba(255,255,255,0.92);
+        line-height: 1.85;
+        max-width: 760px;
+    }
+
+    .appointment-body {
+        padding: 36px 36px 40px;
+        background: linear-gradient(to bottom right, #ffffff, #fbfdff);
+    }
+
+    .section-label {
+        font-size: 0.9rem;
+        font-weight: 800;
+        letter-spacing: 0.04em;
+        color: #2563eb;
+        text-transform: uppercase;
+        margin-bottom: 18px;
+    }
+
+    .form-label {
+        font-weight: 700;
+        color: #334155;
+        margin-bottom: 8px;
+    }
+
+    .appointment-body .form-control,
+    .appointment-body .form-select,
+    .appointment-body input,
+    .appointment-body select,
+    .appointment-body textarea {
+        min-height: 54px;
+        border-radius: 14px;
+        border: 1px solid #dbe3ee;
+        background: #fbfdff;
+        box-shadow: none;
+        padding-left: 14px;
+        padding-right: 14px;
+        width: 100%;
+        transition: all 0.3s ease;
+    }
+
+    .appointment-body textarea.form-control,
+    .appointment-body textarea {
+        min-height: 130px;
+        padding-top: 12px;
+    }
+
+    .appointment-body .form-control:focus,
+    .appointment-body .form-select:focus,
+    .appointment-body input:focus,
+    .appointment-body select:focus,
+    .appointment-body textarea:focus {
+        background: #ffffff;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.08);
+        outline: none;
+    }
+
+    .summary-strip {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 16px;
+        margin-bottom: 28px;
+    }
+
+    .summary-box {
+        background: #f8fbff;
+        border: 1px solid #ebf1f7;
+        border-radius: 20px;
+        padding: 20px;
+        transition: all 0.35s ease;
+        box-shadow: 0 10px 22px rgba(15, 23, 42, 0.04);
+    }
+
+    .summary-box:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 18px 36px rgba(15, 23, 42, 0.09);
+    }
+
+    .summary-icon {
+        width: 52px;
+        height: 52px;
+        border-radius: 16px;
+        background: linear-gradient(135deg, #dbeafe, #e0f2fe);
+        color: #1d4ed8;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 22px;
+        margin-bottom: 14px;
+    }
+
+    .summary-box h5 {
+        margin: 0 0 6px;
+        font-size: 1rem;
+        font-weight: 800;
+        color: #0f172a;
+    }
+
+    .summary-box p {
+        margin: 0;
+        color: #64748b;
+        font-size: 0.95rem;
+        line-height: 1.7;
+    }
+
+    .membership-card {
+        background: linear-gradient(135deg, #f8fbff, #eef5ff);
+        border: 1px solid #dfeaf8;
+        border-radius: 22px;
+        padding: 24px;
+        margin-bottom: 28px;
+        box-shadow: 0 12px 26px rgba(15, 23, 42, 0.05);
+        transition: all 0.35s ease;
+    }
+
+    .membership-card:hover {
+        transform: translateY(-4px);
+    }
+
+    .membership-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 18px;
+        flex-wrap: wrap;
+    }
+
+    .membership-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 7px 12px;
+        border-radius: 999px;
+        background: #eff6ff;
+        color: #1d4ed8;
+        font-size: 12px;
+        font-weight: 700;
+        margin-bottom: 10px;
+    }
+
+    .membership-card h5 {
+        font-size: 1.2rem;
+        font-weight: 800;
+        color: #0f172a;
+        margin-bottom: 6px;
+    }
+
+    .membership-card p {
+        margin-bottom: 0;
+        color: #64748b;
+        line-height: 1.8;
+    }
+
+    .discount-circle {
+        width: 88px;
+        height: 88px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #1d4ed8, #38bdf8);
+        color: #ffffff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.3rem;
+        font-weight: 900;
+        box-shadow: 0 16px 28px rgba(29, 78, 216, 0.18);
+        flex-shrink: 0;
+    }
+
+    .pricing-panel {
+        background: linear-gradient(135deg, #ffffff, #f8fbff);
+        border: 1px solid #e5eef9;
+        border-radius: 22px;
+        padding: 22px;
+        margin-bottom: 28px;
+        box-shadow: 0 12px 26px rgba(15, 23, 42, 0.05);
+        transition: all 0.35s ease;
+    }
+
+    .pricing-panel:hover {
+        transform: translateY(-4px);
+    }
+
+    .pricing-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 18px;
+    }
+
+    .pricing-icon {
+        width: 52px;
+        height: 52px;
+        border-radius: 16px;
+        background: linear-gradient(135deg, #dbeafe, #e0f2fe);
+        color: #1d4ed8;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 22px;
+    }
+
+    .pricing-header h5 {
+        margin: 0;
+        font-size: 1.1rem;
+        font-weight: 800;
+        color: #0f172a;
+    }
+
+    .pricing-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 14px;
+    }
+
+    .price-box {
+        background: #f8fbff;
+        border: 1px solid #e7edf5;
+        border-radius: 18px;
+        padding: 18px;
+        transition: all 0.3s ease;
+    }
+
+    .price-box:hover {
+        background: #ffffff;
+        transform: translateY(-3px);
+    }
+
+    .price-box h6 {
+        margin: 0 0 6px;
+        font-size: 0.9rem;
+        font-weight: 700;
+        color: #475569;
+    }
+
+    .price-box p {
+        margin: 0;
+        font-size: 1.2rem;
+        font-weight: 800;
+        color: #0f172a;
+    }
+
+    .price-highlight p {
+        color: #1d4ed8;
+    }
+
+    .radio-box {
+        background: #f8fbff;
+        border: 1px solid #ebf1f7;
+        border-radius: 18px;
+        padding: 16px 18px;
+        transition: all 0.3s ease;
+    }
+
+    .radio-box:hover,
+    .info-panel:hover {
+        box-shadow: 0 12px 26px rgba(15, 23, 42, 0.05);
+        transform: translateY(-2px);
+    }
+
+    .radio-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 18px;
+    }
+
+    .radio-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: #334155;
+        font-weight: 600;
+    }
+
+    .radio-item input[type="radio"] {
+        width: 18px;
+        height: 18px;
+        accent-color: #2563eb;
+        cursor: pointer;
+    }
+
+    .radio-item label {
+        cursor: pointer;
+        margin: 0;
+    }
+
+    .info-panel {
+        background: #f8fbff;
+        border: 1px solid #e5eef9;
+        border-radius: 18px;
+        padding: 18px;
+        transition: all 0.3s ease;
+    }
+
+    .info-panel h5 {
+        margin: 0 0 10px;
+        font-size: 1rem;
+        font-weight: 800;
+        color: #0f172a;
+    }
+
+    .info-panel p {
+        margin: 0 0 8px;
+        color: #64748b;
+        line-height: 1.7;
+    }
+
+    .info-panel p:last-child {
+        margin-bottom: 0;
+    }
+
+    .btn-appointment-submit {
+        min-height: 56px;
+        padding: 12px 28px;
+        border: none;
+        border-radius: 14px;
+        background: linear-gradient(135deg, #1d4ed8, #38bdf8);
+        color: #ffffff;
+        font-weight: 800;
+        box-shadow: 0 14px 28px rgba(29, 78, 216, 0.18);
+        transition: all 0.3s ease;
+    }
+
+    .btn-appointment-submit:hover {
+        color: #ffffff;
+        transform: translateY(-2px);
+        box-shadow: 0 18px 34px rgba(29, 78, 216, 0.22);
+    }
+
+    .small-note {
+        color: #64748b;
+        font-size: 0.92rem;
+        line-height: 1.7;
+        margin-top: 10px;
+    }
+
+    .required-note {
+        color: #dc2626;
+        font-size: 0.9rem;
+        font-weight: 600;
+        margin-top: 8px;
+    }
+
+    .reveal {
+        opacity: 0;
+        transition: all 0.9s ease;
+    }
+
+    .reveal-up {
+        transform: translateY(40px);
+    }
+
+    .reveal.show {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    @media (max-width: 991px) {
+        .summary-strip,
+        .pricing-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .appointment-top,
+        .appointment-body {
+            padding-left: 22px;
+            padding-right: 22px;
+        }
+
+        .radio-list {
+            flex-direction: column;
+            gap: 12px;
+        }
+    }
+</style>
+
+{{ doctor_data|json_script:"doctor-data-json" }}
+
+<section class="appointment-page">
+    <div class="container">
+        <div class="appointment-shell reveal reveal-up show">
+
+            <div class="appointment-top">
+                <span class="appointment-badge">
+                    <i class="bi bi-calendar2-check"></i>
+                    Smart Appointment Booking
+                </span>
+                <h2>Book an Appointment</h2>
+                <p>
+                    Schedule your consultation with the right doctor, choose online or offline service,
+                    describe your symptoms clearly, and submit your request through a clean professional workflow.
+                </p>
+            </div>
+
+            <div class="appointment-body">
+
+                <div class="summary-strip">
+                    <div class="summary-box reveal reveal-up">
+                        <div class="summary-icon"><i class="bi bi-person-heart"></i></div>
+                        <h5>Choose a Doctor</h5>
+                        <p>Select an approved doctor from the available consultation list.</p>
+                    </div>
+                    <div class="summary-box reveal reveal-up">
+                        <div class="summary-icon"><i class="bi bi-broadcast"></i></div>
+                        <h5>Select Mode</h5>
+                        <p>Choose online or offline consultation depending on your need.</p>
+                    </div>
+                    <div class="summary-box reveal reveal-up">
+                        <div class="summary-icon"><i class="bi bi-clipboard2-pulse"></i></div>
+                        <h5>Describe Your Problem</h5>
+                        <p>Add symptoms and urgency so the doctor understands your case better.</p>
+                    </div>
+                </div>
+
+                <div class="membership-card reveal reveal-up">
+                    <div class="membership-top">
+                        <div>
+                            <span class="membership-badge">
+                                <i class="bi bi-award"></i>
+                                Your Membership Benefit
+                            </span>
+                            <h5>{{ level_name }} Membership</h5>
+                            <p>Your current completed appointment level unlocks a consultation discount.</p>
+                        </div>
+                        <div class="discount-circle">{{ discount_percent }}%</div>
+                    </div>
+                </div>
+
+                <div class="pricing-panel reveal reveal-up">
+                    <div class="pricing-header">
+                        <div class="pricing-icon"><i class="bi bi-cash-stack"></i></div>
+                        <h5>Consultation Fee Summary</h5>
+                    </div>
+
+                    <div class="pricing-grid">
+                        <div class="price-box">
+                            <h6>Doctor Fee</h6>
+                            <p id="doctor-fee">0.00</p>
+                        </div>
+                        <div class="price-box">
+                            <h6>Discount</h6>
+                            <p id="discount-percent">{{ discount_percent }}%</p>
+                        </div>
+                        <div class="price-box">
+                            <h6>You Save</h6>
+                            <p id="discount-amount">0.00</p>
+                        </div>
+                        <div class="price-box price-highlight">
+                            <h6>Final Payable</h6>
+                            <p id="final-fee">0.00</p>
+                        </div>
+                    </div>
+                </div>
+
+                <form method="post">
+                    {% csrf_token %}
+
+                    <div class="section-label">Appointment Details</div>
+                    <div class="row g-4 mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label">{{ form.doctor.label }}</label>
+                            {{ form.doctor }}
+                            {% if form.doctor.errors %}
+                                <small class="text-danger">{{ form.doctor.errors|striptags }}</small>
+                            {% endif %}
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label">{{ form.appointment_date.label }}</label>
+                            {{ form.appointment_date }}
+                            {% if form.appointment_date.errors %}
+                                <small class="text-danger">{{ form.appointment_date.errors|striptags }}</small>
+                            {% endif %}
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label">{{ form.appointment_time.label }}</label>
+                            {{ form.appointment_time }}
+                            {% if form.appointment_time.errors %}
+                                <small class="text-danger">{{ form.appointment_time.errors|striptags }}</small>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="section-label">Consultation Preferences</div>
+                    <div class="row g-4 mb-4">
+                        <div class="col-md-6">
+                            <div class="radio-box">
+                                <label class="form-label d-block">{{ form.appointment_mode.label }}</label>
+                                <div class="radio-list">
+                                    {% for choice in form.appointment_mode %}
+                                        <div class="radio-item">
+                                            {{ choice.tag }}
+                                            <label for="{{ choice.id_for_label }}">{{ choice.choice_label }}</label>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                                {% if form.appointment_mode.errors %}
+                                    <small class="text-danger">{{ form.appointment_mode.errors|striptags }}</small>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="radio-box">
+                                <label class="form-label d-block">{{ form.urgency_level.label }}</label>
+                                <div class="radio-list">
+                                    {% for choice in form.urgency_level %}
+                                        <div class="radio-item">
+                                            {{ choice.tag }}
+                                            <label for="{{ choice.id_for_label }}">{{ choice.choice_label }}</label>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                                {% if form.urgency_level.errors %}
+                                    <small class="text-danger">{{ form.urgency_level.errors|striptags }}</small>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">{{ form.problem_category.label }}</label>
+                            {{ form.problem_category }}
+                            {% if form.problem_category.errors %}
+                                <small class="text-danger">{{ form.problem_category.errors|striptags }}</small>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="section-label">Health Information</div>
+                    <div class="row g-4 mb-4">
+                        <div class="col-12">
+                            <label class="form-label">{{ form.symptoms.label }}</label>
+                            {{ form.symptoms }}
+                            {% if form.symptoms.errors %}
+                                <small class="text-danger">{{ form.symptoms.errors|striptags }}</small>
+                            {% endif %}
+                            <div class="small-note">
+                                Briefly describe the symptoms, duration, pain level, or any specific issue you are facing.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="section-label">Payment Information</div>
+                    <div class="row g-4 mb-4">
+                        <div class="col-md-6">
+                            <div class="info-panel">
+                                <label class="form-label">{{ form.payment_method.label }}</label>
+                                {{ form.payment_method }}
+                                {% if form.payment_method.errors %}
+                                    <small class="text-danger">{{ form.payment_method.errors|striptags }}</small>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="col-md-6" id="bkash-payment-box" style="display:none;">
+                            <div class="info-panel">
+                                <h5>bKash Payment</h5>
+                                <p><strong>bKash Number:</strong> <span id="bkash-number">{{ bkash_number }}</span></p>
+                                <p class="mb-2">Please send the exact payable amount to this number and enter your transaction ID below.</p>
+
+                                <label class="form-label mt-2">{{ form.transaction_id.label }}</label>
+                                {{ form.transaction_id }}
+                                {% if form.transaction_id.errors %}
+                                    <small class="text-danger">{{ form.transaction_id.errors|striptags }}</small>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="section-label">Consultation Access</div>
+                    <div class="row g-4 mb-4">
+                        <div class="col-md-6" id="meeting-link-box">
+                            <div class="info-panel">
+                                <label class="form-label">{{ form.meeting_link.label }}</label>
+                                {{ form.meeting_link }}
+                                <div class="required-note" id="meeting-link-note">
+                                    Meeting link is required for online appointments.
+                                </div>
+                                {% if form.meeting_link.errors %}
+                                    <small class="text-danger">{{ form.meeting_link.errors|striptags }}</small>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="col-md-6" id="offline-info-box">
+                            <div class="info-panel">
+                                <h5>Hospital Information</h5>
+                                <p><strong>Hospital:</strong> <span id="doctor-hospital">Select a doctor</span></p>
+                                <p><strong>Location:</strong> <span id="doctor-location">Select a doctor</span></p>
+                            </div>
+                        </div>
+
+                        <div class="col-12" id="visit-note-box">
+                            <label class="form-label">{{ form.visit_note.label }}</label>
+                            {{ form.visit_note }}
+                            {% if form.visit_note.errors %}
+                                <small class="text-danger">{{ form.visit_note.errors|striptags }}</small>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-appointment-submit">Confirm Appointment</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+    const doctorData = JSON.parse(document.getElementById('doctor-data-json').textContent);
+
+    function formatMoney(value) {
+        const num = parseFloat(value || 0);
+        return num.toFixed(2);
+    }
+
+    function getSelectedDoctorInfo() {
+        const doctorSelect = document.getElementById('id_doctor');
+        const selectedDoctorId = doctorSelect ? doctorSelect.value : '';
+        return doctorData.find(item => String(item.id) === String(selectedDoctorId));
+    }
+
+    function updateDoctorInfo() {
+        const info = getSelectedDoctorInfo();
+
+        document.getElementById('doctor-hospital').textContent = info ? (info.hospital_name || '-') : 'Select a doctor';
+        document.getElementById('doctor-location').textContent = info ? (info.location || '-') : 'Select a doctor';
+
+        document.getElementById('doctor-fee').textContent = info ? formatMoney(info.fee) : '0.00';
+        document.getElementById('discount-percent').textContent = info ? `${info.discount_percent}%` : '0%';
+        document.getElementById('discount-amount').textContent = info ? formatMoney(info.discount_amount) : '0.00';
+        document.getElementById('final-fee').textContent = info ? formatMoney(info.final_fee) : '0.00';
+    }
+
+    function toggleBkashFields() {
+        const paymentMethodSelect = document.getElementById('id_payment_method');
+        const bkashBox = document.getElementById('bkash-payment-box');
+        const transactionInput = document.getElementById('id_transaction_id');
+
+        if (!paymentMethodSelect || !bkashBox) return;
+
+        if (paymentMethodSelect.value === 'Bkash') {
+            bkashBox.style.display = 'block';
+            if (transactionInput) {
+                transactionInput.setAttribute('required', 'required');
+            }
+        } else {
+            bkashBox.style.display = 'none';
+            if (transactionInput) {
+                transactionInput.removeAttribute('required');
+                transactionInput.value = '';
+            }
+        }
+    }
+
+    function updatePaymentOptions() {
+        const selectedMode = document.querySelector('input[name="appointment_mode"]:checked');
+        const paymentMethodSelect = document.getElementById('id_payment_method');
+
+        if (!paymentMethodSelect || !selectedMode) return;
+
+        const currentValue = paymentMethodSelect.value;
+        const mode = selectedMode.value;
+
+        if (mode === 'Online') {
+            paymentMethodSelect.innerHTML = `
+                <option value="Bkash">Bkash</option>
+            `;
+            paymentMethodSelect.value = 'Bkash';
+        } else {
+            paymentMethodSelect.innerHTML = `
+                <option value="">Select Payment Method</option>
+                <option value="Cash">Cash</option>
+                <option value="Bkash">Bkash</option>
+            `;
+
+            if (currentValue === 'Cash' || currentValue === 'Bkash') {
+                paymentMethodSelect.value = currentValue;
+            } else {
+                paymentMethodSelect.value = '';
+            }
+        }
+
+        toggleBkashFields();
+    }
+
+    function toggleAppointmentModeFields() {
+        const selectedMode = document.querySelector('input[name="appointment_mode"]:checked');
+        const meetingLinkBox = document.getElementById('meeting-link-box');
+        const offlineInfoBox = document.getElementById('offline-info-box');
+        const visitNoteBox = document.getElementById('visit-note-box');
+        const meetingLinkInput = document.getElementById('id_meeting_link');
+
+        if (!selectedMode) return;
+
+        if (selectedMode.value === 'Online') {
+            meetingLinkBox.style.display = 'block';
+            offlineInfoBox.style.display = 'none';
+            visitNoteBox.style.display = 'none';
+            if (meetingLinkInput) {
+                meetingLinkInput.setAttribute('required', 'required');
+            }
+        } else {
+            meetingLinkBox.style.display = 'none';
+            offlineInfoBox.style.display = 'block';
+            visitNoteBox.style.display = 'block';
+            if (meetingLinkInput) {
+                meetingLinkInput.removeAttribute('required');
+            }
+        }
+
+        updatePaymentOptions();
+    }
+
+    const appointmentReveal = document.querySelectorAll('.reveal');
+
+    function appointmentRevealOnScroll() {
+        const triggerBottom = window.innerHeight * 0.9;
+        appointmentReveal.forEach((el, index) => {
+            const top = el.getBoundingClientRect().top;
+            if (top < triggerBottom) {
+                setTimeout(() => el.classList.add('show'), index * 70);
+            }
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const modeInputs = document.querySelectorAll('input[name="appointment_mode"]');
+        const doctorSelect = document.getElementById('id_doctor');
+        const paymentMethodSelect = document.getElementById('id_payment_method');
+
+        modeInputs.forEach(input => {
+            input.addEventListener('change', toggleAppointmentModeFields);
+        });
+
+        if (doctorSelect) {
+            doctorSelect.addEventListener('change', updateDoctorInfo);
+        }
+
+        if (paymentMethodSelect) {
+            paymentMethodSelect.addEventListener('change', toggleBkashFields);
+        }
+
+        updateDoctorInfo();
+        toggleAppointmentModeFields();
+        toggleBkashFields();
+        appointmentRevealOnScroll();
+    });
+
+    window.addEventListener('scroll', appointmentRevealOnScroll);
+</script>
+{% endblock %}

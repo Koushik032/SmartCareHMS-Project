@@ -1,0 +1,249 @@
+{% extends 'hms/base.html' %}
+{% block title %}View Prescription{% endblock %}
+
+{% block content %}
+<style>
+    .prescription-page {
+        padding: 34px 0 70px;
+        background:
+            radial-gradient(circle at top left, rgba(37, 99, 235, 0.08), transparent 28%),
+            radial-gradient(circle at bottom right, rgba(56, 189, 248, 0.08), transparent 28%);
+    }
+
+    .prescription-hero {
+        background: linear-gradient(135deg, #0f172a 0%, #1d4ed8 55%, #38bdf8 100%);
+        color: #fff;
+        border-radius: 30px;
+        padding: 55px 40px;
+        margin-bottom: 30px;
+        box-shadow: 0 20px 50px rgba(15, 23, 42, 0.14);
+    }
+
+    .prescription-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 16px;
+        border-radius: 999px;
+        background: rgba(255,255,255,0.14);
+        border: 1px solid rgba(255,255,255,0.16);
+        font-size: 13px;
+        font-weight: 700;
+        margin-bottom: 16px;
+    }
+
+    .prescription-card {
+        background: #fff;
+        border: 1px solid #e5edf5;
+        border-radius: 26px;
+        box-shadow: 0 16px 36px rgba(15, 23, 42, 0.08);
+        padding: 28px;
+    }
+
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 14px;
+        margin-bottom: 22px;
+    }
+
+    .info-item {
+        background: #f8fbff;
+        border: 1px solid #e5eefb;
+        border-radius: 16px;
+        padding: 14px 16px;
+    }
+
+    .info-item small {
+        display: block;
+        color: #64748b;
+        margin-bottom: 5px;
+        font-size: 0.82rem;
+    }
+
+    .info-item strong {
+        color: #0f172a;
+        font-size: 0.97rem;
+    }
+
+    .section-block {
+        margin-bottom: 18px;
+        border-radius: 18px;
+        padding: 18px;
+        border: 1px solid #e8eef5;
+    }
+
+    .section-label {
+        font-size: 1rem;
+        font-weight: 800;
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .section-content {
+        color: #475569;
+        line-height: 1.85;
+        white-space: pre-line;
+    }
+
+    .symptoms-box {
+        background: linear-gradient(135deg, #fff7ed, #fffbeb);
+        border-color: #fed7aa;
+    }
+
+    .symptoms-box .section-label {
+        color: #9a3412;
+    }
+
+    .symptoms-box .section-content {
+        color: #7c2d12;
+    }
+
+    .medicine-box {
+        background: linear-gradient(135deg, #eff6ff, #f8fbff);
+        border-color: #dbeafe;
+    }
+
+    .medicine-box .section-label {
+        color: #1d4ed8;
+    }
+
+    .test-box {
+        background: linear-gradient(135deg, #f0fdf4, #f7fee7);
+        border-color: #dcfce7;
+    }
+
+    .test-box .section-label {
+        color: #166534;
+    }
+
+    .advice-box {
+        background: linear-gradient(135deg, #faf5ff, #fdf4ff);
+        border-color: #f3e8ff;
+    }
+
+    .advice-box .section-label {
+        color: #7e22ce;
+    }
+
+    .back-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        min-height: 48px;
+        padding: 12px 18px;
+        border-radius: 14px;
+        background: linear-gradient(135deg, #0f172a, #334155);
+        color: #fff;
+        text-decoration: none;
+        font-weight: 700;
+        box-shadow: 0 12px 24px rgba(15, 23, 42, 0.15);
+        transition: all 0.3s ease;
+    }
+
+    .back-btn:hover {
+        color: #fff;
+        transform: translateY(-2px);
+    }
+
+    @media (max-width: 768px) {
+        .info-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<section class="section-space prescription-page">
+    <div class="container">
+
+        <div class="prescription-hero">
+            <span class="prescription-badge">
+                <i class="bi bi-file-earmark-medical"></i>
+                Doctor Prescription View
+            </span>
+            <h2>Prescription Details</h2>
+            <p class="mb-0">
+                Review the prescription, recommended tests, and advice for this appointment.
+            </p>
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+            <div>
+                <h4 class="fw-bold mb-1 text-dark">Prescription Record</h4>
+                <p class="text-muted mb-0">Created at: {{ prescription.created_at|date:"M d, Y - h:i A" }}</p>
+            </div>
+
+            <a href="{% url 'doctor_appointments' %}" class="back-btn">
+                <i class="bi bi-arrow-left"></i>
+                Back to Appointments
+            </a>
+        </div>
+
+        <div class="prescription-card">
+            <div class="info-grid">
+                <div class="info-item">
+                    <small>Patient Name</small>
+                    <strong>{{ prescription.patient.first_name }} {{ prescription.patient.last_name }}</strong>
+                </div>
+
+                <div class="info-item">
+                    <small>Doctor Name</small>
+                    <strong>Dr. {{ prescription.doctor.name }}</strong>
+                </div>
+
+                <div class="info-item">
+                    <small>Appointment Date</small>
+                    <strong>{{ prescription.appointment.appointment_date }}</strong>
+                </div>
+
+                <div class="info-item">
+                    <small>Appointment Time</small>
+                    <strong>{{ prescription.appointment.appointment_time }}</strong>
+                </div>
+            </div>
+
+            {% if prescription.symptoms_snapshot %}
+                <div class="section-block symptoms-box">
+                    <div class="section-label">
+                        <i class="bi bi-chat-left-text"></i>
+                        Symptoms / Patient Message
+                    </div>
+                    <div class="section-content">{{ prescription.symptoms_snapshot }}</div>
+                </div>
+            {% endif %}
+
+            <div class="section-block medicine-box">
+                <div class="section-label">
+                    <i class="bi bi-capsule-pill"></i>
+                    Prescription
+                </div>
+                <div class="section-content">{{ prescription.prescription_text }}</div>
+            </div>
+
+            {% if prescription.test %}
+                <div class="section-block test-box">
+                    <div class="section-label">
+                        <i class="bi bi-clipboard2-pulse"></i>
+                        Recommended Test
+                    </div>
+                    <div class="section-content">{{ prescription.test }}</div>
+                </div>
+            {% endif %}
+
+            {% if prescription.advice %}
+                <div class="section-block advice-box">
+                    <div class="section-label">
+                        <i class="bi bi-lightbulb"></i>
+                        Advice
+                    </div>
+                    <div class="section-content">{{ prescription.advice }}</div>
+                </div>
+            {% endif %}
+        </div>
+
+    </div>
+</section>
+{% endblock %}

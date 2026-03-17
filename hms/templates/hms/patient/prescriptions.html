@@ -1,0 +1,384 @@
+{% extends 'hms/base.html' %}
+{% block title %}My Prescriptions{% endblock %}
+
+{% block content %}
+<style>
+    .prescription-page {
+        padding: 34px 0 70px;
+    }
+
+    .prescription-hero {
+        background:
+            linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(29, 78, 216, 0.84) 55%, rgba(56, 189, 248, 0.74) 100%),
+            url('https://images.unsplash.com/photo-1576091160399-112ba8d25d1f?auto=format&fit=crop&w=1600&q=80') center/cover no-repeat;
+        color: #ffffff;
+        border-radius: 30px;
+        padding: 56px 40px;
+        margin-bottom: 30px;
+        box-shadow: 0 20px 50px rgba(15, 23, 42, 0.14);
+        position: relative;
+        overflow: hidden;
+        isolation: isolate;
+    }
+
+    .prescription-hero::before,
+    .prescription-hero::after {
+        content: "";
+        position: absolute;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.08);
+        z-index: -1;
+    }
+
+    .prescription-hero::before {
+        width: 220px;
+        height: 220px;
+        top: -70px;
+        right: -60px;
+    }
+
+    .prescription-hero::after {
+        width: 150px;
+        height: 150px;
+        bottom: -45px;
+        left: -25px;
+    }
+
+    .hero-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 16px;
+        border-radius: 999px;
+        background: rgba(255,255,255,0.14);
+        border: 1px solid rgba(255,255,255,0.16);
+        font-size: 13px;
+        font-weight: 700;
+        margin-bottom: 16px;
+        backdrop-filter: blur(10px);
+    }
+
+    .prescription-hero h2 {
+        font-size: 2.25rem;
+        font-weight: 900;
+        margin-bottom: 10px;
+        letter-spacing: -0.4px;
+    }
+
+    .prescription-hero p {
+        color: rgba(255,255,255,0.92);
+        max-width: 760px;
+        margin-bottom: 0;
+        line-height: 1.85;
+    }
+
+    .summary-card,
+    .prescription-list-card {
+        background: #ffffff;
+        border: 1px solid #e7edf5;
+        border-radius: 24px;
+        box-shadow: 0 16px 36px rgba(15, 23, 42, 0.08);
+    }
+
+    .summary-card {
+        padding: 24px 20px;
+        text-align: center;
+        height: 100%;
+        transition: all 0.35s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .summary-card::after {
+        content: "";
+        position: absolute;
+        right: -30px;
+        bottom: -30px;
+        width: 90px;
+        height: 90px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(56,189,248,0.12), transparent 70%);
+    }
+
+    .summary-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 22px 44px rgba(15, 23, 42, 0.12);
+    }
+
+    .summary-icon {
+        width: 56px;
+        height: 56px;
+        border-radius: 16px;
+        margin: 0 auto 14px;
+        background: linear-gradient(135deg, #dbeafe, #e0f2fe);
+        color: #1d4ed8;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 22px;
+    }
+
+    .summary-card h3 {
+        font-size: 2rem;
+        font-weight: 800;
+        color: #1d4ed8;
+        margin-bottom: 8px;
+    }
+
+    .summary-card p {
+        margin-bottom: 0;
+        color: #64748b;
+        font-weight: 600;
+    }
+
+    .prescription-list-card {
+        padding: 28px;
+        transition: all 0.35s ease;
+    }
+
+    .prescription-list-card:hover {
+        box-shadow: 0 22px 46px rgba(15, 23, 42, 0.1);
+    }
+
+    .prescription-list-title {
+        font-size: 1.8rem;
+        font-weight: 900;
+        color: #0f172a;
+        margin-bottom: 8px;
+    }
+
+    .prescription-list-subtitle {
+        color: #64748b;
+        margin-bottom: 24px;
+        line-height: 1.8;
+    }
+
+    .prescription-table {
+        margin-bottom: 0;
+        vertical-align: middle;
+    }
+
+    .prescription-table thead th {
+        background: #f8fafc;
+        color: #0f172a;
+        font-weight: 700;
+        border-bottom: none;
+        padding: 14px 12px;
+        white-space: nowrap;
+    }
+
+    .prescription-table tbody tr {
+        transition: all 0.3s ease;
+    }
+
+    .prescription-table tbody tr:hover {
+        background: #f8fbff;
+        transform: scale(1.002);
+    }
+
+    .prescription-table tbody td {
+        padding: 14px 12px;
+        color: #475569;
+        border-color: #eef2f7;
+    }
+
+    .doctor-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: #eff6ff;
+        color: #1d4ed8;
+        border-radius: 999px;
+        padding: 7px 12px;
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    .btn-view-modern {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 40px;
+        padding: 8px 14px;
+        border-radius: 10px;
+        background: linear-gradient(135deg, #1d4ed8, #38bdf8);
+        color: #ffffff;
+        text-decoration: none;
+        font-weight: 700;
+        box-shadow: 0 10px 20px rgba(29, 78, 216, 0.16);
+        transition: all 0.3s ease;
+    }
+
+    .btn-view-modern:hover {
+        color: #ffffff;
+        transform: translateY(-2px);
+        box-shadow: 0 14px 24px rgba(29, 78, 216, 0.22);
+    }
+
+    .empty-state {
+        text-align: center;
+        color: #64748b;
+        padding: 34px 10px;
+    }
+
+    .empty-state-icon {
+        width: 72px;
+        height: 72px;
+        border-radius: 20px;
+        margin: 0 auto 14px;
+        background: linear-gradient(135deg, #dbeafe, #e0f2fe);
+        color: #1d4ed8;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 30px;
+    }
+
+    .empty-state h5 {
+        font-weight: 800;
+        color: #0f172a;
+        margin-bottom: 8px;
+    }
+
+    .empty-state p {
+        margin-bottom: 0;
+    }
+
+    .reveal {
+        opacity: 0;
+        transition: all 0.9s ease;
+    }
+
+    .reveal-up {
+        transform: translateY(40px);
+    }
+
+    .reveal.show {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    @media (max-width: 991px) {
+        .prescription-hero {
+            padding: 40px 24px;
+        }
+
+        .prescription-hero h2 {
+            font-size: 1.95rem;
+        }
+    }
+</style>
+
+<section class="section-space prescription-page">
+    <div class="container">
+
+        <div class="prescription-hero reveal reveal-up show">
+            <span class="hero-chip">
+                <i class="bi bi-file-earmark-medical"></i>
+                Patient Prescription Panel
+            </span>
+            <h2>My Prescriptions</h2>
+            <p>
+                View and download your prescriptions provided by doctors, review your consultation record,
+                and keep all your treatment documents organized in one secure place.
+            </p>
+        </div>
+
+        <div class="row g-4 mb-4">
+            <div class="col-md-4">
+                <div class="summary-card reveal reveal-up">
+                    <div class="summary-icon"><i class="bi bi-file-earmark-text"></i></div>
+                    <h3>{{ prescriptions|length }}</h3>
+                    <p>Total Prescriptions</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="summary-card reveal reveal-up">
+                    <div class="summary-icon"><i class="bi bi-person-badge"></i></div>
+                    <h3>Doctor</h3>
+                    <p>Verified Medical Advice</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="summary-card reveal reveal-up">
+                    <div class="summary-icon"><i class="bi bi-download"></i></div>
+                    <h3>PDF Ready</h3>
+                    <p>View or Download Anytime</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="prescription-list-card reveal reveal-up">
+            <h2 class="prescription-list-title">Prescription Records</h2>
+            <p class="prescription-list-subtitle">
+                All prescriptions shared by your doctors are shown below in a structured record table.
+            </p>
+
+            <div class="table-responsive">
+                <table class="table prescription-table">
+                    <thead>
+                        <tr>
+                            <th>Doctor</th>
+                            <th>Date</th>
+                            <th>Time</th>
+                            <th>Created</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for p in prescriptions %}
+                        <tr>
+                            <td>
+                                <span class="doctor-badge">
+                                    <i class="bi bi-person-check"></i>
+                                    Dr. {{ p.doctor.name }}
+                                </span>
+                            </td>
+                            <td>{{ p.appointment.appointment_date }}</td>
+                            <td>{{ p.appointment.appointment_time }}</td>
+                            <td>{{ p.created_at|date:"M d, Y" }}</td>
+                            <td>
+                                <a href="{% url 'patient_prescription_detail' p.id %}" class="btn-view-modern">
+                                    <i class="bi bi-eye me-2"></i>
+                                    View / Download
+                                </a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5">
+                                <div class="empty-state">
+                                    <div class="empty-state-icon">
+                                        <i class="bi bi-file-earmark-x"></i>
+                                    </div>
+                                    <h5>No Prescriptions Found</h5>
+                                    <p>You do not have any prescription records yet.</p>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+<script>
+    const prescriptionReveal = document.querySelectorAll('.reveal');
+
+    function prescriptionRevealOnScroll() {
+        const triggerBottom = window.innerHeight * 0.9;
+        prescriptionReveal.forEach((el, index) => {
+            const top = el.getBoundingClientRect().top;
+            if (top < triggerBottom) {
+                setTimeout(() => el.classList.add('show'), index * 70);
+            }
+        });
+    }
+
+    window.addEventListener('scroll', prescriptionRevealOnScroll);
+    window.addEventListener('load', prescriptionRevealOnScroll);
+</script>
+{% endblock %}

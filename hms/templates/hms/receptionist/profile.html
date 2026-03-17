@@ -1,0 +1,551 @@
+{% extends 'hms/base.html' %}
+{% block title %}Receptionist Profile{% endblock %}
+
+{% block content %}
+<style>
+    .profile-page {
+        padding: 40px 0 70px;
+    }
+
+    .profile-shell {
+        background: #ffffff;
+        border: 1px solid #e9eef5;
+        border-radius: 30px;
+        box-shadow: 0 20px 50px rgba(15, 23, 42, 0.08);
+        overflow: hidden;
+    }
+
+    .profile-top {
+        background:
+            linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(30, 64, 175, 0.84) 55%, rgba(56, 189, 248, 0.72) 100%),
+            url('https://images.unsplash.com/photo-1587351021759-3e566b6af7cc?auto=format&fit=crop&w=1600&q=80') center/cover no-repeat;
+        color: #ffffff;
+        padding: 50px 40px;
+        position: relative;
+        overflow: hidden;
+        isolation: isolate;
+    }
+
+    .profile-top::before,
+    .profile-top::after {
+        content: "";
+        position: absolute;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.08);
+        z-index: -1;
+    }
+
+    .profile-top::before {
+        width: 230px;
+        height: 230px;
+        top: -60px;
+        right: -70px;
+    }
+
+    .profile-top::after {
+        width: 160px;
+        height: 160px;
+        bottom: -40px;
+        left: -20px;
+    }
+
+    .profile-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 14px;
+        border-radius: 999px;
+        background: rgba(255,255,255,0.14);
+        border: 1px solid rgba(255,255,255,0.16);
+        font-size: 13px;
+        font-weight: 700;
+        margin-bottom: 14px;
+        backdrop-filter: blur(10px);
+    }
+
+    .profile-top h2 {
+        margin: 0 0 10px;
+        font-size: 2.2rem;
+        font-weight: 900;
+        letter-spacing: -0.5px;
+    }
+
+    .profile-top p {
+        margin: 0;
+        color: rgba(255,255,255,0.92);
+        line-height: 1.85;
+        max-width: 760px;
+    }
+
+    .profile-body {
+        padding: 36px 36px 40px;
+        background: linear-gradient(to bottom right, #ffffff, #fbfdff);
+    }
+
+    .profile-card,
+    .summary-box,
+    .form-panel {
+        background: #ffffff;
+        border: 1px solid #e8eef7;
+        border-radius: 24px;
+        box-shadow: 0 12px 28px rgba(15, 23, 42, 0.05);
+        transition: all 0.35s ease;
+    }
+
+    .profile-card:hover,
+    .summary-box:hover,
+    .form-panel:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 18px 40px rgba(15, 23, 42, 0.1);
+    }
+
+    .profile-card {
+        padding: 26px;
+        height: 100%;
+    }
+
+    .profile-card h5,
+    .form-panel h5 {
+        font-weight: 800;
+        color: #0f172a;
+        margin-bottom: 18px;
+        font-size: 1.1rem;
+    }
+
+    .profile-card p {
+        color: #475569;
+        margin-bottom: 12px;
+        line-height: 1.8;
+    }
+
+    .profile-label {
+        font-weight: 700;
+        color: #0f172a;
+    }
+
+    .profile-avatar-wrap {
+        position: relative;
+        width: fit-content;
+        margin: 0 auto 18px;
+    }
+
+    .profile-avatar {
+        width: 112px;
+        height: 112px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 5px solid #ffffff;
+        box-shadow: 0 14px 30px rgba(15, 23, 42, 0.14);
+    }
+
+    .profile-avatar-placeholder {
+        width: 112px;
+        height: 112px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #1d4ed8, #38bdf8);
+        color: #ffffff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 900;
+        font-size: 2.2rem;
+        border: 5px solid #ffffff;
+        box-shadow: 0 14px 30px rgba(15, 23, 42, 0.14);
+    }
+
+    .profile-role-chip {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 7px 12px;
+        border-radius: 999px;
+        background: #eff6ff;
+        color: #1d4ed8;
+        font-size: 12px;
+        font-weight: 700;
+        margin-top: 10px;
+    }
+
+    .summary-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 18px;
+        margin-top: 26px;
+    }
+
+    .summary-box {
+        padding: 22px 18px;
+        text-align: center;
+    }
+
+    .summary-icon {
+        width: 56px;
+        height: 56px;
+        border-radius: 18px;
+        margin: 0 auto 14px;
+        background: linear-gradient(135deg, #dbeafe, #e0f2fe);
+        color: #1d4ed8;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 22px;
+    }
+
+    .summary-box h4 {
+        margin: 0 0 8px;
+        color: #1d4ed8;
+        font-size: 1.9rem;
+        font-weight: 900;
+    }
+
+    .summary-box p {
+        margin: 0;
+        color: #64748b;
+        font-weight: 600;
+        font-size: 0.95rem;
+    }
+
+    .form-panel {
+        padding: 28px;
+    }
+
+    .form-label {
+        font-weight: 700;
+        color: #334155;
+        margin-bottom: 8px;
+    }
+
+    .profile-body .form-control,
+    .profile-body textarea,
+    .profile-body input {
+        min-height: 54px;
+        border-radius: 14px;
+        border: 1px solid #dbe3ee;
+        background: #fbfdff;
+        box-shadow: none;
+        width: 100%;
+        transition: all 0.3s ease;
+    }
+
+    .profile-body textarea {
+        min-height: 120px;
+        padding-top: 12px;
+    }
+
+    .profile-body .form-control:focus,
+    .profile-body textarea:focus,
+    .profile-body input:focus {
+        background: #ffffff;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.08);
+        outline: none;
+    }
+
+    .btn-profile-main {
+        min-height: 54px;
+        padding: 12px 24px;
+        border: none;
+        border-radius: 14px;
+        background: linear-gradient(135deg, #1d4ed8, #38bdf8);
+        color: #ffffff;
+        font-weight: 800;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 14px 28px rgba(29, 78, 216, 0.18);
+        transition: all 0.3s ease;
+    }
+
+    .btn-profile-main:hover {
+        color: #ffffff;
+        transform: translateY(-2px);
+        box-shadow: 0 18px 34px rgba(29, 78, 216, 0.22);
+    }
+
+    .btn-profile-outline {
+        min-height: 54px;
+        padding: 12px 24px;
+        border-radius: 14px;
+        border: 1px solid #dbe3ee;
+        background: #ffffff;
+        color: #0f172a;
+        font-weight: 800;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+    }
+
+    .btn-profile-outline:hover {
+        color: #0f172a;
+        background: #f8fafc;
+        transform: translateY(-2px);
+    }
+
+    .action-row {
+        display: flex;
+        gap: 14px;
+        flex-wrap: wrap;
+        margin-top: 24px;
+    }
+
+    .reveal {
+        opacity: 0;
+        transition: all 0.9s ease;
+    }
+
+    .reveal-up {
+        transform: translateY(40px);
+    }
+
+    .reveal.show {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    @media (max-width: 991px) {
+        .profile-top,
+        .profile-body {
+            padding-left: 22px;
+            padding-right: 22px;
+        }
+
+        .summary-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .profile-top h2 {
+            font-size: 1.9rem;
+        }
+    }
+
+    @media (max-width: 575px) {
+        .summary-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<section class="profile-page">
+    <div class="container">
+        <div class="profile-shell">
+
+            <div class="profile-top">
+                <span class="profile-badge">
+                    <i class="bi bi-person-workspace"></i>
+                    Receptionist Account
+                </span>
+                <h2>Profile Management</h2>
+                <p>
+                    View, update, and manage your receptionist account, organization details,
+                    branch information, profile picture, and account security from one place.
+                </p>
+            </div>
+
+            <div class="profile-body">
+
+                {% if not edit_mode and not password_mode %}
+                    <div class="row g-4">
+                        <div class="col-lg-4">
+                            <div class="profile-card text-center reveal reveal-up">
+                                <div class="profile-avatar-wrap">
+                                    {% if receptionist.profile_picture %}
+                                        <img src="{{ receptionist.profile_picture.url }}" alt="Profile Picture" class="profile-avatar">
+                                    {% else %}
+                                        <div class="profile-avatar-placeholder">
+                                            {{ receptionist.organization_name|slice:":1" }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+
+                                <h5 class="mb-2">{{ receptionist.organization_name }}</h5>
+                                <p class="mb-2 text-muted">Receptionist Account</p>
+                                <span class="profile-role-chip">Healthcare Front Desk</span>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-4">
+                            <div class="profile-card reveal reveal-up">
+                                <h5>Organization Information</h5>
+                                <p><span class="profile-label">Organization Name:</span> {{ receptionist.organization_name }}</p>
+                                <p><span class="profile-label">Contact:</span> {{ receptionist.contact|default:"-" }}</p>
+                                <p><span class="profile-label">Branch Address:</span> {{ receptionist.branch_address|default:"-" }}</p>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-4">
+                            <div class="profile-card reveal reveal-up">
+                                <h5>Account Information</h5>
+                                <p><span class="profile-label">Username:</span> {{ request.user.username }}</p>
+                                <p><span class="profile-label">Email:</span> {{ request.user.email|default:"-" }}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="summary-grid">
+                        <div class="summary-box reveal reveal-up">
+                            <div class="summary-icon"><i class="bi bi-person-badge"></i></div>
+                            <h4>{{ total_doctors }}</h4>
+                            <p>Total Doctors</p>
+                        </div>
+                        <div class="summary-box reveal reveal-up">
+                            <div class="summary-icon"><i class="bi bi-people"></i></div>
+                            <h4>{{ total_patients }}</h4>
+                            <p>Total Patients</p>
+                        </div>
+                        <div class="summary-box reveal reveal-up">
+                            <div class="summary-icon"><i class="bi bi-calendar2-check"></i></div>
+                            <h4>{{ total_appointments }}</h4>
+                            <p>All Appointments</p>
+                        </div>
+                        <div class="summary-box reveal reveal-up">
+                            <div class="summary-icon"><i class="bi bi-clock-history"></i></div>
+                            <h4>{{ today_appointments }}</h4>
+                            <p>Today’s Appointments</p>
+                        </div>
+                    </div>
+
+                    <div class="action-row">
+                        <a href="{% url 'receptionist_profile' %}?edit=1" class="btn-profile-main">Edit Profile</a>
+                        <a href="{% url 'receptionist_profile' %}?password=1" class="btn-profile-outline">Change Password</a>
+                    </div>
+
+                {% elif edit_mode %}
+                    <div class="form-panel reveal reveal-up">
+                        <h5>Edit Profile</h5>
+
+                        <form method="post" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <div class="row g-4">
+                                <div class="col-md-6">
+                                    <label class="form-label">{{ profile_form.organization_name.label }}</label>
+                                    {{ profile_form.organization_name }}
+                                    {% if profile_form.organization_name.errors %}
+                                        <small class="text-danger">{{ profile_form.organization_name.errors|striptags }}</small>
+                                    {% endif %}
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label">{{ profile_form.contact.label }}</label>
+                                    {{ profile_form.contact }}
+                                    {% if profile_form.contact.errors %}
+                                        <small class="text-danger">{{ profile_form.contact.errors|striptags }}</small>
+                                    {% endif %}
+                                </div>
+
+                                <div class="col-md-12">
+                                    <label class="form-label">{{ profile_form.branch_address.label }}</label>
+                                    {{ profile_form.branch_address }}
+                                    {% if profile_form.branch_address.errors %}
+                                        <small class="text-danger">{{ profile_form.branch_address.errors|striptags }}</small>
+                                    {% endif %}
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label">{{ profile_form.username.label }}</label>
+                                    {{ profile_form.username }}
+                                    {% if profile_form.username.errors %}
+                                        <small class="text-danger">{{ profile_form.username.errors|striptags }}</small>
+                                    {% endif %}
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label">{{ profile_form.email.label }}</label>
+                                    {{ profile_form.email }}
+                                    {% if profile_form.email.errors %}
+                                        <small class="text-danger">{{ profile_form.email.errors|striptags }}</small>
+                                    {% endif %}
+                                </div>
+
+                                <div class="col-md-12">
+                                    <label class="form-label">{{ profile_form.profile_picture.label }}</label>
+                                    {{ profile_form.profile_picture }}
+                                    {% if profile_form.profile_picture.errors %}
+                                        <small class="text-danger">{{ profile_form.profile_picture.errors|striptags }}</small>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            {% if profile_form.non_field_errors %}
+                                <div class="alert alert-danger mt-3">
+                                    {{ profile_form.non_field_errors|striptags }}
+                                </div>
+                            {% endif %}
+
+                            <div class="action-row">
+                                <button type="submit" name="save_profile" class="btn-profile-main">Save Changes</button>
+                                <a href="{% url 'receptionist_profile' %}" class="btn-profile-outline">Cancel</a>
+                            </div>
+                        </form>
+                    </div>
+
+                {% elif password_mode %}
+                    <div class="form-panel reveal reveal-up">
+                        <h5>Change Password</h5>
+
+                        <form method="post">
+                            {% csrf_token %}
+                            <div class="row g-4">
+                                <div class="col-md-12">
+                                    <label class="form-label">{{ password_form.current_password.label }}</label>
+                                    {{ password_form.current_password }}
+                                    {% if password_form.current_password.errors %}
+                                        <small class="text-danger">{{ password_form.current_password.errors|striptags }}</small>
+                                    {% endif %}
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label">{{ password_form.new_password.label }}</label>
+                                    {{ password_form.new_password }}
+                                    {% if password_form.new_password.errors %}
+                                        <small class="text-danger">{{ password_form.new_password.errors|striptags }}</small>
+                                    {% endif %}
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label">{{ password_form.confirm_password.label }}</label>
+                                    {{ password_form.confirm_password }}
+                                    {% if password_form.confirm_password.errors %}
+                                        <small class="text-danger">{{ password_form.confirm_password.errors|striptags }}</small>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            {% if password_form.non_field_errors %}
+                                <div class="alert alert-danger mt-3">
+                                    {{ password_form.non_field_errors|striptags }}
+                                </div>
+                            {% endif %}
+
+                            <div class="action-row">
+                                <button type="submit" name="change_password" class="btn-profile-main">Update Password</button>
+                                <a href="{% url 'receptionist_profile' %}" class="btn-profile-outline">Cancel</a>
+                            </div>
+                        </form>
+                    </div>
+                {% endif %}
+
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+    const receptionistProfileReveal = document.querySelectorAll('.reveal');
+
+    function receptionistProfileRevealOnScroll() {
+        const triggerBottom = window.innerHeight * 0.9;
+        receptionistProfileReveal.forEach((el, index) => {
+            const top = el.getBoundingClientRect().top;
+            if (top < triggerBottom) {
+                setTimeout(() => el.classList.add('show'), index * 70);
+            }
+        });
+    }
+
+    window.addEventListener('scroll', receptionistProfileRevealOnScroll);
+    window.addEventListener('load', receptionistProfileRevealOnScroll);
+</script>
+{% endblock %}

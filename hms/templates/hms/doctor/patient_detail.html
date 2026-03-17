@@ -1,0 +1,139 @@
+{% extends 'hms/base.html' %}
+{% block title %}Patient Detail{% endblock %}
+
+{% block content %}
+<style>
+    .patient-detail-page { padding: 34px 0 70px; }
+    .detail-hero {
+        background: linear-gradient(135deg, #0f172a 0%, #1d4ed8 55%, #38bdf8 100%);
+        color: #fff;
+        border-radius: 30px;
+        padding: 55px 40px;
+        margin-bottom: 30px;
+        box-shadow: 0 20px 50px rgba(15, 23, 42, 0.14);
+    }
+    .detail-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 16px;
+        border-radius: 999px;
+        background: rgba(255,255,255,0.14);
+        border: 1px solid rgba(255,255,255,0.16);
+        font-size: 13px;
+        font-weight: 700;
+        margin-bottom: 16px;
+    }
+    .detail-card, .prescription-card {
+        background: #fff;
+        border: 1px solid #e5edf5;
+        border-radius: 24px;
+        box-shadow: 0 16px 36px rgba(15, 23, 42, 0.08);
+        padding: 26px;
+    }
+    .patient-photo {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 3px solid #fff;
+        box-shadow: 0 12px 24px rgba(15, 23, 42, 0.12);
+    }
+    .patient-placeholder {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #1d4ed8, #38bdf8);
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 800;
+        font-size: 1.8rem;
+    }
+    .section-title {
+        font-size: 1.3rem;
+        font-weight: 800;
+        color: #0f172a;
+        margin-bottom: 16px;
+    }
+    .detail-card p, .prescription-card p {
+        color: #64748b;
+        line-height: 1.8;
+        margin-bottom: 10px;
+    }
+    .prescription-entry {
+        border: 1px solid #e8eef7;
+        border-radius: 18px;
+        padding: 18px;
+        background: #f8fbff;
+        margin-bottom: 16px;
+    }
+    .prescription-entry:last-child {
+        margin-bottom: 0;
+    }
+</style>
+
+<section class="section-space patient-detail-page">
+    <div class="container">
+
+        <div class="detail-hero">
+            <span class="detail-badge">
+                <i class="bi bi-person-vcard"></i>
+                Patient Detail
+            </span>
+            <h2>{{ patient.first_name }} {{ patient.last_name }}</h2>
+            <p class="mb-0">
+                Patient profile and previous prescriptions written under your completed consultations.
+            </p>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-lg-4">
+                <div class="detail-card text-center">
+                    {% if patient.photo %}
+                        <img src="{{ patient.photo.url }}" alt="{{ patient.first_name }}" class="patient-photo mb-3">
+                    {% else %}
+                        <div class="patient-placeholder mx-auto mb-3">{{ patient.first_name|slice:":1" }}</div>
+                    {% endif %}
+
+                    <h4 class="fw-bold mb-2">{{ patient.first_name }} {{ patient.last_name }}</h4>
+                    <p><strong>Email:</strong> {{ patient.user.email|default:"-" }}</p>
+                    <p><strong>Contact:</strong> {{ patient.contact|default:"-" }}</p>
+                    <p><strong>Gender:</strong> {{ patient.gender|default:"-" }}</p>
+                </div>
+            </div>
+
+            <div class="col-lg-8">
+                <div class="detail-card mb-4">
+                    <h3 class="section-title">Completed Appointments With This Patient</h3>
+                    {% for ap in completed_appointments %}
+                        <p>
+                            <strong>Date:</strong> {{ ap.appointment_date }}
+                            | <strong>Time:</strong> {{ ap.appointment_time }}
+                            | <strong>Mode:</strong> {{ ap.appointment_mode }}
+                        </p>
+                    {% empty %}
+                        <p class="mb-0">No completed appointment records found.</p>
+                    {% endfor %}
+                </div>
+
+                <div class="prescription-card">
+                    <h3 class="section-title">Previous Prescriptions</h3>
+
+                    {% for pr in prescriptions %}
+                        <div class="prescription-entry">
+                            <p><strong>Appointment:</strong> {{ pr.appointment.appointment_date }} {{ pr.appointment.appointment_time }}</p>
+                            <p><strong>Prescription:</strong> {{ pr.prescription_text }}</p>
+                            <p class="mb-0"><strong>Advice:</strong> {{ pr.advice|default:"-" }}</p>
+                        </div>
+                    {% empty %}
+                        <p class="mb-0">No previous prescription found for this patient.</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+    </div>
+</section>
+{% endblock %}

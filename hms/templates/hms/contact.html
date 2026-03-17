@@ -1,0 +1,410 @@
+{% extends 'hms/base.html' %}
+{% load static %}
+{% block title %}Contact{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --primary: #0f172a;
+        --secondary: #1d4ed8;
+        --accent: #38bdf8;
+        --muted: #64748b;
+        --soft: #f8fbff;
+        --white: #ffffff;
+        --border: #e2e8f0;
+        --shadow-sm: 0 10px 25px rgba(15, 23, 42, 0.06);
+        --shadow-md: 0 18px 40px rgba(15, 23, 42, 0.09);
+        --shadow-lg: 0 25px 60px rgba(15, 23, 42, 0.14);
+        --transition: all 0.35s ease;
+    }
+
+    .contact-hero {
+        position: relative;
+        overflow: hidden;
+        border-radius: 34px;
+        padding: 88px 55px;
+        margin-bottom: 40px;
+        background:
+            linear-gradient(120deg, rgba(15, 23, 42, 0.92), rgba(29, 78, 216, 0.82)),
+            url('https://images.unsplash.com/photo-1516549655169-df83a0774514?auto=format&fit=crop&w=1600&q=80') center/cover no-repeat;
+        color: #fff;
+        box-shadow: var(--shadow-lg);
+    }
+
+    .contact-hero h1 {
+        font-size: 3rem;
+        font-weight: 900;
+        line-height: 1.1;
+        margin-bottom: 16px;
+        letter-spacing: -1px;
+    }
+
+    .contact-hero p {
+        max-width: 760px;
+        color: rgba(255,255,255,0.92);
+        line-height: 1.9;
+        font-size: 1.05rem;
+        margin-bottom: 0;
+    }
+
+    .badge-soft {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(255,255,255,0.14);
+        border: 1px solid rgba(255,255,255,0.16);
+        padding: 8px 16px;
+        border-radius: 999px;
+        font-size: 13px;
+        font-weight: 700;
+        margin-bottom: 18px;
+    }
+
+    .mini-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 16px;
+        background: #eaf4ff;
+        color: var(--secondary);
+        border-radius: 999px;
+        font-size: 13px;
+        font-weight: 700;
+        margin-bottom: 15px;
+    }
+
+    .contact-card,
+    .contact-info-card,
+    .faq-card {
+        background: rgba(255,255,255,0.97);
+        border: 1px solid #edf2f7;
+        border-radius: 26px;
+        box-shadow: var(--shadow-md);
+        transition: var(--transition);
+        height: 100%;
+    }
+
+    .contact-card:hover,
+    .contact-info-card:hover,
+    .faq-card:hover {
+        transform: translateY(-7px);
+        box-shadow: var(--shadow-lg);
+    }
+
+    .contact-card,
+    .contact-info-card,
+    .faq-card {
+        padding: 32px;
+    }
+
+    .section-title {
+        font-size: 2.15rem;
+        font-weight: 800;
+        color: var(--primary);
+        margin-bottom: 12px;
+        letter-spacing: -0.5px;
+    }
+
+    .section-subtitle {
+        color: var(--muted);
+        line-height: 1.85;
+        margin-bottom: 0;
+    }
+
+    .icon-box {
+        width: 58px;
+        height: 58px;
+        border-radius: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 18px;
+        font-size: 22px;
+        color: var(--secondary);
+        background: linear-gradient(135deg, #dbeafe, #e0f2fe);
+        box-shadow: var(--shadow-sm);
+    }
+
+    .contact-info-card h5,
+    .faq-card h5,
+    .contact-card h4 {
+        font-weight: 800;
+        color: var(--primary);
+        margin-bottom: 12px;
+    }
+
+    .contact-info-card p,
+    .faq-card p {
+        color: var(--muted);
+        line-height: 1.85;
+        margin: 0;
+    }
+
+    .form-label {
+        font-weight: 700;
+        color: var(--primary);
+        margin-bottom: 8px;
+    }
+
+    .form-control,
+    .form-select,
+    textarea.form-control {
+        border-radius: 14px;
+        padding: 13px 15px;
+        border: 1px solid var(--border);
+        box-shadow: none !important;
+    }
+
+    .form-control:focus,
+    .form-select:focus,
+    textarea.form-control:focus {
+        border-color: #93c5fd;
+        box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.10) !important;
+    }
+
+    .btn-contact {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: linear-gradient(135deg, var(--secondary), var(--accent));
+        color: #fff;
+        border: none;
+        border-radius: 14px;
+        padding: 13px 22px;
+        font-weight: 700;
+        transition: var(--transition);
+    }
+
+    .btn-contact:hover {
+        color: #fff;
+        transform: translateY(-2px);
+    }
+
+    .map-box {
+        overflow: hidden;
+        border-radius: 24px;
+        min-height: 100%;
+        background:
+            linear-gradient(to top, rgba(15,23,42,0.82), rgba(15,23,42,0.08)),
+            url('https://images.unsplash.com/photo-1505751172876-fa1923c5c528?auto=format&fit=crop&w=1400&q=80') center/cover no-repeat;
+        box-shadow: var(--shadow-lg);
+        position: relative;
+    }
+
+    .map-box-content {
+        position: absolute;
+        inset: auto 0 0 0;
+        padding: 28px;
+        color: #fff;
+    }
+
+    .map-box-content h4 {
+        font-weight: 800;
+        margin-bottom: 10px;
+    }
+
+    .map-box-content p {
+        margin: 0;
+        color: rgba(255,255,255,0.88);
+        line-height: 1.85;
+    }
+
+    .reveal {
+        opacity: 0;
+        transition: all 0.9s ease;
+    }
+
+    .reveal-left { transform: translateX(-70px); }
+    .reveal-right { transform: translateX(70px); }
+    .reveal-up { transform: translateY(55px); }
+
+    .reveal.show {
+        opacity: 1;
+        transform: translate(0,0);
+    }
+
+    .delay-1 { transition-delay: 0.08s; }
+    .delay-2 { transition-delay: 0.16s; }
+    .delay-3 { transition-delay: 0.24s; }
+    .delay-4 { transition-delay: 0.32s; }
+
+    @media (max-width: 991px) {
+        .contact-hero {
+            padding: 60px 28px;
+        }
+
+        .contact-hero h1 {
+            font-size: 2.3rem;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .contact-hero {
+            padding: 48px 22px;
+            border-radius: 26px;
+        }
+
+        .contact-hero h1 {
+            font-size: 2rem;
+        }
+
+        .section-title {
+            font-size: 1.8rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="section-space">
+    <div class="container">
+
+        <div class="contact-hero reveal reveal-up show">
+            <span class="badge-soft"><i class="bi bi-envelope-paper"></i> Contact SmartCare HMS</span>
+            <h1>Let’s Talk About Your Healthcare Platform Needs</h1>
+            <p>
+                Reach out to discuss hospital workflow improvements, digital coordination, appointments,
+                or general platform questions. We’d love to hear your feedback and ideas.
+            </p>
+        </div>
+
+        <div class="row g-4 mb-5">
+            <div class="col-md-4">
+                <div class="contact-info-card reveal reveal-left delay-1">
+                    <div class="icon-box"><i class="bi bi-telephone"></i></div>
+                    <h5>Call Us</h5>
+                    <p>+880 1234-567890</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="contact-info-card reveal reveal-up delay-2">
+                    <div class="icon-box"><i class="bi bi-envelope"></i></div>
+                    <h5>Email Us</h5>
+                    <p>support@hospital.com</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="contact-info-card reveal reveal-right delay-3">
+                    <div class="icon-box"><i class="bi bi-geo-alt"></i></div>
+                    <h5>Visit Us</h5>
+                    <p>Dhaka, Bangladesh</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4 align-items-stretch mb-5">
+            <div class="col-lg-7">
+                <div class="contact-card reveal reveal-left">
+                    <span class="mini-badge"><i class="bi bi-chat-dots"></i> Send a Message</span>
+                    <h4 class="mb-3">Get in Touch</h4>
+
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Full Name</label>
+                                <input type="text" name="name" class="form-control" placeholder="Enter your name" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Email Address</label>
+                                <input type="email" name="email" class="form-control" placeholder="Enter your email" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Phone</label>
+                                <input type="text" name="phone" class="form-control" placeholder="Enter your phone number">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Subject</label>
+                                <input type="text" name="subject" class="form-control" placeholder="Enter message subject">
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Message</label>
+                                <textarea name="message" rows="6" class="form-control" placeholder="Write your message here..." required></textarea>
+                            </div>
+                            <div class="col-12 pt-2">
+                                <button type="submit" class="btn-contact">
+                                    <i class="bi bi-send"></i>
+                                    Send Message
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="col-lg-5">
+                <div class="map-box reveal reveal-right">
+                    <div class="map-box-content">
+                        <h4>Healthcare Support & Communication</h4>
+                        <p>
+                            Whether you want to ask about hospital operations, platform usability,
+                            or digital transformation opportunities, our team is here to connect.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="text-center mb-4 reveal reveal-up">
+            <span class="mini-badge"><i class="bi bi-question-circle"></i> Common Questions</span>
+            <h2 class="section-title">Frequently Asked Questions</h2>
+            <p class="section-subtitle">
+                A few common questions users might have before reaching out.
+            </p>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="faq-card reveal reveal-left delay-1">
+                    <div class="icon-box"><i class="bi bi-hospital"></i></div>
+                    <h5>What is SmartCare HMS?</h5>
+                    <p>
+                        It is a hospital management platform built to organize patients, doctors,
+                        appointments, hospital workflows, and administration digitally.
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="faq-card reveal reveal-up delay-2">
+                    <div class="icon-box"><i class="bi bi-shield-lock"></i></div>
+                    <h5>Is the system role-based?</h5>
+                    <p>
+                        Yes. Patients, doctors, receptionists, and administrators each have
+                        their own dedicated workflows and access areas.
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="faq-card reveal reveal-right delay-3">
+                    <div class="icon-box"><i class="bi bi-stars"></i></div>
+                    <h5>Can it be presented to clients?</h5>
+                    <p>
+                        Absolutely. The interface is designed to feel modern, clean,
+                        and professional enough for presentation and demonstration.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const contactReveal = document.querySelectorAll('.reveal');
+
+    function contactRevealOnScroll() {
+        const triggerBottom = window.innerHeight * 0.88;
+        contactReveal.forEach(el => {
+            const top = el.getBoundingClientRect().top;
+            if (top < triggerBottom) {
+                el.classList.add('show');
+            }
+        });
+    }
+
+    window.addEventListener('scroll', contactRevealOnScroll);
+    window.addEventListener('load', contactRevealOnScroll);
+</script>
+{% endblock %}

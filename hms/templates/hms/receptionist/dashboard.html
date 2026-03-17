@@ -1,0 +1,995 @@
+{% extends 'hms/base.html' %}
+{% block title %}Receptionist Dashboard{% endblock %}
+
+{% block content %}
+<style>
+    .reception-page {
+        position: relative;
+        overflow: hidden;
+        background:
+            radial-gradient(circle at top left, rgba(37, 99, 235, 0.08), transparent 24%),
+            radial-gradient(circle at bottom right, rgba(56, 189, 248, 0.08), transparent 24%);
+    }
+
+    .reception-page::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(to bottom, rgba(255,255,255,0.28), rgba(255,255,255,0));
+        pointer-events: none;
+    }
+
+    .reception-hero {
+        background:
+            linear-gradient(135deg, rgba(15, 23, 42, 0.94) 0%, rgba(29, 78, 216, 0.90) 56%, rgba(56, 189, 248, 0.82) 100%),
+            url('https://images.unsplash.com/photo-1584515933487-779824d29309?auto=format&fit=crop&w=1600&q=80') center/cover no-repeat;
+        color: #ffffff;
+        border-radius: 30px;
+        padding: 55px 40px;
+        margin-bottom: 30px;
+        box-shadow: 0 24px 60px rgba(15, 23, 42, 0.16);
+        position: relative;
+        overflow: hidden;
+        border: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .reception-hero::before,
+    .reception-hero::after {
+        content: "";
+        position: absolute;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.08);
+    }
+
+    .reception-hero::before {
+        width: 240px;
+        height: 240px;
+        top: -80px;
+        right: -60px;
+    }
+
+    .reception-hero::after {
+        width: 180px;
+        height: 180px;
+        bottom: -60px;
+        left: -30px;
+    }
+
+    .reception-hero-content {
+        position: relative;
+        z-index: 2;
+    }
+
+    .reception-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 16px;
+        border-radius: 999px;
+        background: rgba(255,255,255,0.14);
+        border: 1px solid rgba(255,255,255,0.18);
+        font-size: 14px;
+        font-weight: 700;
+        margin-bottom: 18px;
+        backdrop-filter: blur(8px);
+    }
+
+    .reception-hero h2 {
+        font-size: 2.35rem;
+        font-weight: 800;
+        margin-bottom: 10px;
+        letter-spacing: -0.5px;
+    }
+
+    .reception-hero p {
+        color: rgba(255,255,255,0.92);
+        margin-bottom: 0;
+        line-height: 1.8;
+        max-width: 760px;
+    }
+
+    .reception-stat-card,
+    .reception-info-card,
+    .reception-table-card,
+    .visual-card,
+    .person-card,
+    .quick-note-card {
+        background: rgba(255,255,255,0.96);
+        border: 1px solid #e9eef5;
+        border-radius: 24px;
+        box-shadow: 0 18px 40px rgba(15, 23, 42, 0.08);
+        transition: all 0.35s ease;
+    }
+
+    .reception-stat-card:hover,
+    .reception-info-card:hover,
+    .reception-table-card:hover,
+    .visual-card:hover,
+    .person-card:hover,
+    .quick-note-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 24px 48px rgba(15, 23, 42, 0.12);
+    }
+
+    .reception-stat-card {
+        padding: 26px 22px;
+        text-align: center;
+        height: 100%;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .reception-stat-card::before {
+        content: "";
+        position: absolute;
+        width: 110px;
+        height: 110px;
+        border-radius: 50%;
+        top: -34px;
+        right: -28px;
+        background: rgba(59, 130, 246, 0.08);
+    }
+
+    .stat-icon {
+        width: 58px;
+        height: 58px;
+        border-radius: 18px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 14px;
+        font-size: 1.35rem;
+        color: #1d4ed8;
+        background: linear-gradient(135deg, #eff6ff, #dbeafe);
+        box-shadow: inset 0 0 0 1px #bfdbfe;
+        position: relative;
+        z-index: 2;
+    }
+
+    .reception-stat-card h3 {
+        font-size: 2rem;
+        font-weight: 800;
+        color: #1d4ed8;
+        margin-bottom: 8px;
+        position: relative;
+        z-index: 2;
+    }
+
+    .reception-stat-card p {
+        color: #64748b;
+        margin-bottom: 0;
+        font-weight: 700;
+        position: relative;
+        z-index: 2;
+    }
+
+    .reception-info-card,
+    .reception-table-card,
+    .visual-card,
+    .quick-note-card {
+        padding: 28px;
+    }
+
+    .reception-info-card h4,
+    .reception-table-card h4,
+    .table-title,
+    .section-title {
+        font-weight: 800;
+        color: #0f172a;
+        margin-bottom: 18px;
+    }
+
+    .reception-info-card p,
+    .quick-note-card p {
+        color: #475569;
+        margin-bottom: 10px;
+        line-height: 1.7;
+    }
+
+    .section-subtitle,
+    .table-subtitle {
+        color: #64748b;
+        margin-bottom: 24px;
+    }
+
+    .table-title,
+    .section-title {
+        font-size: 1.45rem;
+        margin-bottom: 8px;
+        letter-spacing: -0.3px;
+    }
+
+    .section-icon-title {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .section-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 14px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        color: #1d4ed8;
+        background: linear-gradient(135deg, #eff6ff, #dbeafe);
+        box-shadow: inset 0 0 0 1px #bfdbfe;
+        flex-shrink: 0;
+    }
+
+    .section-topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 14px;
+        flex-wrap: wrap;
+        margin-bottom: 18px;
+    }
+
+    .btn-view-all {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 44px;
+        padding: 10px 16px;
+        border-radius: 12px;
+        background: linear-gradient(135deg, #0f172a, #1e293b);
+        color: #ffffff;
+        font-weight: 700;
+        text-decoration: none;
+        transition: 0.25s ease;
+        box-shadow: 0 12px 24px rgba(15, 23, 42, 0.14);
+    }
+
+    .btn-view-all:hover {
+        color: #ffffff;
+        transform: translateY(-2px);
+        box-shadow: 0 16px 28px rgba(15, 23, 42, 0.18);
+    }
+
+    .reception-table {
+        margin-bottom: 0;
+        vertical-align: middle;
+    }
+
+    .reception-table thead th {
+        background: linear-gradient(180deg, #f8fafc, #f1f5f9);
+        color: #0f172a;
+        font-weight: 800;
+        border-bottom: none;
+        padding: 14px 12px;
+        white-space: nowrap;
+        font-size: 0.95rem;
+    }
+
+    .reception-table tbody td {
+        padding: 14px 12px;
+        color: #475569;
+        border-color: #eef2f7;
+    }
+
+    .reception-table tbody tr {
+        transition: all 0.28s ease;
+    }
+
+    .reception-table tbody tr:hover {
+        background: #f8fbff;
+    }
+
+    .status-badge {
+        display: inline-block;
+        padding: 7px 12px;
+        border-radius: 999px;
+        font-size: 13px;
+        font-weight: 700;
+        box-shadow: inset 0 0 0 1px rgba(255,255,255,0.2);
+    }
+
+    .status-booked { background: #dbeafe; color: #1d4ed8; }
+    .status-arrived { background: #e0f2fe; color: #0369a1; }
+    .status-waiting { background: #fef3c7; color: #b45309; }
+    .status-inconsultation { background: #ede9fe; color: #6d28d9; }
+    .status-completed { background: #dcfce7; color: #166534; }
+    .status-missed { background: #fee2e2; color: #b91c1c; }
+    .status-cancelled { background: #fee2e2; color: #b91c1c; }
+
+    .urgency-badge {
+        display: inline-block;
+        padding: 6px 10px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    .urgency-normal { background: #e2e8f0; color: #334155; }
+    .urgency-urgent { background: #fde68a; color: #92400e; }
+    .urgency-emergency { background: #fecaca; color: #b91c1c; }
+
+    .search-form .form-control {
+        min-height: 50px;
+        border-radius: 14px;
+        background: #f8fafc;
+        border: 1px solid #dbe3ee;
+        box-shadow: none;
+        transition: all 0.3s ease;
+    }
+
+    .search-form .form-control:focus {
+        background: #ffffff;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.08);
+    }
+
+    .btn-modern {
+        min-height: 50px;
+        border-radius: 14px;
+        font-weight: 700;
+        transition: all 0.3s ease;
+    }
+
+    .btn-modern:hover {
+        transform: translateY(-2px);
+    }
+
+    .btn-print {
+        background: linear-gradient(135deg, #0f172a, #334155);
+        color: #ffffff;
+        border: none;
+        box-shadow: 0 12px 24px rgba(15, 23, 42, 0.14);
+    }
+
+    .btn-print:hover {
+        color: #ffffff;
+        background: linear-gradient(135deg, #1e293b, #475569);
+    }
+
+    .action-stack a {
+        display: block;
+        margin-bottom: 6px;
+        transition: all 0.28s ease;
+    }
+
+    .action-stack a:hover {
+        transform: translateX(4px);
+    }
+
+    .visual-card {
+        height: 100%;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .visual-card::before {
+        content: "";
+        position: absolute;
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        top: -30px;
+        right: -34px;
+        background: rgba(59, 130, 246, 0.06);
+    }
+
+    .visual-chip {
+        display: inline-block;
+        padding: 6px 12px;
+        border-radius: 999px;
+        background: #eff6ff;
+        color: #1d4ed8;
+        font-size: 12px;
+        font-weight: 700;
+        margin-bottom: 14px;
+        box-shadow: inset 0 0 0 1px #dbeafe;
+    }
+
+    .progress-group {
+        display: grid;
+        gap: 18px;
+    }
+
+    .progress-row .label-wrap {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 8px;
+        color: #334155;
+        font-weight: 700;
+    }
+
+    .bar-track {
+        width: 100%;
+        height: 12px;
+        border-radius: 999px;
+        background: #e2e8f0;
+        overflow: hidden;
+        box-shadow: inset 0 2px 4px rgba(15,23,42,0.04);
+    }
+
+    .bar-fill {
+        height: 100%;
+        border-radius: 999px;
+        background: linear-gradient(135deg, #1d4ed8, #38bdf8);
+        box-shadow: 0 4px 12px rgba(29, 78, 216, 0.18);
+    }
+
+    .mini-graph {
+        display: flex;
+        align-items: end;
+        gap: 16px;
+        min-height: 210px;
+        padding-top: 18px;
+    }
+
+    .mini-graph-col {
+        flex: 1;
+        text-align: center;
+    }
+
+    .mini-graph-value {
+        margin-bottom: 8px;
+        font-weight: 800;
+        color: #0f172a;
+    }
+
+    .mini-graph-bar {
+        width: 100%;
+        min-height: 42px;
+        border-radius: 16px 16px 6px 6px;
+        background: linear-gradient(180deg, #38bdf8, #1d4ed8);
+        box-shadow: 0 10px 18px rgba(29, 78, 216, 0.16);
+        transition: all 0.3s ease;
+    }
+
+    .mini-graph-col:hover .mini-graph-bar {
+        transform: scaleY(1.03);
+        filter: brightness(1.03);
+    }
+
+    .mini-graph-label {
+        margin-top: 10px;
+        color: #64748b;
+        font-weight: 700;
+        font-size: 14px;
+    }
+
+    .person-card {
+        overflow: hidden;
+        height: 100%;
+        position: relative;
+    }
+
+    .person-image {
+        width: 100%;
+        height: 220px;
+        object-fit: cover;
+        background: #e2e8f0;
+        transition: transform 0.45s ease;
+    }
+
+    .person-card:hover .person-image {
+        transform: scale(1.04);
+    }
+
+    .person-placeholder {
+        width: 100%;
+        height: 220px;
+        background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #1d4ed8;
+        font-size: 2rem;
+        font-weight: 800;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .person-placeholder::before {
+        content: "";
+        position: absolute;
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.24);
+        top: -30px;
+        right: -20px;
+    }
+
+    .person-content {
+        padding: 22px;
+    }
+
+    .person-content h5 {
+        font-weight: 800;
+        color: #0f172a;
+        margin-bottom: 8px;
+    }
+
+    .person-content p {
+        color: #64748b;
+        margin-bottom: 8px;
+        line-height: 1.7;
+    }
+
+    .info-tag {
+        display: inline-block;
+        padding: 6px 12px;
+        border-radius: 999px;
+        background: #eff6ff;
+        color: #1d4ed8;
+        font-size: 12px;
+        font-weight: 700;
+        margin-bottom: 10px;
+        box-shadow: inset 0 0 0 1px #dbeafe;
+    }
+
+    .quick-note-card {
+        position: relative;
+        overflow: hidden;
+    }
+
+    .quick-note-card::before {
+        content: "";
+        position: absolute;
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        top: -24px;
+        right: -24px;
+        background: rgba(59,130,246,0.06);
+    }
+
+    .quick-note-card ul {
+        list-style: none;
+        padding: 0;
+        margin: 16px 0 0;
+    }
+
+    .quick-note-card li {
+        padding: 12px 0;
+        border-bottom: 1px solid #eef2f7;
+        color: #475569;
+        line-height: 1.75;
+        position: relative;
+        padding-left: 24px;
+    }
+
+    .quick-note-card li::before {
+        content: "•";
+        position: absolute;
+        left: 0;
+        top: 11px;
+        color: #2563eb;
+        font-size: 1.1rem;
+        font-weight: 800;
+    }
+
+    .quick-note-card li:last-child {
+        border-bottom: none;
+    }
+
+    /* Reveal animations */
+    .reveal {
+        opacity: 0;
+        transition: all 0.9s ease;
+        will-change: transform, opacity;
+    }
+
+    .reveal-up {
+        transform: translateY(46px);
+    }
+
+    .reveal-left {
+        transform: translateX(-54px);
+    }
+
+    .reveal-right {
+        transform: translateX(54px);
+    }
+
+    .reveal.show {
+        opacity: 1;
+        transform: translate(0, 0);
+    }
+
+    @media print {
+        .no-print,
+        nav,
+        footer {
+            display: none !important;
+        }
+    }
+
+    @media (max-width: 991px) {
+        .reception-hero {
+            padding: 40px 24px;
+        }
+
+        .reception-hero h2 {
+            font-size: 1.9rem;
+        }
+    }
+</style>
+
+<section class="section-space reception-page">
+  <div class="container">
+
+    <div class="reception-hero reveal reveal-up">
+      <div class="reception-hero-content">
+        <span class="reception-badge">
+            <i class="bi bi-headset"></i>
+            Receptionist Portal
+        </span>
+        <h2>Welcome {{ receptionist.organization_name }}</h2>
+        <p>
+          Manage front-desk activity, monitor today’s appointments, update patient flow status,
+          and support hospital operations with a modern smart HMS interface.
+        </p>
+      </div>
+    </div>
+
+    <div class="row g-4 mb-4">
+      <div class="col-md-3">
+        <div class="reception-stat-card reveal reveal-up">
+          <div class="stat-icon"><i class="bi bi-calendar2-check"></i></div>
+          <h3>{{ today_appointments|length }}</h3>
+          <p>Today’s Appointments</p>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="reception-stat-card reveal reveal-up">
+          <div class="stat-icon"><i class="bi bi-hourglass-split"></i></div>
+          <h3>{{ waiting_count }}</h3>
+          <p>Waiting</p>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="reception-stat-card reveal reveal-up">
+          <div class="stat-icon"><i class="bi bi-check-circle"></i></div>
+          <h3>{{ completed_count }}</h3>
+          <p>Completed</p>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="reception-stat-card reveal reveal-up">
+          <div class="stat-icon"><i class="bi bi-exclamation-triangle"></i></div>
+          <h3>{{ urgent_count }}</h3>
+          <p>Emergency Cases</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="row g-4 mb-4">
+      <div class="col-lg-5">
+        <div class="visual-card reveal reveal-left">
+          <span class="visual-chip">Operational Flow</span>
+          <div class="section-icon-title">
+            <span class="section-icon"><i class="bi bi-activity"></i></span>
+            <div>
+              <h3 class="section-title mb-1">Front Desk Performance</h3>
+              <p class="section-subtitle mb-0">Track appointment movement and daily workload visually.</p>
+            </div>
+          </div>
+
+          <div class="progress-group mt-4">
+            <div class="progress-row">
+              <div class="label-wrap">
+                <span>Completed Cases</span>
+                <span>{{ completed_count }}</span>
+              </div>
+              <div class="bar-track">
+                <div class="bar-fill" style="width:{% if appointments|length %}{% widthratio completed_count appointments|length 100 %}{% else %}0{% endif %}%"></div>
+              </div>
+            </div>
+
+            <div class="progress-row">
+              <div class="label-wrap">
+                <span>Waiting Queue</span>
+                <span>{{ waiting_count }}</span>
+              </div>
+              <div class="bar-track">
+                <div class="bar-fill" style="width:{% if appointments|length %}{% widthratio waiting_count appointments|length 100 %}{% else %}0{% endif %}%"></div>
+              </div>
+            </div>
+
+            <div class="progress-row">
+              <div class="label-wrap">
+                <span>Emergency Priority</span>
+                <span>{{ urgent_count }}</span>
+              </div>
+              <div class="bar-track">
+                <div class="bar-fill" style="width:{% if appointments|length %}{% widthratio urgent_count appointments|length 100 %}{% else %}0{% endif %}%"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-7">
+        <div class="visual-card reveal reveal-right">
+          <span class="visual-chip">Visual Snapshot</span>
+          <div class="section-icon-title">
+            <span class="section-icon"><i class="bi bi-bar-chart-line"></i></span>
+            <div>
+              <h3 class="section-title mb-1">Daily Service Graph</h3>
+              <p class="section-subtitle mb-0">Quick comparison of active medical resources and front desk workload.</p>
+            </div>
+          </div>
+
+          <div class="mini-graph">
+            <div class="mini-graph-col">
+              <div class="mini-graph-value">{{ doctors.count }}</div>
+              <div class="mini-graph-bar" style="height:{% widthratio doctors.count 1 20 %}px;"></div>
+              <div class="mini-graph-label">Doctors</div>
+            </div>
+            <div class="mini-graph-col">
+              <div class="mini-graph-value">{{ patients.count }}</div>
+              <div class="mini-graph-bar" style="height:{% widthratio patients.count 1 6 %}px;"></div>
+              <div class="mini-graph-label">Patients</div>
+            </div>
+            <div class="mini-graph-col">
+              <div class="mini-graph-value">{{ today_appointments|length }}</div>
+              <div class="mini-graph-bar" style="height:{% widthratio today_appointments|length 1 18 %}px;"></div>
+              <div class="mini-graph-label">Today</div>
+            </div>
+            <div class="mini-graph-col">
+              <div class="mini-graph-value">{{ urgent_count }}</div>
+              <div class="mini-graph-bar" style="height:{% widthratio urgent_count 1 36 %}px;"></div>
+              <div class="mini-graph-label">Urgent</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row g-4 mb-4">
+      <div class="col-lg-4">
+        <div class="reception-info-card reveal reveal-left">
+          <div class="section-icon-title">
+            <span class="section-icon"><i class="bi bi-building"></i></span>
+            <div>
+              <h4 class="mb-1">Organization Summary</h4>
+              <p class="text-muted mb-0">Quick overview of your front desk environment.</p>
+            </div>
+          </div>
+          <div class="mt-4">
+            <p><strong>Organization:</strong> {{ receptionist.organization_name }}</p>
+            <p><strong>Contact:</strong> {{ receptionist.contact }}</p>
+            <p><strong>Approved Doctors:</strong> {{ doctors.count }}</p>
+            <p><strong>Patients Connected:</strong> {{ patients.count }}</p>
+            <p class="mb-0"><strong>Today:</strong> {{ today_date }}</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-8">
+        <div class="reception-table-card reveal reveal-right">
+          <div class="section-icon-title">
+            <span class="section-icon"><i class="bi bi-search"></i></span>
+            <div>
+              <h3 class="table-title mb-1">Quick Search & Daily Print</h3>
+              <p class="table-subtitle mb-0">
+                Search today’s operations by patient name, phone number, or date, then print the filtered schedule.
+              </p>
+            </div>
+          </div>
+
+          <form method="get" class="row g-3 search-form no-print mt-1">
+            <div class="col-md-5">
+              <input type="text" name="q" value="{{ query }}" class="form-control" placeholder="Search patient by name or contact">
+            </div>
+            <div class="col-md-4">
+              <input type="date" name="date" value="{{ filter_date }}" class="form-control">
+            </div>
+            <div class="col-md-2">
+              <button class="btn btn-primary btn-modern w-100">Filter</button>
+            </div>
+            <div class="col-md-1">
+              <button type="button" onclick="window.print()" class="btn btn-print btn-modern w-100">Print</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div class="reception-table-card mb-4 reveal reveal-up">
+      <div class="section-topbar">
+        <div>
+          <div class="section-icon-title">
+            <span class="section-icon"><i class="bi bi-calendar-week"></i></span>
+            <div>
+              <h3 class="table-title mb-1">Today’s Appointments</h3>
+              <p class="table-subtitle mb-0">Handle arrival, waiting queue, consultation progress, and completion from one place.</p>
+            </div>
+          </div>
+        </div>
+        <a href="{% url 'receptionist_all_appointments' %}" class="btn-view-all no-print">View All</a>
+      </div>
+
+      <div class="table-responsive">
+        <table class="table reception-table">
+          <thead>
+            <tr>
+              <th>Patient</th>
+              <th>Doctor</th>
+              <th>Time</th>
+              <th>Mode</th>
+              <th>Urgency</th>
+              <th>Symptoms</th>
+              <th>Status</th>
+              <th class="no-print">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for a in today_appointments|slice:":3" %}
+            <tr>
+              <td>{{ a.patient.first_name }} {{ a.patient.last_name }}</td>
+              <td>{{ a.doctor.name }}</td>
+              <td>{{ a.appointment_time }}</td>
+              <td>{{ a.appointment_mode }}</td>
+              <td>
+                {% if a.urgency_level == 'Emergency' %}
+                  <span class="urgency-badge urgency-emergency">{{ a.urgency_level }}</span>
+                {% elif a.urgency_level == 'Urgent' %}
+                  <span class="urgency-badge urgency-urgent">{{ a.urgency_level }}</span>
+                {% else %}
+                  <span class="urgency-badge urgency-normal">{{ a.urgency_level }}</span>
+                {% endif %}
+              </td>
+              <td>{{ a.symptoms|default:"-"|truncatewords:6 }}</td>
+              <td>
+                {% if a.display_status == 'Booked' %}
+                  <span class="status-badge status-booked">{{ a.display_status }}</span>
+                {% elif a.display_status == 'Arrived' %}
+                  <span class="status-badge status-arrived">{{ a.display_status }}</span>
+                {% elif a.display_status == 'Waiting' %}
+                  <span class="status-badge status-waiting">{{ a.display_status }}</span>
+                {% elif a.display_status == 'In Consultation' %}
+                  <span class="status-badge status-inconsultation">{{ a.display_status }}</span>
+                {% elif a.display_status == 'Completed' %}
+                  <span class="status-badge status-completed">{{ a.display_status }}</span>
+                {% elif a.display_status == 'Missed' %}
+                  <span class="status-badge status-missed">{{ a.display_status }}</span>
+                {% else %}
+                  <span class="status-badge status-cancelled">{{ a.display_status }}</span>
+                {% endif %}
+              </td>
+              <td class="no-print">
+                <div class="action-stack">
+                  <a href="{% url 'receptionist_update_appointment_status' a.id 'Arrived' %}" class="btn btn-outline-primary btn-sm">Arrived</a>
+                  <a href="{% url 'receptionist_update_appointment_status' a.id 'Waiting' %}" class="btn btn-outline-warning btn-sm">Waiting</a>
+                  <a href="{% url 'receptionist_update_appointment_status' a.id 'In Consultation' %}" class="btn btn-outline-info btn-sm">In Consultation</a>
+                  <a href="{% url 'receptionist_update_appointment_status' a.id 'Completed' %}" class="btn btn-outline-success btn-sm">Completed</a>
+                  <a href="{% url 'receptionist_update_appointment_status' a.id 'Missed' %}" class="btn btn-outline-danger btn-sm">Missed</a>
+                </div>
+              </td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="8" class="text-center text-muted py-4">No appointments for today.</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="mb-4">
+      <div class="section-topbar reveal reveal-up">
+        <div>
+          <div class="section-icon-title">
+            <span class="section-icon"><i class="bi bi-heart-pulse"></i></span>
+            <div>
+              <h3 class="section-title mb-1">Doctors in {{ receptionist.organization_name }}</h3>
+              <p class="section-subtitle mb-0">Approved doctors currently serving under your organization.</p>
+            </div>
+          </div>
+        </div>
+        <a href="{% url 'receptionist_doctors' %}" class="btn-view-all">View All</a>
+      </div>
+
+      <div class="row g-4">
+        {% for d in doctors|slice:":3" %}
+        <div class="col-md-6 col-lg-4">
+          <div class="person-card reveal reveal-up">
+            {% if d.photo %}
+              <img src="{{ d.photo.url }}" alt="{{ d.name }}" class="person-image">
+            {% else %}
+              <div class="person-placeholder">{{ d.name|slice:":1" }}</div>
+            {% endif %}
+            <div class="person-content">
+              <span class="info-tag">Doctor Profile</span>
+              <h5>Dr. {{ d.name }}</h5>
+              <p><strong>Specialist:</strong> {{ d.specialist }}</p>
+              <p><strong>Hospital:</strong> {{ d.hospital_name }}</p>
+              <p><strong>Fee:</strong> {{ d.consultancy_fee }}</p>
+            </div>
+          </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+          <div class="reception-table-card text-center reveal reveal-up">
+            <p class="mb-0 text-muted">No doctors found for your organization.</p>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="mb-4">
+      <div class="section-topbar reveal reveal-up">
+        <div>
+          <div class="section-icon-title">
+            <span class="section-icon"><i class="bi bi-people"></i></span>
+            <div>
+              <h3 class="section-title mb-1">Patients in {{ receptionist.organization_name }}</h3>
+              <p class="section-subtitle mb-0">Recently connected patients through appointments in your organization.</p>
+            </div>
+          </div>
+        </div>
+        <a href="{% url 'receptionist_patients' %}" class="btn-view-all">View All</a>
+      </div>
+
+      <div class="row g-4">
+        {% for p in patients|slice:":3" %}
+        <div class="col-md-6 col-lg-4">
+          <div class="person-card reveal reveal-up">
+            <div class="person-placeholder">{{ p.first_name|slice:":1" }}</div>
+            <div class="person-content">
+              <span class="info-tag">Patient Record</span>
+              <h5>{{ p.first_name }} {{ p.last_name }}</h5>
+              <p><strong>Email:</strong> {{ p.user.email }}</p>
+              <p><strong>Contact:</strong> {{ p.contact }}</p>
+              <p><strong>Gender:</strong> {{ p.gender|default:"-" }}</p>
+            </div>
+          </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+          <div class="reception-table-card text-center reveal reveal-up">
+            <p class="mb-0 text-muted">No patients found for your organization.</p>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="quick-note-card reveal reveal-up">
+      <div class="section-icon-title">
+        <span class="section-icon"><i class="bi bi-lightbulb"></i></span>
+        <div>
+          <h3 class="section-title mb-1">Smart Front Desk Insights</h3>
+          <p class="mb-0 text-muted">A clean operational overview for efficient front-desk management.</p>
+        </div>
+      </div>
+      <div class="mt-3">
+        <p>
+          This receptionist dashboard is designed to provide a clean operational overview of your hospital’s daily workflow.
+          Use the analytics above to track appointment load, emergency priorities, and patient flow more efficiently.
+        </p>
+        <ul>
+          <li>Monitor only the latest critical records from the dashboard and open the full modules through View All buttons.</li>
+          <li>Use quick search for day-based filtering and print support for front desk management.</li>
+          <li>Track doctors, patients, and appointment urgency from one modern interface without information overload.</li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<script>
+    const receptionRevealItems = document.querySelectorAll('.reveal');
+
+    function receptionistRevealSequence() {
+        receptionRevealItems.forEach((item, index) => {
+            setTimeout(() => {
+                item.classList.add('show');
+            }, index * 120);
+        });
+    }
+
+    window.addEventListener('load', receptionistRevealSequence);
+</script>
+{% endblock %}

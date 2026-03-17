@@ -1,0 +1,599 @@
+{% extends 'hms/base.html' %}
+{% block title %}Patient Profile{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --primary: #0f172a;
+        --secondary: #1d4ed8;
+        --accent: #38bdf8;
+        --muted: #64748b;
+        --border: #e6edf5;
+        --soft: #f8fbff;
+        --white: #ffffff;
+        --shadow-sm: 0 10px 24px rgba(15, 23, 42, 0.06);
+        --shadow-md: 0 18px 40px rgba(15, 23, 42, 0.09);
+        --shadow-lg: 0 25px 60px rgba(15, 23, 42, 0.14);
+        --transition: all 0.35s ease;
+    }
+
+    .profile-page {
+        padding: 40px 0 70px;
+    }
+
+    .profile-shell {
+        background: #ffffff;
+        border: 1px solid #e9eef5;
+        border-radius: 30px;
+        box-shadow: var(--shadow-lg);
+        overflow: hidden;
+    }
+
+    .profile-top {
+        background:
+            linear-gradient(135deg, rgba(15, 23, 42, 0.94) 0%, rgba(30, 64, 175, 0.84) 55%, rgba(56, 189, 248, 0.74) 100%),
+            url('https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=1600&q=80') center/cover no-repeat;
+        color: #ffffff;
+        padding: 48px 40px;
+        position: relative;
+        overflow: hidden;
+        isolation: isolate;
+    }
+
+    .profile-top::before,
+    .profile-top::after {
+        content: "";
+        position: absolute;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.08);
+        z-index: -1;
+    }
+
+    .profile-top::before {
+        width: 220px;
+        height: 220px;
+        top: -70px;
+        right: -60px;
+    }
+
+    .profile-top::after {
+        width: 150px;
+        height: 150px;
+        bottom: -45px;
+        left: -25px;
+    }
+
+    .profile-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 14px;
+        border-radius: 999px;
+        background: rgba(255,255,255,0.14);
+        border: 1px solid rgba(255,255,255,0.16);
+        font-size: 13px;
+        font-weight: 700;
+        margin-bottom: 14px;
+        position: relative;
+        z-index: 2;
+        backdrop-filter: blur(10px);
+    }
+
+    .profile-top h2 {
+        margin: 0 0 10px;
+        font-size: 2.1rem;
+        font-weight: 900;
+        position: relative;
+        z-index: 2;
+        letter-spacing: -0.4px;
+    }
+
+    .profile-top p {
+        margin: 0;
+        color: rgba(255,255,255,0.92);
+        line-height: 1.85;
+        position: relative;
+        z-index: 2;
+        max-width: 760px;
+    }
+
+    .profile-body {
+        padding: 36px;
+        background: linear-gradient(to bottom right, #ffffff, #fbfdff);
+    }
+
+    .profile-card,
+    .info-card,
+    .summary-box,
+    .form-card {
+        background: #f8fbff;
+        border: 1px solid #e8eef7;
+        border-radius: 24px;
+        transition: var(--transition);
+    }
+
+    .profile-card,
+    .info-card,
+    .form-card {
+        padding: 24px;
+        height: 100%;
+        box-shadow: var(--shadow-sm);
+    }
+
+    .profile-card:hover,
+    .info-card:hover,
+    .summary-box:hover,
+    .form-card:hover,
+    .profile-left-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--shadow-md);
+    }
+
+    .profile-left-card {
+        background: linear-gradient(180deg, #ffffff, #f8fbff);
+        border: 1px solid #e8eef7;
+        border-radius: 24px;
+        padding: 28px 24px;
+        text-align: center;
+        height: 100%;
+        box-shadow: 0 12px 28px rgba(15, 23, 42, 0.05);
+        transition: var(--transition);
+    }
+
+    .patient-avatar {
+        width: 130px;
+        height: 130px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 5px solid #ffffff;
+        box-shadow: 0 14px 30px rgba(15, 23, 42, 0.14);
+        margin-bottom: 18px;
+        transition: var(--transition);
+    }
+
+    .profile-left-card:hover .patient-avatar {
+        transform: scale(1.05);
+    }
+
+    .patient-avatar-placeholder {
+        width: 130px;
+        height: 130px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #1d4ed8, #38bdf8);
+        color: #ffffff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2.4rem;
+        font-weight: 800;
+        border: 5px solid #ffffff;
+        box-shadow: 0 14px 30px rgba(15, 23, 42, 0.14);
+        margin: 0 auto 18px;
+        transition: var(--transition);
+    }
+
+    .profile-left-card:hover .patient-avatar-placeholder {
+        transform: scale(1.05);
+    }
+
+    .patient-name {
+        font-size: 1.45rem;
+        font-weight: 800;
+        color: #0f172a;
+        margin-bottom: 8px;
+    }
+
+    .patient-subtitle {
+        color: #64748b;
+        margin-bottom: 18px;
+        line-height: 1.7;
+    }
+
+    .profile-mini-tag {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 8px 14px;
+        border-radius: 999px;
+        background: #eff6ff;
+        color: #1d4ed8;
+        font-size: 12px;
+        font-weight: 700;
+        margin: 4px;
+        gap: 6px;
+    }
+
+    .summary-box {
+        padding: 20px 18px;
+        text-align: center;
+        height: 100%;
+        background: #ffffff;
+        box-shadow: 0 10px 24px rgba(15, 23, 42, 0.04);
+    }
+
+    .summary-box h4 {
+        margin: 0 0 8px;
+        color: #1d4ed8;
+        font-size: 1.9rem;
+        font-weight: 800;
+    }
+
+    .summary-box p {
+        margin: 0;
+        color: #64748b;
+        font-weight: 600;
+    }
+
+    .info-title,
+    .form-title {
+        font-size: 1.2rem;
+        font-weight: 800;
+        color: #0f172a;
+        margin-bottom: 18px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .title-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 14px;
+        background: linear-gradient(135deg, #dbeafe, #e0f2fe);
+        color: #1d4ed8;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+    }
+
+    .info-list {
+        display: grid;
+        gap: 12px;
+    }
+
+    .info-item {
+        background: #ffffff;
+        border: 1px solid #e8eef7;
+        border-radius: 16px;
+        padding: 14px 16px;
+        line-height: 1.7;
+        color: #475569;
+        transition: var(--transition);
+    }
+
+    .info-item:hover {
+        background: #fdfefe;
+        transform: translateX(2px);
+    }
+
+    .info-item strong {
+        color: #0f172a;
+    }
+
+    .form-label {
+        font-weight: 700;
+        color: #334155;
+        margin-bottom: 8px;
+    }
+
+    .profile-body .form-control,
+    .profile-body textarea,
+    .profile-body input,
+    .profile-body select {
+        min-height: 52px;
+        border-radius: 14px;
+        border: 1px solid #dbe3ee;
+        background: #fbfdff;
+        box-shadow: none;
+        width: 100%;
+        padding: 12px 14px;
+        transition: var(--transition);
+    }
+
+    .profile-body .form-control:focus,
+    .profile-body textarea:focus,
+    .profile-body input:focus,
+    .profile-body select:focus {
+        background: #ffffff;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.08);
+        outline: none;
+    }
+
+    .radio-list {
+        display: flex;
+        gap: 18px;
+        flex-wrap: wrap;
+    }
+
+    .radio-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-weight: 600;
+        color: #334155;
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        padding: 10px 14px;
+        border-radius: 14px;
+    }
+
+    .radio-item input[type="radio"] {
+        width: 18px;
+        height: 18px;
+        accent-color: #2563eb;
+    }
+
+    .btn-profile-main,
+    .btn-profile-outline {
+        min-height: 52px;
+        padding: 12px 22px;
+        border-radius: 14px;
+        font-weight: 700;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        transition: 0.25s ease;
+    }
+
+    .btn-profile-main {
+        border: none;
+        background: linear-gradient(135deg, #1d4ed8, #38bdf8);
+        color: #ffffff;
+        box-shadow: 0 12px 24px rgba(29, 78, 216, 0.18);
+    }
+
+    .btn-profile-main:hover {
+        color: #ffffff;
+        opacity: 0.97;
+        transform: translateY(-2px);
+    }
+
+    .btn-profile-outline {
+        border: 1px solid #dbe3ee;
+        background: #ffffff;
+        color: #0f172a;
+    }
+
+    .btn-profile-outline:hover {
+        color: #0f172a;
+        background: #f8fafc;
+    }
+
+    .reveal {
+        opacity: 0;
+        transition: all 0.9s ease;
+    }
+
+    .reveal-up {
+        transform: translateY(45px);
+    }
+
+    .reveal.show {
+        opacity: 1;
+        transform: translate(0, 0);
+    }
+
+    @media (max-width: 991px) {
+        .profile-top,
+        .profile-body {
+            padding-left: 22px;
+            padding-right: 22px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="profile-page">
+    <div class="container">
+        <div class="profile-shell">
+            <div class="profile-top reveal reveal-up show">
+                <span class="profile-badge">
+                    <i class="bi bi-person-circle"></i>
+                    Patient Account
+                </span>
+                <h2>Profile Management</h2>
+                <p>View and update your personal profile, image, and account security with a modern healthcare profile experience.</p>
+            </div>
+
+            <div class="profile-body">
+                {% if not edit_mode and not password_mode %}
+                    <div class="row g-4 mb-4">
+                        <div class="col-lg-4">
+                            <div class="profile-left-card reveal reveal-up">
+                                {% if patient.photo %}
+                                    <img src="{{ patient.photo.url }}" alt="{{ patient.first_name }}" class="patient-avatar">
+                                {% else %}
+                                    <div class="patient-avatar-placeholder">
+                                        {{ patient.first_name|slice:":1" }}
+                                    </div>
+                                {% endif %}
+
+                                <h4 class="patient-name">{{ patient.first_name }} {{ patient.last_name }}</h4>
+                                <p class="patient-subtitle">
+                                    Manage your appointments, profile details, and account settings from one secure patient panel.
+                                </p>
+
+                                <div>
+                                    <span class="profile-mini-tag"><i class="bi bi-person-vcard"></i> Patient Profile</span>
+                                    <span class="profile-mini-tag"><i class="bi bi-gender-ambiguous"></i> {{ patient.gender|default:"Member" }}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-8">
+                            <div class="row g-4 mb-4">
+                                <div class="col-md-4">
+                                    <div class="summary-box reveal reveal-up">
+                                        <h4>{{ total_appointments }}</h4>
+                                        <p>Total Appointments</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="summary-box reveal reveal-up">
+                                        <h4>{{ pending_appointments }}</h4>
+                                        <p>Pending</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="summary-box reveal reveal-up">
+                                        <h4>{{ completed_appointments }}</h4>
+                                        <p>Completed</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="info-card reveal reveal-up">
+                                <h5 class="info-title">
+                                    <span class="title-icon"><i class="bi bi-info-circle"></i></span>
+                                    Profile Information
+                                </h5>
+
+                                <div class="info-list">
+                                    <div class="info-item"><strong>First Name:</strong> {{ patient.first_name }}</div>
+                                    <div class="info-item"><strong>Last Name:</strong> {{ patient.last_name }}</div>
+                                    <div class="info-item"><strong>Contact:</strong> {{ patient.contact|default:"Not available" }}</div>
+                                    <div class="info-item"><strong>Gender:</strong> {{ patient.gender|default:"Not provided" }}</div>
+                                    <div class="info-item"><strong>Username:</strong> {{ request.user.username }}</div>
+                                    <div class="info-item"><strong>Email:</strong> {{ request.user.email|default:"-" }}</div>
+                                </div>
+
+                                <div class="mt-4 d-flex gap-3 flex-wrap">
+                                    <a href="{% url 'patient_profile' %}?edit=1" class="btn-profile-main">
+                                        <i class="bi bi-pencil-square"></i>
+                                        Edit Profile
+                                    </a>
+                                    <a href="{% url 'patient_profile' %}?password=1" class="btn-profile-outline">
+                                        <i class="bi bi-key"></i>
+                                        Change Password
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                {% elif edit_mode %}
+                    <div class="form-card reveal reveal-up">
+                        <h5 class="form-title">
+                            <span class="title-icon"><i class="bi bi-pencil-square"></i></span>
+                            Edit Profile
+                        </h5>
+
+                        <form method="post" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <div class="row g-4">
+                                <div class="col-md-6">
+                                    <label class="form-label">{{ profile_form.first_name.label }}</label>
+                                    {{ profile_form.first_name }}
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">{{ profile_form.last_name.label }}</label>
+                                    {{ profile_form.last_name }}
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">{{ profile_form.contact.label }}</label>
+                                    {{ profile_form.contact }}
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">{{ profile_form.username.label }}</label>
+                                    {{ profile_form.username }}
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">{{ profile_form.email.label }}</label>
+                                    {{ profile_form.email }}
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">{{ profile_form.photo.label }}</label>
+                                    {{ profile_form.photo }}
+                                </div>
+                                <div class="col-md-12">
+                                    <label class="form-label d-block">{{ profile_form.gender.label }}</label>
+                                    <div class="radio-list">
+                                        {% for choice in profile_form.gender %}
+                                            <div class="radio-item">
+                                                {{ choice.tag }}
+                                                <label for="{{ choice.id_for_label }}">{{ choice.choice_label }}</label>
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mt-4 d-flex gap-3 flex-wrap">
+                                <button type="submit" name="save_profile" class="btn-profile-main">
+                                    <i class="bi bi-check2-circle"></i>
+                                    Save Changes
+                                </button>
+                                <a href="{% url 'patient_profile' %}" class="btn-profile-outline">
+                                    <i class="bi bi-x-circle"></i>
+                                    Cancel
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+
+                {% elif password_mode %}
+                    <div class="form-card reveal reveal-up">
+                        <h5 class="form-title">
+                            <span class="title-icon"><i class="bi bi-key"></i></span>
+                            Change Password
+                        </h5>
+
+                        <form method="post">
+                            {% csrf_token %}
+                            <div class="row g-4">
+                                <div class="col-md-12">
+                                    <label class="form-label">{{ password_form.current_password.label }}</label>
+                                    {{ password_form.current_password }}
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">{{ password_form.new_password.label }}</label>
+                                    {{ password_form.new_password }}
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">{{ password_form.confirm_password.label }}</label>
+                                    {{ password_form.confirm_password }}
+                                </div>
+                            </div>
+
+                            <div class="mt-4 d-flex gap-3 flex-wrap">
+                                <button type="submit" name="change_password" class="btn-profile-main">
+                                    <i class="bi bi-check2-circle"></i>
+                                    Update Password
+                                </button>
+                                <a href="{% url 'patient_profile' %}" class="btn-profile-outline">
+                                    <i class="bi bi-x-circle"></i>
+                                    Cancel
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const patientProfileReveal = document.querySelectorAll('.reveal');
+
+    function patientProfileRevealOnScroll() {
+        const triggerBottom = window.innerHeight * 0.9;
+        patientProfileReveal.forEach((el, index) => {
+            const top = el.getBoundingClientRect().top;
+            if (top < triggerBottom) {
+                setTimeout(() => el.classList.add('show'), index * 70);
+            }
+        });
+    }
+
+    window.addEventListener('scroll', patientProfileRevealOnScroll);
+    window.addEventListener('load', patientProfileRevealOnScroll);
+</script>
+{% endblock %}

@@ -1,0 +1,374 @@
+{% extends 'hms/base.html' %}
+{% block title %}Doctor Appointments{% endblock %}
+
+{% block content %}
+<style>
+    .appointment-page-hero {
+        background: linear-gradient(135deg, #0f172a 0%, #1d4ed8 55%, #38bdf8 100%);
+        color: #ffffff;
+        border-radius: 28px;
+        padding: 55px 40px;
+        margin-bottom: 30px;
+        box-shadow: 0 20px 50px rgba(15, 23, 42, 0.14);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .appointment-page-hero::before,
+    .appointment-page-hero::after {
+        content: "";
+        position: absolute;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.08);
+    }
+
+    .appointment-page-hero::before {
+        width: 220px;
+        height: 220px;
+        top: -70px;
+        right: -60px;
+    }
+
+    .appointment-page-hero::after {
+        width: 160px;
+        height: 160px;
+        bottom: -50px;
+        left: -30px;
+    }
+
+    .appointment-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 16px;
+        border-radius: 999px;
+        background: rgba(255,255,255,0.14);
+        border: 1px solid rgba(255,255,255,0.16);
+        font-size: 14px;
+        font-weight: 600;
+        margin-bottom: 18px;
+    }
+
+    .appointment-page-hero h2 {
+        font-size: 2.3rem;
+        font-weight: 800;
+        margin-bottom: 10px;
+    }
+
+    .appointment-page-hero p {
+        color: rgba(255,255,255,0.9);
+        margin-bottom: 0;
+        line-height: 1.8;
+        max-width: 760px;
+    }
+
+    .appointment-summary-card,
+    .appointment-table-card {
+        background: #ffffff;
+        border: none;
+        border-radius: 24px;
+        box-shadow: 0 16px 36px rgba(15, 23, 42, 0.08);
+    }
+
+    .appointment-summary-card {
+        padding: 24px;
+        text-align: center;
+        height: 100%;
+    }
+
+    .appointment-summary-card h3 {
+        font-size: 2rem;
+        font-weight: 800;
+        color: #1d4ed8;
+        margin-bottom: 8px;
+        word-break: break-word;
+    }
+
+    .appointment-summary-card p {
+        color: #64748b;
+        margin-bottom: 0;
+        font-weight: 600;
+    }
+
+    .appointment-table-card {
+        padding: 28px;
+    }
+
+    .appointment-table-title {
+        font-size: 1.6rem;
+        font-weight: 800;
+        color: #0f172a;
+        margin-bottom: 8px;
+    }
+
+    .appointment-table-subtitle {
+        color: #64748b;
+        margin-bottom: 24px;
+    }
+
+    .search-box-modern .form-control {
+        min-height: 52px;
+        border-radius: 14px;
+        background: #f8fafc;
+        border: 1px solid #dbe2ea;
+        box-shadow: none;
+    }
+
+    .search-box-modern .form-control:focus {
+        background: #ffffff;
+        border-color: #2563eb;
+        box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.08);
+    }
+
+    .btn-search-modern,
+    .btn-print-modern {
+        min-height: 52px;
+        border-radius: 14px;
+        border: none;
+        color: #ffffff;
+        font-weight: 700;
+    }
+
+    .btn-search-modern {
+        background: linear-gradient(135deg, #1d4ed8, #38bdf8);
+        box-shadow: 0 12px 24px rgba(29, 78, 216, 0.18);
+    }
+
+    .btn-print-modern {
+        background: linear-gradient(135deg, #0f172a, #334155);
+    }
+
+    .btn-search-modern:hover,
+    .btn-print-modern:hover {
+        color: #ffffff;
+        opacity: 0.96;
+    }
+
+    .doctor-table {
+        margin-bottom: 0;
+        vertical-align: middle;
+    }
+
+    .doctor-table thead th {
+        background: #f8fafc;
+        color: #0f172a;
+        font-weight: 700;
+        border-bottom: none;
+        padding: 14px 12px;
+        white-space: nowrap;
+    }
+
+    .doctor-table tbody td {
+        padding: 14px 12px;
+        color: #475569;
+        border-color: #eef2f7;
+    }
+
+    .status-badge {
+        display: inline-block;
+        padding: 7px 12px;
+        border-radius: 999px;
+        font-size: 13px;
+        font-weight: 700;
+    }
+
+    .status-cancelled {
+        background: #fee2e2;
+        color: #b91c1c;
+    }
+
+    .status-completed {
+        background: #dbeafe;
+        color: #1d4ed8;
+    }
+
+    .status-missed {
+        background: #fef3c7;
+        color: #b45309;
+    }
+
+    .view-prescription-btn {
+        display: inline-block;
+        padding: 7px 12px;
+        border-radius: 10px;
+        background: linear-gradient(135deg, #0f172a, #334155);
+        color: #fff;
+        font-size: 13px;
+        font-weight: 700;
+        text-decoration: none;
+    }
+
+    .view-prescription-btn:hover {
+        color: #fff;
+        opacity: 0.96;
+    }
+
+    @media print {
+        .no-print,
+        nav,
+        footer {
+            display: none !important;
+        }
+
+        body {
+            background: #ffffff !important;
+        }
+
+        .appointment-table-card,
+        .appointment-summary-card,
+        .appointment-page-hero {
+            box-shadow: none !important;
+            border: 1px solid #ddd !important;
+        }
+    }
+
+    @media (max-width: 991px) {
+        .appointment-page-hero {
+            padding: 40px 24px;
+        }
+
+        .appointment-page-hero h2 {
+            font-size: 1.9rem;
+        }
+    }
+</style>
+
+<section class="section-space">
+    <div class="container">
+
+        <div class="appointment-page-hero">
+            <span class="appointment-badge">
+                <i class="bi bi-calendar2-check"></i>
+                Doctor Appointments
+            </span>
+            <h2>Appointment List for Dr. {{ doctor.name }}</h2>
+            <p>
+                Review all your patient bookings, search by contact number, filter by date range,
+                and print filtered appointment records whenever needed.
+            </p>
+        </div>
+
+        <div class="row g-4 mb-4">
+            <div class="col-md-4">
+                <div class="appointment-summary-card">
+                    <h3>{{ total_visible }}</h3>
+                    <p>Total Visible Records</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="appointment-summary-card">
+                    <h3>{{ doctor.hospital_name }}</h3>
+                    <p>Hospital</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="appointment-summary-card">
+                    <h3>{{ doctor.specialist }}</h3>
+                    <p>Specialization</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="appointment-table-card">
+            <h3 class="appointment-table-title">Appointments</h3>
+            <p class="appointment-table-subtitle">
+                Search by patient contact and filter by date range. You can print the filtered result.
+            </p>
+
+            <form method="get" class="row g-3 mb-4 search-box-modern no-print">
+                <div class="col-md-3">
+                    <input
+                        type="text"
+                        name="q"
+                        value="{{ query }}"
+                        class="form-control"
+                        placeholder="Search by patient contact"
+                    >
+                </div>
+                <div class="col-md-3">
+                    <input
+                        type="date"
+                        name="from_date"
+                        value="{{ from_date }}"
+                        class="form-control"
+                    >
+                </div>
+                <div class="col-md-3">
+                    <input
+                        type="date"
+                        name="to_date"
+                        value="{{ to_date }}"
+                        class="form-control"
+                    >
+                </div>
+                <div class="col-md-1">
+                    <button class="btn btn-search-modern w-100">Filter</button>
+                </div>
+                <div class="col-md-2">
+                    <button type="button" onclick="window.print()" class="btn btn-print-modern w-100">
+                        Print
+                    </button>
+                </div>
+            </form>
+
+            <div class="table-responsive">
+                <table class="table doctor-table">
+                    <thead>
+                        <tr>
+                            <th>First Name</th>
+                            <th>Last Name</th>
+                            <th>Contact</th>
+                            <th>Date</th>
+                            <th>Time</th>
+                            <th>Mode</th>
+                            <th>Category</th>
+                            <th>Urgency</th>
+                            <th>Symptoms</th>
+                            <th>Status</th>
+                            <th>Prescription</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for a in appointments %}
+                        <tr>
+                            <td>{{ a.patient.first_name }}</td>
+                            <td>{{ a.patient.last_name }}</td>
+                            <td>{{ a.patient.contact }}</td>
+                            <td>{{ a.appointment_date }}</td>
+                            <td>{{ a.appointment_time }}</td>
+                            <td>{{ a.appointment_mode }}</td>
+                            <td>{{ a.problem_category }}</td>
+                            <td>{{ a.urgency_level }}</td>
+                            <td>{{ a.symptoms|truncatewords:8 }}</td>
+                            <td>
+                                {% if a.display_status == 'Completed' %}
+                                    <span class="status-badge status-completed">{{ a.display_status }}</span>
+                                {% elif a.display_status == 'Missed' %}
+                                    <span class="status-badge status-missed">{{ a.display_status }}</span>
+                                {% else %}
+                                    <span class="status-badge status-cancelled">{{ a.display_status }}</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if a.has_prescription %}
+                                    <a href="{% url 'doctor_view_prescription' a.id %}" class="view-prescription-btn">
+                                        View Prescription
+                                    </a>
+                                {% else %}
+                                    <span class="text-muted">No Prescription</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="11" class="text-center text-muted py-4">No appointments found.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,560 @@
+{% extends 'hms/base.html' %}
+{% block title %}{{ role }} Registration{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --primary: #0f172a;
+        --secondary: #1d4ed8;
+        --accent: #38bdf8;
+        --muted: #64748b;
+        --border: #dbe2ea;
+        --soft: #f8fbff;
+        --white: #ffffff;
+        --shadow-sm: 0 10px 25px rgba(15, 23, 42, 0.06);
+        --shadow-md: 0 18px 40px rgba(15, 23, 42, 0.10);
+        --shadow-lg: 0 25px 60px rgba(15, 23, 42, 0.16);
+        --transition: all 0.35s ease;
+    }
+
+    .register-section {
+        padding: 50px 0 75px;
+    }
+
+    .register-wrapper {
+        position: relative;
+        background: rgba(255,255,255,0.96);
+        border-radius: 32px;
+        overflow: hidden;
+        box-shadow: var(--shadow-lg);
+        border: 1px solid rgba(226, 232, 240, 0.85);
+    }
+
+    .register-left {
+        position: relative;
+        min-height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 60px 42px;
+        background:
+            linear-gradient(135deg, rgba(15, 23, 42, 0.94) 0%, rgba(29, 78, 216, 0.86) 58%, rgba(56, 189, 248, 0.76) 100%),
+            url('https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=1600&q=80') center/cover no-repeat;
+        color: #ffffff;
+        overflow: hidden;
+    }
+
+    .register-left::before {
+        content: "";
+        position: absolute;
+        width: 260px;
+        height: 260px;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.08);
+        top: -90px;
+        right: -60px;
+    }
+
+    .register-left::after {
+        content: "";
+        position: absolute;
+        width: 180px;
+        height: 180px;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.05);
+        bottom: -60px;
+        left: -40px;
+    }
+
+    .register-left-content {
+        width: 100%;
+        max-width: 380px;
+        position: relative;
+        z-index: 2;
+    }
+
+    .register-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 16px;
+        border-radius: 999px;
+        background: rgba(255,255,255,0.14);
+        border: 1px solid rgba(255,255,255,0.16);
+        font-size: 13px;
+        font-weight: 700;
+        margin-bottom: 18px;
+        backdrop-filter: blur(10px);
+    }
+
+    .register-left h2 {
+        font-size: 2.35rem;
+        font-weight: 900;
+        margin-bottom: 16px;
+        letter-spacing: -0.7px;
+        line-height: 1.12;
+    }
+
+    .register-left p {
+        color: rgba(255,255,255,0.92);
+        line-height: 1.9;
+        margin-bottom: 24px;
+    }
+
+    .register-points {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .register-points li {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 12px;
+        color: rgba(255,255,255,0.92);
+        font-weight: 500;
+    }
+
+    .register-check {
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.14);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        flex-shrink: 0;
+    }
+
+    .register-right {
+        padding: 46px 38px;
+        background: linear-gradient(to bottom right, #ffffff, #fbfdff);
+    }
+
+    .form-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 16px;
+        border-radius: 999px;
+        background: #eaf4ff;
+        color: var(--secondary);
+        font-size: 13px;
+        font-weight: 700;
+        margin-bottom: 14px;
+        box-shadow: var(--shadow-sm);
+    }
+
+    .register-title {
+        font-size: 2rem;
+        font-weight: 800;
+        color: #0f172a;
+        margin-bottom: 10px;
+        letter-spacing: -0.4px;
+    }
+
+    .register-subtitle {
+        color: var(--muted);
+        margin-bottom: 28px;
+        line-height: 1.8;
+        max-width: 520px;
+    }
+
+    .register-right .form-label {
+        font-weight: 700;
+        color: #334155;
+        margin-bottom: 8px;
+    }
+
+    .register-right .form-control,
+    .register-right input,
+    .register-right select,
+    .register-right textarea {
+        min-height: 52px;
+        border-radius: 14px;
+        background: #f8fafc;
+        border: 1px solid var(--border);
+        box-shadow: none !important;
+        width: 100%;
+        padding: 12px 14px;
+        transition: var(--transition);
+    }
+
+    .register-right textarea.form-control,
+    .register-right textarea {
+        min-height: 110px;
+    }
+
+    .register-right .form-control:focus,
+    .register-right input:focus,
+    .register-right select:focus,
+    .register-right textarea:focus {
+        background: #ffffff;
+        border-color: #2563eb;
+        box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.08) !important;
+        outline: none;
+    }
+
+    .register-right input[type="file"] {
+        min-height: 56px;
+        border-radius: 14px;
+        background: #f8fafc;
+        border: 1px dashed #93c5fd;
+        width: 100%;
+        padding: 10px 14px;
+        transition: var(--transition);
+        cursor: pointer;
+    }
+
+    .register-right input[type="file"]:hover {
+        background: #eff6ff;
+        border-color: #60a5fa;
+    }
+
+    .register-right input[type="file"]:focus {
+        background: #ffffff;
+        border-color: #2563eb;
+        box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.08) !important;
+        outline: none;
+    }
+
+    .register-right input[type="file"]::file-selector-button {
+        border: none;
+        background: linear-gradient(135deg, #1d4ed8, #38bdf8);
+        color: #ffffff;
+        padding: 10px 16px;
+        margin-right: 14px;
+        border-radius: 10px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: 0.3s ease;
+    }
+
+    .register-right input[type="file"]::file-selector-button:hover {
+        opacity: 0.95;
+    }
+
+    .upload-hint {
+        display: block;
+        margin-top: 8px;
+        color: #64748b;
+        font-size: 0.84rem;
+        line-height: 1.6;
+    }
+
+    .register-right ul.errorlist {
+        list-style: none;
+        padding: 0;
+        margin: 8px 0 0;
+    }
+
+    .register-right ul.errorlist li,
+    .field-error {
+        color: #dc2626;
+        font-size: 0.88rem;
+        font-weight: 600;
+    }
+
+    .btn-register {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        background: linear-gradient(135deg, #1d4ed8, #38bdf8);
+        color: #ffffff;
+        border: none;
+        border-radius: 14px;
+        padding: 13px 20px;
+        font-weight: 700;
+        width: 100%;
+        box-shadow: 0 14px 28px rgba(29, 78, 216, 0.20);
+        transition: var(--transition);
+        margin-top: 6px;
+    }
+
+    .btn-register:hover {
+        color: #ffffff;
+        transform: translateY(-2px);
+    }
+
+    .register-bottom-text {
+        text-align: center;
+        margin-top: 20px;
+        color: var(--muted);
+        line-height: 1.7;
+        padding: 16px 18px;
+        border-radius: 16px;
+        background: #f8fbff;
+        border: 1px solid #e5eefb;
+    }
+
+    .register-bottom-text a {
+        color: #1d4ed8;
+        font-weight: 700;
+        text-decoration: none;
+    }
+
+    .register-bottom-text a:hover {
+        text-decoration: underline;
+    }
+
+    .gender-group {
+        display: flex;
+        gap: 14px;
+        flex-wrap: wrap;
+        margin-top: 6px;
+    }
+
+    .gender-group label {
+        flex: 1;
+        min-width: 130px;
+        position: relative;
+        cursor: pointer;
+        margin: 0;
+    }
+
+    .gender-group input[type="radio"] {
+        display: none;
+    }
+
+    .gender-card {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 54px;
+        border-radius: 14px;
+        border: 1px solid #dbe2ea;
+        background: #f8fafc;
+        font-weight: 700;
+        color: #334155;
+        transition: var(--transition);
+    }
+
+    .gender-group input[type="radio"]:checked + .gender-card {
+        background: linear-gradient(135deg, #1d4ed8, #38bdf8);
+        color: #ffffff;
+        border-color: transparent;
+        box-shadow: 0 10px 20px rgba(29, 78, 216, 0.18);
+    }
+
+    .gender-group label:hover .gender-card {
+        border-color: #93c5fd;
+        background: #eff6ff;
+    }
+
+    .gender-group input[type="radio"]:checked + .gender-card:hover {
+        background: linear-gradient(135deg, #1d4ed8, #38bdf8);
+        color: #ffffff;
+    }
+
+    .reveal {
+        opacity: 0;
+        transition: all 0.9s ease;
+    }
+
+    .reveal-left { transform: translateX(-60px); }
+    .reveal-right { transform: translateX(60px); }
+
+    .reveal.show {
+        opacity: 1;
+        transform: translateX(0);
+    }
+
+    @media (max-width: 991px) {
+        .register-left,
+        .register-right {
+            padding: 34px 24px;
+        }
+
+        .register-left h2 {
+            font-size: 1.95rem;
+        }
+
+        .register-title {
+            font-size: 1.75rem;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .register-section {
+            padding: 28px 0 50px;
+        }
+
+        .register-wrapper {
+            border-radius: 24px;
+        }
+
+        .register-left h2 {
+            font-size: 1.8rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="register-section">
+    <div class="container">
+        <div class="register-wrapper">
+            <div class="row g-0">
+                <div class="col-lg-5">
+                    <div class="register-left reveal reveal-left show">
+                        <div class="register-left-content">
+                            <span class="register-badge">
+                                {% if role == 'Patient' %}
+                                    <i class="bi bi-person-circle"></i>
+                                {% elif role == 'Doctor' %}
+                                    <i class="bi bi-heart-pulse"></i>
+                                {% elif role == 'Receptionist' %}
+                                    <i class="bi bi-headset"></i>
+                                {% elif role == 'Admin' %}
+                                    <i class="bi bi-shield-check"></i>
+                                {% else %}
+                                    <i class="bi bi-person-plus"></i>
+                                {% endif %}
+                                {{ role }} Registration
+                            </span>
+
+                            <h2>
+                                {% if role == 'Patient' %}
+                                    Create Patient Account
+                                {% elif role == 'Doctor' %}
+                                    Create Doctor Account
+                                {% elif role == 'Receptionist' %}
+                                    Create Reception Account
+                                {% elif role == 'Admin' %}
+                                    Create Admin Account
+                                {% else %}
+                                    Create Your Account
+                                {% endif %}
+                            </h2>
+
+                            <p>
+                                {% if role == 'Patient' %}
+                                    Register as a patient to book appointments, browse doctors, and access healthcare services digitally.
+                                {% elif role == 'Doctor' %}
+                                    Register as a doctor to join the platform and manage appointments, schedules, and patient visibility.
+                                {% elif role == 'Receptionist' %}
+                                    Register as a receptionist to support appointment coordination and daily hospital workflow.
+                                {% elif role == 'Admin' %}
+                                    Register for administrative access to manage hospital-wide operations and system visibility.
+                                {% else %}
+                                    Register securely to access your hospital portal and use the digital healthcare services available for your role.
+                                {% endif %}
+                            </p>
+
+                            <ul class="register-points">
+                                <li><span class="register-check">✓</span> Secure role-based registration</li>
+                                <li><span class="register-check">✓</span> Modern portal access</li>
+                                <li><span class="register-check">✓</span> Professional healthcare workflow</li>
+                                <li><span class="register-check">✓</span> Clean and premium interface</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-7">
+                    <div class="register-right reveal reveal-right show">
+                        <span class="form-badge">
+                            {% if role == 'Patient' %}
+                                <i class="bi bi-person-heart"></i>
+                            {% elif role == 'Doctor' %}
+                                <i class="bi bi-clipboard2-pulse"></i>
+                            {% elif role == 'Receptionist' %}
+                                <i class="bi bi-building"></i>
+                            {% elif role == 'Admin' %}
+                                <i class="bi bi-kanban"></i>
+                            {% else %}
+                                <i class="bi bi-person-plus"></i>
+                            {% endif %}
+                            {{ role }} Portal
+                        </span>
+
+                        <h3 class="register-title">{{ role }} Registration</h3>
+                        <p class="register-subtitle">
+                            Fill in the form below to create your {{ role|lower }} account.
+                        </p>
+
+                        <form method="post" enctype="multipart/form-data">
+                            {% csrf_token %}
+
+                            {% for field in form %}
+                                <div class="mb-3">
+                                    <label class="form-label">{{ field.label }}</label>
+
+                                    {% if field.name == 'gender' %}
+                                        <div class="gender-group">
+                                            {% for choice in field %}
+                                                <label>
+                                                    {{ choice.tag }}
+                                                    <span class="gender-card">{{ choice.choice_label }}</span>
+                                                </label>
+                                            {% endfor %}
+                                        </div>
+                                    {% else %}
+                                        {{ field }}
+                                    {% endif %}
+
+                                    {% if field.name == 'profile_picture' %}
+                                        <small class="upload-hint">
+                                            Upload a clear profile photo. Supported formats: JPG, JPEG, PNG.
+                                        </small>
+                                    {% endif %}
+
+                                    {% if field.errors %}
+                                        <small class="field-error">{{ field.errors|striptags }}</small>
+                                    {% endif %}
+                                </div>
+                            {% endfor %}
+
+                            <button type="submit" class="btn-register">
+                                {% if role == 'Patient' %}
+                                    Create Patient Account
+                                {% elif role == 'Doctor' %}
+                                    Create Doctor Account
+                                {% elif role == 'Receptionist' %}
+                                    Create Reception Account
+                                {% elif role == 'Admin' %}
+                                    Create Admin Account
+                                {% else %}
+                                    Create Account
+                                {% endif %}
+                            </button>
+                        </form>
+
+                        <div class="register-bottom-text">
+                            Already have an account?
+                            {% if role == 'Patient' %}
+                                <a href="{% url 'patient_login' %}">Login here</a>
+                            {% elif role == 'Receptionist' %}
+                                <a href="{% url 'receptionist_login' %}">Login here</a>
+                            {% elif role == 'Doctor' %}
+                                <a href="{% url 'doctor_login' %}">Login here</a>
+                            {% elif role == 'Admin' %}
+                                <a href="{% url 'admin_login' %}">Login here</a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const registerReveal = document.querySelectorAll('.reveal');
+
+    function registerRevealOnLoad() {
+        registerReveal.forEach((el, index) => {
+            setTimeout(() => {
+                el.classList.add('show');
+            }, index * 120);
+        });
+    }
+
+    window.addEventListener('load', registerRevealOnLoad);
+</script>
+{% endblock %}

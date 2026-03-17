@@ -1,0 +1,1064 @@
+{% extends 'hms/base.html' %}
+{% block title %}Doctor Dashboard{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --primary: #0f172a;
+        --secondary: #1d4ed8;
+        --accent: #38bdf8;
+        --success: #16a34a;
+        --warning: #f59e0b;
+        --danger: #dc2626;
+        --muted: #64748b;
+        --border: #e5edf5;
+        --soft: #f8fbff;
+        --white: #ffffff;
+        --shadow-sm: 0 10px 24px rgba(15, 23, 42, 0.06);
+        --shadow-md: 0 18px 40px rgba(15, 23, 42, 0.09);
+        --shadow-lg: 0 25px 60px rgba(15, 23, 42, 0.14);
+        --transition: all 0.35s ease;
+    }
+
+    .doctor-dashboard-page {
+        padding: 34px 0 70px;
+    }
+
+    .doctor-hero {
+        position: relative;
+        overflow: hidden;
+        background:
+            linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(29, 78, 216, 0.82) 50%, rgba(56, 189, 248, 0.72) 100%),
+            url('https://images.unsplash.com/photo-1579684453377-8e3f2ea4e8a9?auto=format&fit=crop&w=1600&q=80') center/cover no-repeat;
+        color: #ffffff;
+        border-radius: 30px;
+        padding: 60px 42px;
+        margin-bottom: 30px;
+        box-shadow: 0 24px 60px rgba(15, 23, 42, 0.16);
+        isolation: isolate;
+    }
+
+    .doctor-hero::before,
+    .doctor-hero::after {
+        content: "";
+        position: absolute;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.08);
+        z-index: -1;
+    }
+
+    .doctor-hero::before {
+        width: 240px;
+        height: 240px;
+        top: -70px;
+        right: -70px;
+    }
+
+    .doctor-hero::after {
+        width: 170px;
+        height: 170px;
+        bottom: -50px;
+        left: -40px;
+    }
+
+    .doctor-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 16px;
+        border-radius: 999px;
+        background: rgba(255,255,255,0.14);
+        border: 1px solid rgba(255,255,255,0.16);
+        font-size: 13px;
+        font-weight: 700;
+        margin-bottom: 18px;
+        position: relative;
+        z-index: 2;
+        backdrop-filter: blur(10px);
+    }
+
+    .doctor-hero h2 {
+        font-size: 2.45rem;
+        font-weight: 900;
+        margin-bottom: 12px;
+        position: relative;
+        z-index: 2;
+        letter-spacing: -0.5px;
+    }
+
+    .doctor-hero p {
+        color: rgba(255,255,255,0.92);
+        margin-bottom: 0;
+        line-height: 1.85;
+        max-width: 760px;
+        position: relative;
+        z-index: 2;
+    }
+
+    .hero-pills {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 22px;
+        position: relative;
+        z-index: 2;
+    }
+
+    .hero-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 14px;
+        border-radius: 999px;
+        background: rgba(255,255,255,0.10);
+        border: 1px solid rgba(255,255,255,0.14);
+        color: #fff;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .doctor-stat-card,
+    .doctor-info-card,
+    .doctor-card-box,
+    .doctor-chart-card,
+    .doctor-note-box,
+    .doctor-table-card,
+    .patient-mini-card,
+    .quick-action-card {
+        background: rgba(255,255,255,0.98);
+        border: 1px solid var(--border);
+        border-radius: 24px;
+        box-shadow: var(--shadow-md);
+    }
+
+    .doctor-stat-card,
+    .doctor-info-card,
+    .doctor-card-box,
+    .doctor-chart-card,
+    .doctor-note-box,
+    .doctor-table-card,
+    .patient-mini-card,
+    .quick-action-card {
+        transition: var(--transition);
+    }
+
+    .doctor-stat-card:hover,
+    .doctor-info-card:hover,
+    .doctor-card-box:hover,
+    .doctor-chart-card:hover,
+    .doctor-note-box:hover,
+    .doctor-table-card:hover,
+    .patient-mini-card:hover,
+    .quick-action-card:hover {
+        transform: translateY(-6px);
+        box-shadow: var(--shadow-lg);
+    }
+
+    .doctor-stat-card {
+        padding: 24px 22px;
+        text-align: left;
+        height: 100%;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .doctor-stat-card::after {
+        content: "";
+        position: absolute;
+        right: -35px;
+        bottom: -35px;
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(56,189,248,0.12), transparent 70%);
+    }
+
+    .stat-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 14px;
+        margin-bottom: 10px;
+    }
+
+    .stat-icon {
+        width: 58px;
+        height: 58px;
+        border-radius: 18px;
+        background: linear-gradient(135deg, #dbeafe, #e0f2fe);
+        color: var(--secondary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        box-shadow: var(--shadow-sm);
+        flex-shrink: 0;
+    }
+
+    .doctor-stat-card h3 {
+        font-size: 2rem;
+        font-weight: 900;
+        color: #1d4ed8;
+        margin-bottom: 8px;
+    }
+
+    .doctor-stat-card p {
+        margin-bottom: 0;
+        color: #64748b;
+        font-weight: 600;
+    }
+
+    .doctor-info-card,
+    .doctor-card-box,
+    .doctor-chart-card,
+    .doctor-note-box,
+    .doctor-table-card {
+        padding: 28px;
+    }
+
+    .section-title {
+        font-size: 1.45rem;
+        font-weight: 800;
+        color: #0f172a;
+        margin-bottom: 8px;
+        letter-spacing: -0.2px;
+    }
+
+    .section-subtitle {
+        color: #64748b;
+        margin-bottom: 22px;
+        line-height: 1.8;
+    }
+
+    .doctor-info-card p,
+    .doctor-note-box p {
+        color: #475569;
+        line-height: 1.8;
+        margin-bottom: 10px;
+    }
+
+    .mini-stat-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 14px;
+    }
+
+    .mini-stat {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 18px;
+        padding: 18px;
+        text-align: center;
+        transition: var(--transition);
+    }
+
+    .mini-stat:hover {
+        transform: translateY(-4px);
+        background: #ffffff;
+    }
+
+    .mini-stat h5 {
+        font-size: 1.5rem;
+        font-weight: 800;
+        color: #1d4ed8;
+        margin-bottom: 6px;
+    }
+
+    .mini-stat p {
+        margin-bottom: 0;
+        color: #64748b;
+        font-weight: 600;
+    }
+
+    .progress-block {
+        margin-bottom: 18px;
+    }
+
+    .progress-label-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 8px;
+        font-weight: 700;
+        color: #334155;
+    }
+
+    .progress-track {
+        height: 12px;
+        width: 100%;
+        background: #e2e8f0;
+        border-radius: 999px;
+        overflow: hidden;
+    }
+
+    .progress-fill-blue,
+    .progress-fill-green,
+    .progress-fill-purple {
+        height: 100%;
+        border-radius: 999px;
+    }
+
+    .progress-fill-blue {
+        background: linear-gradient(135deg, #1d4ed8, #38bdf8);
+    }
+
+    .progress-fill-green {
+        background: linear-gradient(135deg, #0f766e, #22c55e);
+    }
+
+    .progress-fill-purple {
+        background: linear-gradient(135deg, #7c3aed, #a78bfa);
+    }
+
+    .chart-wrap {
+        display: flex;
+        align-items: end;
+        justify-content: space-between;
+        gap: 12px;
+        min-height: 230px;
+        margin-top: 8px;
+    }
+
+    .chart-col {
+        flex: 1;
+        text-align: center;
+    }
+
+    .chart-value {
+        font-weight: 800;
+        color: #0f172a;
+        margin-bottom: 8px;
+    }
+
+    .chart-bar {
+        width: 100%;
+        border-radius: 16px 16px 6px 6px;
+        background: linear-gradient(180deg, #38bdf8, #1d4ed8);
+        min-height: 18px;
+        transition: var(--transition);
+    }
+
+    .chart-col:hover .chart-bar {
+        transform: translateY(-5px);
+    }
+
+    .chart-label {
+        margin-top: 10px;
+        color: #64748b;
+        font-weight: 700;
+        font-size: 14px;
+    }
+
+    .search-box-modern .form-control {
+        min-height: 52px;
+        border-radius: 14px;
+        background: #f8fafc;
+        border: 1px solid #dbe2ea;
+        box-shadow: none;
+    }
+
+    .search-box-modern .form-control:focus {
+        background: #ffffff;
+        border-color: #2563eb;
+        box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.08);
+    }
+
+    .btn-search-modern,
+    .btn-view-all,
+    .btn-bookmark-mini,
+    .btn-quick-action {
+        min-height: 52px;
+        border-radius: 14px;
+        border: none;
+        font-weight: 700;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        transition: var(--transition);
+    }
+
+    .btn-search-modern {
+        background: linear-gradient(135deg, #1d4ed8, #38bdf8);
+        color: #ffffff;
+        box-shadow: 0 12px 24px rgba(29, 78, 216, 0.18);
+    }
+
+    .btn-search-modern:hover,
+    .btn-view-all:hover,
+    .btn-bookmark-mini:hover,
+    .btn-quick-action:hover {
+        color: #ffffff;
+        transform: translateY(-2px);
+    }
+
+    .btn-view-all {
+        background: #0f172a;
+        color: #ffffff;
+        min-height: 46px;
+        padding: 10px 18px;
+        border-radius: 12px;
+    }
+
+    .btn-bookmark-mini {
+        background: #f59e0b;
+        color: #ffffff;
+        min-height: 40px;
+        padding: 8px 14px;
+        border-radius: 10px;
+    }
+
+    .btn-quick-action {
+        background: linear-gradient(135deg, #1d4ed8, #38bdf8);
+        color: #fff;
+        padding: 10px 16px;
+        min-height: 46px;
+        border-radius: 12px;
+    }
+
+    .table-topbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 14px;
+        flex-wrap: wrap;
+        margin-bottom: 18px;
+    }
+
+    .doctor-table {
+        margin-bottom: 0;
+        vertical-align: middle;
+    }
+
+    .doctor-table thead th {
+        background: #f8fafc;
+        color: #0f172a;
+        font-weight: 800;
+        border-bottom: none;
+        padding: 14px 12px;
+        white-space: nowrap;
+    }
+
+    .doctor-table tbody td {
+        padding: 14px 12px;
+        color: #475569;
+        border-color: #eef2f7;
+        line-height: 1.7;
+    }
+
+    .status-badge {
+        display: inline-block;
+        padding: 7px 12px;
+        border-radius: 999px;
+        font-size: 13px;
+        font-weight: 700;
+    }
+
+    .status-booked {
+        background: #dcfce7;
+        color: #166534;
+    }
+
+    .status-completed {
+        background: #dbeafe;
+        color: #1d4ed8;
+    }
+
+    .status-cancelled {
+        background: #fee2e2;
+        color: #b91c1c;
+    }
+
+    .patient-mini-card {
+        padding: 20px;
+        height: 100%;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .patient-mini-card::after {
+        content: "";
+        position: absolute;
+        right: -30px;
+        bottom: -30px;
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(56,189,248,0.10), transparent 70%);
+    }
+
+    .patient-mini-card > * {
+        position: relative;
+        z-index: 1;
+    }
+
+    .patient-mini-card h5 {
+        font-size: 1.05rem;
+        font-weight: 800;
+        color: #0f172a;
+        margin-bottom: 8px;
+    }
+
+    .patient-mini-card p {
+        color: #64748b;
+        margin-bottom: 8px;
+        line-height: 1.7;
+    }
+
+    .doctor-tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 12px;
+        border-radius: 999px;
+        background: #eff6ff;
+        color: #1d4ed8;
+        font-size: 12px;
+        font-weight: 700;
+        margin-bottom: 10px;
+    }
+
+    .quick-action-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 14px;
+    }
+
+    .quick-action-card {
+        padding: 20px;
+        text-align: center;
+        background: linear-gradient(180deg, #ffffff, #f9fcff);
+    }
+
+    .quick-action-icon {
+        width: 54px;
+        height: 54px;
+        border-radius: 16px;
+        background: linear-gradient(135deg, #dbeafe, #e0f2fe);
+        color: #1d4ed8;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 22px;
+        margin: 0 auto 14px;
+    }
+
+    .quick-action-card h5 {
+        font-weight: 800;
+        color: #0f172a;
+        margin-bottom: 8px;
+        font-size: 1rem;
+    }
+
+    .quick-action-card p {
+        color: #64748b;
+        line-height: 1.7;
+        margin-bottom: 14px;
+        font-size: 0.92rem;
+    }
+
+    .focus-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .focus-list li {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        padding: 12px 0;
+        border-bottom: 1px solid #edf2f7;
+        color: #475569;
+        line-height: 1.75;
+    }
+
+    .focus-list li:last-child {
+        border-bottom: none;
+    }
+
+    .focus-dot {
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        background: #eff6ff;
+        color: #1d4ed8;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 800;
+        flex-shrink: 0;
+    }
+
+    .next-appointment-card {
+        background: linear-gradient(135deg, #eff6ff, #f8fbff);
+        border: 1px solid #dbeafe;
+        border-radius: 18px;
+        padding: 18px;
+        margin-top: 20px;
+    }
+
+    .next-appointment-card h5 {
+        font-size: 1rem;
+        font-weight: 800;
+        color: #0f172a;
+        margin-bottom: 10px;
+    }
+
+    .next-appointment-card p {
+        margin-bottom: 6px;
+        color: #475569;
+        line-height: 1.75;
+    }
+
+    .reveal {
+        opacity: 0;
+        transition: all 0.9s ease;
+    }
+
+    .reveal-left { transform: translateX(-60px); }
+    .reveal-right { transform: translateX(60px); }
+    .reveal-up { transform: translateY(50px); }
+
+    .reveal.show {
+        opacity: 1;
+        transform: translate(0, 0);
+    }
+
+    @media (max-width: 991px) {
+        .doctor-hero {
+            padding: 40px 24px;
+        }
+
+        .doctor-hero h2 {
+            font-size: 1.95rem;
+        }
+
+        .mini-stat-grid,
+        .quick-action-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="section-space doctor-dashboard-page">
+  <div class="container">
+
+    <div class="doctor-hero reveal reveal-up show">
+      <span class="doctor-badge">
+        <i class="bi bi-heart-pulse"></i>
+        Doctor Portal
+      </span>
+      <h2>Welcome Dr. {{ doctor.name }}</h2>
+      <p>
+        Access your daily medical workflow, patient insights, earnings overview, and recent appointments
+        from a modern, efficient, and analytics-driven doctor dashboard.
+      </p>
+
+      <div class="hero-pills">
+        <span class="hero-pill"><i class="bi bi-calendar2-check"></i> Smart Scheduling</span>
+        <span class="hero-pill"><i class="bi bi-people"></i> Patient Care Flow</span>
+        <span class="hero-pill"><i class="bi bi-graph-up-arrow"></i> Performance Insights</span>
+        <span class="hero-pill"><i class="bi bi-shield-check"></i> Secure Access</span>
+      </div>
+    </div>
+
+    <div class="row g-4 mb-4">
+      <div class="col-md-3">
+        <div class="doctor-stat-card reveal reveal-left">
+          <div class="stat-top">
+            <div>
+              <h3>{{ today_count }}</h3>
+              <p>Today’s Appointments</p>
+            </div>
+            <div class="stat-icon"><i class="bi bi-calendar-day"></i></div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="doctor-stat-card reveal reveal-up">
+          <div class="stat-top">
+            <div>
+              <h3>{{ monthly_completed_count }}</h3>
+              <p>Monthly Completed</p>
+            </div>
+            <div class="stat-icon"><i class="bi bi-check2-circle"></i></div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="doctor-stat-card reveal reveal-up">
+          <div class="stat-top">
+            <div>
+              <h3>{{ monthly_earnings|floatformat:2 }}</h3>
+              <p>Monthly Earnings</p>
+            </div>
+            <div class="stat-icon"><i class="bi bi-cash-stack"></i></div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="doctor-stat-card reveal reveal-right">
+          <div class="stat-top">
+            <div>
+              <h3>{{ unique_patient_count }}</h3>
+              <p>Total Patients Served</p>
+            </div>
+            <div class="stat-icon"><i class="bi bi-people-fill"></i></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row g-4 mb-4">
+      <div class="col-lg-8">
+        <div class="doctor-chart-card reveal reveal-left">
+          <h3 class="section-title">Daily Summary Dashboard</h3>
+          <p class="section-subtitle">Measure your consultation performance and patient load in one quick visual block.</p>
+
+          <div class="mini-stat-grid mb-4">
+            <div class="mini-stat">
+              <h5>{{ completed_count }}</h5>
+              <p>Completed Visits</p>
+            </div>
+            <div class="mini-stat">
+              <h5>{{ online_count }}</h5>
+              <p>Online Visits</p>
+            </div>
+            <div class="mini-stat">
+              <h5>{{ offline_count }}</h5>
+              <p>Offline Visits</p>
+            </div>
+          </div>
+
+          <div class="progress-block">
+            <div class="progress-label-row">
+              <span>Completion Rate</span>
+              <span>{{ appointment_completion_rate }}%</span>
+            </div>
+            <div class="progress-track">
+              <div class="progress-fill-green" style="width:{{ appointment_completion_rate }}%;"></div>
+            </div>
+          </div>
+
+          <div class="progress-block">
+            <div class="progress-label-row">
+              <span>Online Visit Ratio</span>
+              <span>{{ online_ratio }}%</span>
+            </div>
+            <div class="progress-track">
+              <div class="progress-fill-blue" style="width:{{ online_ratio }}%;"></div>
+            </div>
+          </div>
+
+          <div class="progress-block mb-0">
+            <div class="progress-label-row">
+              <span>Upcoming Load</span>
+              <span>{{ upcoming_count }}</span>
+            </div>
+            <div class="progress-track">
+              <div class="progress-fill-purple" style="width:{% if total_count %}{% widthratio upcoming_count total_count 100 %}{% else %}0{% endif %}%;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-4">
+        <div class="doctor-info-card reveal reveal-right">
+          <h3 class="section-title">Quick Search Patient</h3>
+          <p class="section-subtitle">Search your patient by first name, last name, or contact number.</p>
+
+          <form method="get" class="row g-3 search-box-modern">
+            <div class="col-md-12">
+              <input
+                type="text"
+                name="q"
+                value="{{ query }}"
+                class="form-control"
+                placeholder="Search patient by name or contact"
+              >
+            </div>
+            <div class="col-md-12">
+              <button class="btn btn-search-modern w-100">
+                <i class="bi bi-search"></i>
+                Search Patient
+              </button>
+            </div>
+          </form>
+
+          <hr class="my-4">
+
+          <p><strong>Doctor:</strong> {{ doctor.name }}</p>
+          <p><strong>Specialist:</strong> {{ doctor.specialist }}</p>
+          <p><strong>Hospital:</strong> {{ doctor.hospital_name }}</p>
+          <p><strong>Contact:</strong> {{ doctor.contact }}</p>
+          <p><strong>Today’s Earnings:</strong> {{ today_earnings|floatformat:2 }}</p>
+          <p><strong>Repeat Patients:</strong> {{ repeat_patient_count }}</p>
+          <p class="mb-0"><strong>Today Pending:</strong> {{ today_pending_count }}</p>
+
+          <div class="next-appointment-card">
+            <h5><i class="bi bi-clock-history me-1"></i> Next Upcoming Appointment</h5>
+            {% if next_upcoming_appointment %}
+              <p><strong>Patient:</strong> {{ next_upcoming_appointment.patient.first_name }} {{ next_upcoming_appointment.patient.last_name }}</p>
+              <p><strong>Date:</strong> {{ next_upcoming_appointment.appointment_date }}</p>
+              <p><strong>Time:</strong> {{ next_upcoming_appointment.appointment_time }}</p>
+              <p class="mb-0"><strong>Mode:</strong> {{ next_upcoming_appointment.appointment_mode }}</p>
+            {% else %}
+              <p class="mb-0">No upcoming appointment scheduled.</p>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row g-4 mb-4">
+      <div class="col-lg-8">
+        <div class="doctor-chart-card reveal reveal-left">
+          <h3 class="section-title">Patient Load Chart</h3>
+          <p class="section-subtitle">Daily patient booking trend for the last 7 days.</p>
+
+          <div class="chart-wrap">
+            {% for item in patient_load_data %}
+            <div class="chart-col">
+              <div class="chart-value">{{ item.count }}</div>
+              <div class="chart-bar" style="height: {{ item.height }}px;"></div>
+              <div class="chart-label">{{ item.label }}</div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-4">
+        <div class="doctor-note-box reveal reveal-right">
+          <h3 class="section-title">Today Focus Summary</h3>
+          <p><strong>Today:</strong> {{ today_count }} appointment{{ today_count|pluralize }} scheduled.</p>
+          <p><strong>This Month:</strong> {{ monthly_completed_count }} completed consultation{{ monthly_completed_count|pluralize }}.</p>
+          <p><strong>Care Channel:</strong> {{ online_count }} online and {{ offline_count }} offline visits recorded.</p>
+          <p class="mb-0"><strong>Performance Tip:</strong> Track your recent patients and bookmarked cases to reduce repeat lookup time during consultation.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="doctor-card-box reveal reveal-up mb-4">
+      <div class="table-topbar">
+        <div>
+          <h3 class="section-title mb-1">Quick Actions</h3>
+          <p class="section-subtitle mb-0">Useful shortcuts for your daily workflow.</p>
+        </div>
+      </div>
+
+      <div class="quick-action-grid">
+        <div class="quick-action-card">
+          <div class="quick-action-icon"><i class="bi bi-calendar2-check"></i></div>
+          <h5>Appointments</h5>
+          <p>Review full appointment history and schedule details.</p>
+          <a href="{% url 'doctor_appointments' %}" class="btn-quick-action">Open</a>
+        </div>
+
+        <div class="quick-action-card">
+          <div class="quick-action-icon"><i class="bi bi-search-heart"></i></div>
+          <h5>Find Patients</h5>
+          <p>Search patients quickly from the dashboard and reduce lookup time.</p>
+          <a href="#search-patient-box" class="btn-quick-action">Search</a>
+        </div>
+
+        <div class="quick-action-card">
+          <div class="quick-action-icon"><i class="bi bi-bookmark-heart"></i></div>
+          <h5>Important Cases</h5>
+          <p>Review bookmarked patients you marked for follow-up consultation.</p>
+          <a href="#important-cases" class="btn-quick-action">Review</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="row g-4 mb-4">
+      <div class="col-lg-6">
+        <div class="doctor-card-box reveal reveal-left">
+          <div class="table-topbar">
+            <div>
+              <h3 class="section-title mb-1">Recent Patients</h3>
+              <p class="section-subtitle mb-0">Quick access to your latest patient interactions.</p>
+            </div>
+          </div>
+
+          <div class="row g-3">
+            {% for p in recent_patients %}
+            <div class="col-md-6">
+              <div class="patient-mini-card">
+                <span class="doctor-tag"><i class="bi bi-person-vcard"></i> Recent Patient</span>
+                <h5>{{ p.first_name }} {{ p.last_name }}</h5>
+                <p><strong>Contact:</strong> {{ p.contact }}</p>
+                <p><strong>Email:</strong> {{ p.user.email }}</p>
+                <a href="{% url 'doctor_toggle_bookmark_patient' p.id %}" class="btn btn-bookmark-mini">
+                  <i class="bi bi-bookmark-plus"></i>
+                  Bookmark Case
+                </a>
+              </div>
+            </div>
+            {% empty %}
+            <div class="col-12">
+              <p class="text-muted mb-0">No recent patients available.</p>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-6" id="important-cases">
+        <div class="doctor-card-box reveal reveal-right">
+          <div class="table-topbar">
+            <div>
+              <h3 class="section-title mb-1">Bookmarked Important Cases</h3>
+              <p class="section-subtitle mb-0">Quickly revisit patients you marked as important.</p>
+            </div>
+          </div>
+
+          <div class="row g-3">
+            {% for p in bookmarked_patients %}
+            <div class="col-md-6">
+              <div class="patient-mini-card">
+                <span class="doctor-tag"><i class="bi bi-bookmark-heart"></i> Important Case</span>
+                <h5>{{ p.first_name }} {{ p.last_name }}</h5>
+                <p><strong>Contact:</strong> {{ p.contact }}</p>
+                <p><strong>Email:</strong> {{ p.user.email }}</p>
+                <a href="{% url 'doctor_toggle_bookmark_patient' p.id %}" class="btn btn-bookmark-mini">
+                  <i class="bi bi-bookmark-dash"></i>
+                  Remove Bookmark
+                </a>
+              </div>
+            </div>
+            {% empty %}
+            <div class="col-12">
+              <p class="text-muted mb-0">No bookmarked patients yet.</p>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row g-4 mb-4">
+      <div class="col-lg-6">
+        <div class="doctor-note-box reveal reveal-left" id="search-patient-box">
+          <h3 class="section-title">Doctor Workflow Tips</h3>
+          <ul class="focus-list">
+            <li>
+              <span class="focus-dot">1</span>
+              <span>Search your patient before consultation to save time during peak hours.</span>
+            </li>
+            <li>
+              <span class="focus-dot">2</span>
+              <span>Bookmark repeat or sensitive cases for easier follow-up and continuity of care.</span>
+            </li>
+            <li>
+              <span class="focus-dot">3</span>
+              <span>Track online vs offline ratio to understand how your care channel is evolving.</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="col-lg-6">
+        <div class="doctor-note-box reveal reveal-right">
+          <h3 class="section-title">Consultation Snapshot</h3>
+          <ul class="focus-list">
+            <li>
+              <span class="focus-dot"><i class="bi bi-calendar-week"></i></span>
+              <span>{{ upcoming_count }} upcoming appointment{{ upcoming_count|pluralize }} still need attention.</span>
+            </li>
+            <li>
+              <span class="focus-dot"><i class="bi bi-cash"></i></span>
+              <span>Today’s earnings currently show <strong>{{ today_earnings|floatformat:2 }}</strong>.</span>
+            </li>
+            <li>
+              <span class="focus-dot"><i class="bi bi-people"></i></span>
+              <span>You have served <strong>{{ unique_patient_count }}</strong> unique patient{{ unique_patient_count|pluralize }} so far.</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="doctor-table-card reveal reveal-up">
+      <div class="table-topbar">
+        <div>
+          <h3 class="section-title mb-1">Recent Appointments</h3>
+          <p class="section-subtitle mb-0">Only the latest 3 appointments are shown here for quick access.</p>
+        </div>
+        <a href="{% url 'doctor_appointments' %}" class="btn-view-all">
+          <i class="bi bi-arrow-right-circle"></i>
+          View All
+        </a>
+      </div>
+
+      <div class="table-responsive">
+        <table class="table doctor-table">
+          <thead>
+            <tr>
+              <th>Patient</th>
+              <th>Email</th>
+              <th>Contact</th>
+              <th>Date</th>
+              <th>Time</th>
+              <th>Mode</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for a in appointments %}
+            <tr>
+              <td>{{ a.patient.first_name }} {{ a.patient.last_name }}</td>
+              <td>{{ a.patient.user.email }}</td>
+              <td>{{ a.patient.contact }}</td>
+              <td>{{ a.appointment_date }}</td>
+              <td>{{ a.appointment_time }}</td>
+              <td>{{ a.appointment_mode }}</td>
+              <td>
+                {% if a.status == 'Booked' %}
+                  <span class="status-badge status-booked">{{ a.status }}</span>
+                {% elif a.status == 'Completed' %}
+                  <span class="status-badge status-completed">{{ a.status }}</span>
+                {% else %}
+                  <span class="status-badge status-cancelled">{{ a.status }}</span>
+                {% endif %}
+              </td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="7" class="text-center text-muted py-4">
+                No recent appointments found.
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const doctorRevealItems = document.querySelectorAll('.reveal');
+
+    function doctorRevealOnScroll() {
+        const triggerBottom = window.innerHeight * 0.88;
+        doctorRevealItems.forEach((el, index) => {
+            const top = el.getBoundingClientRect().top;
+            if (top < triggerBottom) {
+                setTimeout(() => {
+                    el.classList.add('show');
+                }, index * 60);
+            }
+        });
+    }
+
+    window.addEventListener('scroll', doctorRevealOnScroll);
+    window.addEventListener('load', doctorRevealOnScroll);
+</script>
+{% endblock %}

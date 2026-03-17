@@ -1,0 +1,346 @@
+{% extends 'hms/base.html' %}
+{% block title %}Doctor Patients{% endblock %}
+
+{% block content %}
+<style>
+    .patients-page {
+        padding: 34px 0 70px;
+    }
+
+    .patients-hero {
+        position: relative;
+        overflow: hidden;
+        background:
+            linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(29, 78, 216, 0.84) 55%, rgba(56, 189, 248, 0.74) 100%),
+            url('https://images.unsplash.com/photo-1579684453377-8e3f2ea4e8a9?auto=format&fit=crop&w=1600&q=80') center/cover no-repeat;
+        color: #fff;
+        border-radius: 30px;
+        padding: 55px 40px;
+        margin-bottom: 30px;
+        box-shadow: 0 20px 50px rgba(15, 23, 42, 0.14);
+        isolation: isolate;
+    }
+
+    .patients-hero::before,
+    .patients-hero::after {
+        content: "";
+        position: absolute;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.08);
+        z-index: -1;
+    }
+
+    .patients-hero::before {
+        width: 220px;
+        height: 220px;
+        top: -70px;
+        right: -60px;
+    }
+
+    .patients-hero::after {
+        width: 150px;
+        height: 150px;
+        bottom: -45px;
+        left: -25px;
+    }
+
+    .hero-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 16px;
+        border-radius: 999px;
+        background: rgba(255,255,255,0.14);
+        border: 1px solid rgba(255,255,255,0.16);
+        font-size: 13px;
+        font-weight: 700;
+        margin-bottom: 16px;
+        backdrop-filter: blur(10px);
+    }
+
+    .patients-hero h2 {
+        font-size: 2.2rem;
+        font-weight: 900;
+        margin-bottom: 10px;
+        letter-spacing: -0.4px;
+    }
+
+    .patients-hero p {
+        color: rgba(255,255,255,0.92);
+        margin-bottom: 0;
+        line-height: 1.85;
+        max-width: 760px;
+    }
+
+    .search-card,
+    .patient-card {
+        background: #fff;
+        border: 1px solid #e5edf5;
+        border-radius: 24px;
+        box-shadow: 0 16px 36px rgba(15, 23, 42, 0.08);
+    }
+
+    .search-card {
+        padding: 24px;
+        margin-bottom: 28px;
+    }
+
+    .search-card .form-control {
+        min-height: 54px;
+        border-radius: 14px;
+        background: #f8fafc;
+        border: 1px solid #dbe2ea;
+        box-shadow: none;
+    }
+
+    .search-card .form-control:focus {
+        background: #ffffff;
+        border-color: #2563eb;
+        box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.08);
+    }
+
+    .btn-search-modern,
+    .btn-view-modern {
+        min-height: 52px;
+        border-radius: 14px;
+        border: none;
+        font-weight: 700;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.35s ease;
+    }
+
+    .btn-search-modern {
+        background: linear-gradient(135deg, #1d4ed8, #38bdf8);
+        color: #fff;
+        box-shadow: 0 12px 24px rgba(29, 78, 216, 0.18);
+    }
+
+    .btn-search-modern:hover {
+        color: #fff;
+        transform: translateY(-2px);
+    }
+
+    .btn-view-modern {
+        background: #0f172a;
+        color: #fff;
+        padding: 10px 18px;
+        border-radius: 12px;
+    }
+
+    .btn-view-modern:hover {
+        color: #fff;
+        background: #1e293b;
+        transform: translateY(-2px);
+    }
+
+    .patient-card {
+        padding: 22px;
+        height: 100%;
+        transition: all 0.35s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .patient-card::after {
+        content: "";
+        position: absolute;
+        right: -30px;
+        bottom: -30px;
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(56,189,248,0.12), transparent 70%);
+        transition: all 0.35s ease;
+    }
+
+    .patient-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 24px 50px rgba(15, 23, 42, 0.14);
+    }
+
+    .patient-card:hover::after {
+        transform: scale(1.15);
+    }
+
+    .patient-photo {
+        width: 82px;
+        height: 82px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 3px solid #fff;
+        box-shadow: 0 12px 24px rgba(15, 23, 42, 0.12);
+        margin-bottom: 14px;
+        transition: all 0.35s ease;
+    }
+
+    .patient-card:hover .patient-photo {
+        transform: scale(1.06);
+    }
+
+    .patient-placeholder {
+        width: 82px;
+        height: 82px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #1d4ed8, #38bdf8);
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 800;
+        font-size: 1.5rem;
+        margin-bottom: 14px;
+        transition: all 0.35s ease;
+    }
+
+    .patient-card:hover .patient-placeholder {
+        transform: scale(1.06);
+    }
+
+    .patient-card h4 {
+        font-size: 1.15rem;
+        font-weight: 800;
+        color: #0f172a;
+        margin-bottom: 10px;
+    }
+
+    .patient-card p {
+        color: #64748b;
+        line-height: 1.75;
+        margin-bottom: 8px;
+    }
+
+    .patient-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 12px;
+        border-radius: 999px;
+        background: #eff6ff;
+        color: #1d4ed8;
+        font-size: 12px;
+        font-weight: 700;
+        margin-bottom: 10px;
+    }
+
+    .empty-card {
+        text-align: center;
+        padding: 42px 20px;
+    }
+
+    .reveal {
+        opacity: 0;
+        transition: all 0.9s ease;
+    }
+
+    .reveal-up {
+        transform: translateY(45px);
+    }
+
+    .reveal.show {
+        opacity: 1;
+        transform: translate(0, 0);
+    }
+
+    @media (max-width: 991px) {
+        .patients-hero {
+            padding: 40px 24px;
+        }
+
+        .patients-hero h2 {
+            font-size: 1.9rem;
+        }
+    }
+</style>
+
+<section class="section-space patients-page">
+    <div class="container">
+
+        <div class="patients-hero reveal reveal-up show">
+            <span class="hero-badge">
+                <i class="bi bi-people"></i>
+                Doctor Patients
+            </span>
+            <h2>Completed Case Patients</h2>
+            <p class="mb-0">
+                Only patients with completed appointments under your care are shown here.
+            </p>
+        </div>
+
+        <div class="search-card reveal reveal-up">
+            <form method="get" class="row g-3">
+                <div class="col-md-10">
+                    <input
+                        type="text"
+                        name="q"
+                        value="{{ query }}"
+                        class="form-control"
+                        placeholder="Search by patient first name, last name, or contact"
+                    >
+                </div>
+                <div class="col-md-2">
+                    <button class="btn btn-search-modern w-100">
+                        <i class="bi bi-search me-1"></i>
+                        Search
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <div class="row g-4">
+            {% for p in patients %}
+            <div class="col-md-6 col-lg-4">
+                <div class="patient-card reveal reveal-up">
+                    {% if p.photo %}
+                        <img src="{{ p.photo.url }}" alt="{{ p.first_name }}" class="patient-photo">
+                    {% else %}
+                        <div class="patient-placeholder">{{ p.first_name|slice:":1" }}</div>
+                    {% endif %}
+
+                    <span class="patient-chip">
+                        <i class="bi bi-person-vcard"></i>
+                        Patient
+                    </span>
+
+                    <h4>{{ p.first_name }} {{ p.last_name }}</h4>
+                    <p><strong>Contact:</strong> {{ p.contact|default:"-" }}</p>
+                    <p><strong>Email:</strong> {{ p.user.email|default:"-" }}</p>
+                    <p><strong>Gender:</strong> {{ p.gender|default:"-" }}</p>
+
+                    <a href="{% url 'doctor_patient_detail' p.id %}" class="btn-view-modern">View</a>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12">
+                <div class="patient-card empty-card reveal reveal-up">
+                    <h4>No patients found</h4>
+                    <p class="mb-0">No completed-case patient matched your search.</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const doctorPatientsReveal = document.querySelectorAll('.reveal');
+
+    function doctorPatientsRevealOnScroll() {
+        const triggerBottom = window.innerHeight * 0.9;
+        doctorPatientsReveal.forEach((el, index) => {
+            const top = el.getBoundingClientRect().top;
+            if (top < triggerBottom) {
+                setTimeout(() => el.classList.add('show'), index * 70);
+            }
+        });
+    }
+
+    window.addEventListener('scroll', doctorPatientsRevealOnScroll);
+    window.addEventListener('load', doctorPatientsRevealOnScroll);
+</script>
+{% endblock %}

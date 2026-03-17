@@ -1,0 +1,62 @@
+{% extends 'hms/base.html' %}
+{% block title %}Update Report{% endblock %}
+
+{% block content %}
+<style>
+    .page-wrap { padding: 34px 0 70px; }
+    .hero {
+        background: linear-gradient(135deg, #0f172a 0%, #1d4ed8 55%, #38bdf8 100%);
+        color:#fff; border-radius:30px; padding:55px 40px; margin-bottom:30px;
+        box-shadow:0 20px 50px rgba(15,23,42,.14);
+    }
+    .form-card {
+        background:#fff; border:1px solid #e5edf5; border-radius:24px; box-shadow:0 16px 36px rgba(15,23,42,.08); padding:28px;
+    }
+    .form-control {
+        min-height:52px; border-radius:14px; background:#f8fafc; border:1px solid #dbe2ea; box-shadow:none !important;
+    }
+    .form-control:focus {
+        background:#fff; border-color:#2563eb; box-shadow:0 0 0 4px rgba(37,99,235,.08) !important;
+    }
+    textarea.form-control { min-height:120px; }
+    .submit-btn {
+        min-height:52px; border:none; border-radius:14px; color:#fff; font-weight:700; width:100%;
+        background:linear-gradient(135deg, #1d4ed8, #38bdf8);
+    }
+</style>
+
+<section class="section-space page-wrap">
+    <div class="container">
+        <div class="hero">
+            <h2>Update Report</h2>
+            <p class="mb-0">Write prescription, recommended test, and advice for this report submission.</p>
+        </div>
+
+        <div class="form-card">
+            <h4 class="fw-bold mb-3">Patient: {{ report.patient.first_name }} {{ report.patient.last_name }}</h4>
+            <p class="text-muted">Previous doctor note / report: {{ report.report_note|default:"No note" }}</p>
+
+            <form method="post">
+                {% csrf_token %}
+
+                <div class="mb-3">
+                    <label class="form-label">Prescription</label>
+                    {{ form.prescription_text }}
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Test</label>
+                    {{ form.test }}
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Advice</label>
+                    {{ form.advice }}
+                </div>
+
+                <button type="submit" class="btn submit-btn">Submit Update</button>
+            </form>
+        </div>
+    </div>
+</section>
+{% endblock %}

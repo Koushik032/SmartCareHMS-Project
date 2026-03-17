@@ -1,0 +1,494 @@
+{% extends 'hms/base.html' %}
+{% block title %}Create Test Report{% endblock %}
+
+{% block content %}
+<style>
+    .report-page {
+        padding: 34px 0 70px;
+        background:
+            radial-gradient(circle at top left, rgba(37,99,235,.08), transparent 28%),
+            radial-gradient(circle at bottom right, rgba(56,189,248,.08), transparent 28%);
+    }
+
+    .report-hero {
+        background: linear-gradient(135deg, #0f172a 0%, #1d4ed8 55%, #38bdf8 100%);
+        color: #fff;
+        border-radius: 30px;
+        padding: 55px 40px;
+        margin-bottom: 30px;
+        box-shadow: 0 20px 50px rgba(15,23,42,.14);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .report-hero::before,
+    .report-hero::after {
+        content: "";
+        position: absolute;
+        border-radius: 50%;
+        background: rgba(255,255,255,.08);
+    }
+
+    .report-hero::before {
+        width: 220px;
+        height: 220px;
+        top: -70px;
+        right: -60px;
+    }
+
+    .report-hero::after {
+        width: 160px;
+        height: 160px;
+        bottom: -50px;
+        left: -30px;
+    }
+
+    .report-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 16px;
+        border-radius: 999px;
+        background: rgba(255,255,255,.14);
+        border: 1px solid rgba(255,255,255,.16);
+        font-size: 13px;
+        font-weight: 700;
+        margin-bottom: 16px;
+    }
+
+    .report-card {
+        background: #fff;
+        border: 1px solid #e5edf5;
+        border-radius: 26px;
+        box-shadow: 0 16px 36px rgba(15,23,42,.08);
+        padding: 28px;
+    }
+
+    .form-label {
+        font-weight: 700;
+        color: #334155;
+        margin-bottom: 8px;
+    }
+
+    .form-control {
+        min-height: 52px;
+        border-radius: 14px;
+        background: #f8fafc;
+        border: 1px solid #dbe2ea;
+        box-shadow: none !important;
+        width: 100%;
+        padding: 12px 14px;
+        transition: all 0.35s ease;
+    }
+
+    .form-control:focus {
+        background: #fff;
+        border-color: #2563eb;
+        box-shadow: 0 0 0 4px rgba(37,99,235,.08) !important;
+        outline: none;
+    }
+
+    .helper-text {
+        display: block;
+        margin-top: 6px;
+        color: #64748b;
+        font-size: 0.84rem;
+    }
+
+    .cost-box {
+        background: linear-gradient(135deg, #eff6ff, #f8fbff);
+        border: 1px solid #dbeafe;
+        border-radius: 18px;
+        padding: 18px 20px;
+        margin-top: 20px;
+    }
+
+    .cost-box h5 {
+        font-weight: 800;
+        color: #0f172a;
+        margin-bottom: 8px;
+    }
+
+    .cost-amount {
+        font-size: 2rem;
+        font-weight: 800;
+        color: #1d4ed8;
+        margin: 0;
+    }
+
+    .submit-btn {
+        min-height: 52px;
+        border: none;
+        border-radius: 14px;
+        color: #fff;
+        font-weight: 700;
+        width: 100%;
+        background: linear-gradient(135deg, #1d4ed8, #38bdf8);
+        box-shadow: 0 14px 28px rgba(29,78,216,.20);
+        transition: all 0.35s ease;
+        margin-top: 18px;
+    }
+
+    .submit-btn:hover {
+        color: #fff;
+        transform: translateY(-2px);
+    }
+
+    /* Modern multi-select */
+    .multi-select-wrap {
+        position: relative;
+    }
+
+    .multi-select-box {
+        min-height: 56px;
+        border-radius: 16px;
+        background: #f8fafc;
+        border: 1px solid #dbe2ea;
+        padding: 10px 14px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        cursor: pointer;
+        transition: all 0.35s ease;
+    }
+
+    .multi-select-box:hover {
+        background: #ffffff;
+        border-color: #bfdbfe;
+    }
+
+    .multi-select-box.active {
+        background: #ffffff;
+        border-color: #2563eb;
+        box-shadow: 0 0 0 4px rgba(37,99,235,.08);
+    }
+
+    .multi-select-placeholder {
+        color: #64748b;
+        font-weight: 500;
+    }
+
+    .multi-select-arrow {
+        color: #64748b;
+        font-size: 14px;
+        transition: transform 0.3s ease;
+        flex-shrink: 0;
+    }
+
+    .multi-select-box.active .multi-select-arrow {
+        transform: rotate(180deg);
+    }
+
+    .multi-select-dropdown {
+        position: absolute;
+        top: calc(100% + 10px);
+        left: 0;
+        width: 100%;
+        background: #fff;
+        border: 1px solid #dbe2ea;
+        border-radius: 18px;
+        box-shadow: 0 18px 36px rgba(15,23,42,.12);
+        padding: 14px;
+        z-index: 50;
+        display: none;
+    }
+
+    .multi-select-dropdown.show {
+        display: block;
+    }
+
+    .multi-search {
+        margin-bottom: 12px;
+    }
+
+    .multi-search input {
+        width: 100%;
+        min-height: 46px;
+        border-radius: 12px;
+        border: 1px solid #dbe2ea;
+        background: #f8fafc;
+        padding: 10px 12px;
+        outline: none;
+        transition: all 0.3s ease;
+    }
+
+    .multi-search input:focus {
+        background: #fff;
+        border-color: #2563eb;
+        box-shadow: 0 0 0 4px rgba(37,99,235,.08);
+    }
+
+    .multi-options {
+        max-height: 260px;
+        overflow-y: auto;
+        padding-right: 4px;
+    }
+
+    .multi-option {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 12px 12px;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: all 0.25s ease;
+        margin-bottom: 6px;
+    }
+
+    .multi-option:hover {
+        background: #eff6ff;
+    }
+
+    .multi-option.hidden {
+        display: none;
+    }
+
+    .multi-option-left {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .multi-option input[type="checkbox"] {
+        width: 18px;
+        height: 18px;
+        accent-color: #2563eb;
+        cursor: pointer;
+    }
+
+    .multi-option-name {
+        font-weight: 600;
+        color: #0f172a;
+    }
+
+    .multi-option-price {
+        font-size: 13px;
+        font-weight: 700;
+        color: #1d4ed8;
+        background: #eff6ff;
+        border-radius: 999px;
+        padding: 6px 10px;
+        white-space: nowrap;
+    }
+
+    .selected-tests {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 14px;
+    }
+
+    .test-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 9px 12px;
+        border-radius: 999px;
+        background: linear-gradient(135deg, #eff6ff, #dbeafe);
+        color: #1d4ed8;
+        font-size: 13px;
+        font-weight: 700;
+        border: 1px solid #bfdbfe;
+    }
+
+    .test-chip-price {
+        color: #0f172a;
+        font-weight: 800;
+    }
+
+    /* Hide original multi-select but keep it in form */
+    .native-test-select {
+        display: none !important;
+    }
+
+    @media (max-width: 768px) {
+        .report-hero {
+            padding: 40px 24px;
+        }
+    }
+</style>
+
+<section class="section-space report-page">
+    <div class="container">
+        <div class="report-hero">
+            <span class="report-badge">
+                <i class="bi bi-clipboard2-pulse"></i>
+                Reception Test Report
+            </span>
+            <h2>Create Test Report</h2>
+            <p class="mb-0">
+                Add patient details, select recommended tests, and create a complete diagnostic report entry.
+            </p>
+        </div>
+
+        <div class="report-card">
+            <form method="post">
+                {% csrf_token %}
+
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Patient Name</label>
+                        {{ form.patient_name }}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Age</label>
+                        {{ form.age }}
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">Gender</label>
+                        {{ form.gender }}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Contact Number</label>
+                        {{ form.contact_number }}
+                    </div>
+
+                    <div class="col-12">
+                        <label class="form-label">Select Test(s)</label>
+
+                        <div class="native-test-select">
+                            {{ form.tests }}
+                        </div>
+
+                        <div class="multi-select-wrap">
+                            <div class="multi-select-box" id="multiSelectBox">
+                                <span class="multi-select-placeholder" id="multiSelectPlaceholder">
+                                    Select one or more tests
+                                </span>
+                                <span class="multi-select-arrow">
+                                    <i class="bi bi-chevron-down"></i>
+                                </span>
+                            </div>
+
+                            <div class="multi-select-dropdown" id="multiSelectDropdown">
+                                <div class="multi-search">
+                                    <input type="text" id="testSearchInput" placeholder="Search test...">
+                                </div>
+
+                                <div class="multi-options" id="multiOptions">
+                                    {% for test in available_tests %}
+                                    <label class="multi-option" data-name="{{ test.name|lower }}">
+                                        <div class="multi-option-left">
+                                            <input type="checkbox" class="test-checkbox" value="{{ test.id }}">
+                                            <span class="multi-option-name">{{ test.name }}</span>
+                                        </div>
+                                        <span class="multi-option-price">৳ {{ test.price }}</span>
+                                    </label>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="selected-tests" id="selectedTests"></div>
+
+                        <small class="helper-text">
+                            Click to open the test list and choose multiple tests one by one.
+                        </small>
+                    </div>
+                </div>
+
+                <div class="cost-box">
+                    <h5>Total Cost</h5>
+                    <p class="cost-amount" id="totalCost">৳ 0.00</p>
+                </div>
+
+                <button type="submit" class="btn submit-btn">Submit Test Report</button>
+            </form>
+        </div>
+    </div>
+</section>
+
+<script>
+    const nativeSelect = document.getElementById('id_tests');
+    const multiSelectBox = document.getElementById('multiSelectBox');
+    const multiSelectDropdown = document.getElementById('multiSelectDropdown');
+    const multiSelectPlaceholder = document.getElementById('multiSelectPlaceholder');
+    const selectedTests = document.getElementById('selectedTests');
+    const totalCostEl = document.getElementById('totalCost');
+    const searchInput = document.getElementById('testSearchInput');
+    const optionRows = document.querySelectorAll('.multi-option');
+    const checkboxes = document.querySelectorAll('.test-checkbox');
+
+    const testData = {
+        {% for test in available_tests %}
+            "{{ test.id }}": {
+                name: "{{ test.name|escapejs }}",
+                price: parseFloat("{{ test.price }}")
+            },
+        {% endfor %}
+    };
+
+    function syncNativeSelect() {
+        if (!nativeSelect) return;
+
+        Array.from(nativeSelect.options).forEach(option => {
+            const checkbox = document.querySelector(`.test-checkbox[value="${option.value}"]`);
+            option.selected = checkbox ? checkbox.checked : false;
+        });
+    }
+
+    function updateSelectedDisplay() {
+        let total = 0;
+        let selectedCount = 0;
+        selectedTests.innerHTML = '';
+
+        checkboxes.forEach(checkbox => {
+            if (checkbox.checked && testData[checkbox.value]) {
+                selectedCount += 1;
+                total += testData[checkbox.value].price;
+
+                const chip = document.createElement('div');
+                chip.className = 'test-chip';
+                chip.innerHTML = `
+                    <span>${testData[checkbox.value].name}</span>
+                    <span class="test-chip-price">৳ ${testData[checkbox.value].price.toFixed(2)}</span>
+                `;
+                selectedTests.appendChild(chip);
+            }
+        });
+
+        if (selectedCount === 0) {
+            multiSelectPlaceholder.textContent = 'Select one or more tests';
+        } else {
+            multiSelectPlaceholder.textContent = `${selectedCount} test${selectedCount > 1 ? 's' : ''} selected`;
+        }
+
+        totalCostEl.textContent = `৳ ${total.toFixed(2)}`;
+        syncNativeSelect();
+    }
+
+    if (multiSelectBox) {
+        multiSelectBox.addEventListener('click', function() {
+            multiSelectBox.classList.toggle('active');
+            multiSelectDropdown.classList.toggle('show');
+        });
+    }
+
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.multi-select-wrap')) {
+            multiSelectBox.classList.remove('active');
+            multiSelectDropdown.classList.remove('show');
+        }
+    });
+
+    checkboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', updateSelectedDisplay);
+    });
+
+    if (searchInput) {
+        searchInput.addEventListener('input', function() {
+            const keyword = this.value.trim().toLowerCase();
+
+            optionRows.forEach(row => {
+                const name = row.getAttribute('data-name') || '';
+                row.classList.toggle('hidden', !name.includes(keyword));
+            });
+        });
+    }
+
+    updateSelectedDisplay();
+</script>
+{% endblock %}

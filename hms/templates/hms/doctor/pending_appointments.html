@@ -1,0 +1,159 @@
+{% extends 'hms/base.html' %}
+{% block title %}Pending Appointments{% endblock %}
+
+{% block content %}
+<style>
+    .pending-page { padding: 34px 0 70px; }
+    .pending-hero {
+        background: linear-gradient(135deg, #0f172a 0%, #1d4ed8 55%, #38bdf8 100%);
+        color: #fff;
+        border-radius: 30px;
+        padding: 55px 40px;
+        margin-bottom: 30px;
+        box-shadow: 0 20px 50px rgba(15, 23, 42, 0.14);
+    }
+    .pending-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 16px;
+        border-radius: 999px;
+        background: rgba(255,255,255,0.14);
+        border: 1px solid rgba(255,255,255,0.16);
+        font-size: 13px;
+        font-weight: 700;
+        margin-bottom: 16px;
+    }
+    .pending-card {
+        background: #fff;
+        border: 1px solid #e5edf5;
+        border-radius: 24px;
+        box-shadow: 0 16px 36px rgba(15, 23, 42, 0.08);
+        padding: 28px;
+    }
+    .doctor-table thead th {
+        background: #f8fafc;
+        font-weight: 800;
+        color: #0f172a;
+        padding: 14px 12px;
+    }
+    .doctor-table tbody td {
+        padding: 14px 12px;
+        color: #475569;
+        border-color: #eef2f7;
+        vertical-align: middle;
+    }
+    .status-badge {
+        display: inline-block;
+        padding: 7px 12px;
+        border-radius: 999px;
+        font-size: 13px;
+        font-weight: 700;
+        background: #dcfce7;
+        color: #166534;
+    }
+    .btn-action-modern {
+        border-radius: 10px;
+        padding: 7px 14px;
+        font-weight: 700;
+        text-decoration: none;
+        display: inline-block;
+        margin-bottom: 4px;
+    }
+    .meeting-link-btn {
+        display: inline-block;
+        padding: 7px 12px;
+        border-radius: 10px;
+        background: linear-gradient(135deg, #0ea5e9, #2563eb);
+        color: #fff;
+        font-size: 13px;
+        font-weight: 700;
+        text-decoration: none;
+    }
+    .meeting-link-btn:hover {
+        color: #fff;
+        opacity: 0.96;
+    }
+</style>
+
+<section class="section-space pending-page">
+    <div class="container">
+
+        <div class="pending-hero">
+            <span class="pending-badge">
+                <i class="bi bi-hourglass-split"></i>
+                Doctor Pending Queue
+            </span>
+            <h2>Pending Appointments</h2>
+            <p class="mb-0">
+                Booked appointments are listed here in date and time order.
+            </p>
+        </div>
+
+        <div class="pending-card">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+                <div>
+                    <h4 class="fw-bold mb-1">Pending Appointment List</h4>
+                    <p class="text-muted mb-0">Total Pending: {{ total_visible }}</p>
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table doctor-table">
+                    <thead>
+                        <tr>
+                            <th>Patient</th>
+                            <th>Contact</th>
+                            <th>Date</th>
+                            <th>Time</th>
+                            <th>Mode</th>
+                            <th>Meeting Link</th>
+                            <th>Symptoms</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for a in appointments %}
+                        <tr>
+                            <td>{{ a.patient.first_name }} {{ a.patient.last_name }}</td>
+                            <td>{{ a.patient.contact }}</td>
+                            <td>{{ a.appointment_date }}</td>
+                            <td>{{ a.appointment_time }}</td>
+                            <td>{{ a.appointment_mode }}</td>
+                            <td>
+                                {% if a.meeting_link %}
+                                    <a href="{{ a.meeting_link }}" target="_blank" class="meeting-link-btn">
+                                        Join Link
+                                    </a>
+                                {% else %}
+                                    <span class="text-muted">No link</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ a.symptoms|truncatewords:8 }}</td>
+                            <td><span class="status-badge">{{ a.display_status }}</span></td>
+                            <td>
+                                <div class="d-flex flex-column gap-1">
+                                    <a href="{% url 'doctor_add_prescription' a.id %}" class="btn btn-primary btn-sm btn-action-modern">
+                                        Prescription
+                                    </a>
+
+                                    <a href="{% url 'doctor_cancel_appointment' a.id %}" class="btn btn-danger btn-sm btn-action-modern">
+                                        Cancel
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="9" class="text-center text-muted py-4">No pending appointments found.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+</section>
+{% endblock %}

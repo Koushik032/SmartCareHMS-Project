@@ -1,0 +1,501 @@
+{% extends 'hms/base.html' %}
+{% block title %}Doctor Profile{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --primary: #0f172a;
+        --secondary: #1d4ed8;
+        --accent: #38bdf8;
+        --muted: #64748b;
+        --border: #e6edf5;
+        --soft: #f8fbff;
+        --white: #ffffff;
+        --shadow-sm: 0 10px 24px rgba(15, 23, 42, 0.06);
+        --shadow-md: 0 18px 40px rgba(15, 23, 42, 0.09);
+        --shadow-lg: 0 25px 60px rgba(15, 23, 42, 0.14);
+        --transition: all 0.35s ease;
+    }
+
+    .profile-page { padding: 40px 0 70px; }
+
+    .profile-shell {
+        background: rgba(255,255,255,0.98);
+        border: 1px solid var(--border);
+        border-radius: 30px;
+        box-shadow: var(--shadow-lg);
+        overflow: hidden;
+    }
+
+    .profile-top {
+        position: relative;
+        overflow: hidden;
+        background:
+            linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(30, 64, 175, 0.84) 55%, rgba(56, 189, 248, 0.74) 100%),
+            url('https://images.unsplash.com/photo-1579684453377-8e3f2ea4e8a9?auto=format&fit=crop&w=1600&q=80') center/cover no-repeat;
+        color: #ffffff;
+        padding: 46px 40px;
+        isolation: isolate;
+    }
+
+    .profile-top::before,
+    .profile-top::after {
+        content: "";
+        position: absolute;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.08);
+        z-index: -1;
+    }
+
+    .profile-top::before {
+        width: 220px;
+        height: 220px;
+        top: -70px;
+        right: -60px;
+    }
+
+    .profile-top::after {
+        width: 150px;
+        height: 150px;
+        bottom: -45px;
+        left: -25px;
+    }
+
+    .profile-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 14px;
+        border-radius: 999px;
+        background: rgba(255,255,255,0.14);
+        border: 1px solid rgba(255,255,255,0.16);
+        font-size: 13px;
+        font-weight: 700;
+        margin-bottom: 14px;
+        backdrop-filter: blur(10px);
+    }
+
+    .profile-top h2 {
+        margin: 0 0 10px;
+        font-size: 2.1rem;
+        font-weight: 900;
+        letter-spacing: -0.4px;
+    }
+
+    .profile-top p {
+        margin: 0;
+        color: rgba(255,255,255,0.92);
+        line-height: 1.85;
+        max-width: 760px;
+    }
+
+    .profile-body { padding: 36px; background: linear-gradient(to bottom right, #ffffff, #fbfdff); }
+
+    .profile-card {
+        background: #f8fbff;
+        border: 1px solid #e8eef7;
+        border-radius: 24px;
+        padding: 24px;
+        height: 100%;
+        box-shadow: var(--shadow-sm);
+        transition: var(--transition);
+    }
+
+    .profile-card:hover,
+    .summary-box:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-md);
+    }
+
+    .doctor-avatar {
+        width: 118px;
+        height: 118px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 4px solid #ffffff;
+        box-shadow: 0 12px 24px rgba(15, 23, 42, 0.12);
+    }
+
+    .doctor-avatar-placeholder {
+        width: 118px;
+        height: 118px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #1d4ed8, #38bdf8);
+        color: #ffffff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        font-weight: 800;
+        margin: 0 auto;
+        box-shadow: 0 12px 24px rgba(29, 78, 216, 0.18);
+    }
+
+    .summary-box {
+        background: #ffffff;
+        border: 1px solid #e7eef7;
+        border-radius: 18px;
+        padding: 18px;
+        text-align: center;
+        height: 100%;
+        box-shadow: var(--shadow-sm);
+        transition: var(--transition);
+    }
+
+    .summary-box h4 {
+        margin: 0 0 8px;
+        color: #1d4ed8;
+        font-size: 1.8rem;
+        font-weight: 800;
+    }
+
+    .summary-box p {
+        margin: 0;
+        color: #64748b;
+        font-weight: 600;
+    }
+
+    .section-title {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 1.2rem;
+        font-weight: 800;
+        color: #0f172a;
+        margin-bottom: 18px;
+    }
+
+    .title-icon {
+        width: 42px;
+        height: 42px;
+        border-radius: 14px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #dbeafe, #e0f2fe);
+        color: #1d4ed8;
+        font-size: 18px;
+    }
+
+    .info-list p {
+        color: #475569;
+        line-height: 1.85;
+        margin-bottom: 10px;
+    }
+
+    .form-label {
+        font-weight: 700;
+        color: #334155;
+        margin-bottom: 8px;
+    }
+
+    .profile-body .form-control,
+    .profile-body textarea,
+    .profile-body input,
+    .profile-body select {
+        min-height: 52px;
+        border-radius: 14px;
+        border: 1px solid #dbe3ee;
+        background: #fbfdff;
+        box-shadow: none;
+        width: 100%;
+        padding: 12px 14px;
+        transition: var(--transition);
+    }
+
+    .profile-body textarea { min-height: 120px; }
+
+    .profile-body .form-control:focus,
+    .profile-body textarea:focus,
+    .profile-body input:focus,
+    .profile-body select:focus {
+        background: #ffffff;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.08);
+        outline: none;
+    }
+
+    .btn-profile-main,
+    .btn-profile-outline {
+        min-height: 52px;
+        padding: 12px 22px;
+        border-radius: 14px;
+        font-weight: 700;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        transition: var(--transition);
+    }
+
+    .btn-profile-main {
+        border: none;
+        background: linear-gradient(135deg, #1d4ed8, #38bdf8);
+        color: #ffffff;
+        box-shadow: 0 12px 24px rgba(29, 78, 216, 0.18);
+    }
+
+    .btn-profile-main:hover {
+        color: #ffffff;
+        transform: translateY(-2px);
+    }
+
+    .btn-profile-outline {
+        border: 1px solid #dbe3ee;
+        background: #ffffff;
+        color: #0f172a;
+    }
+
+    .btn-profile-outline:hover {
+        color: #0f172a;
+        background: #f8fafc;
+        transform: translateY(-2px);
+    }
+
+    .field-error {
+        color: #dc2626;
+        margin-top: 6px;
+        display: block;
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+
+    .reveal {
+        opacity: 0;
+        transition: all 0.9s ease;
+    }
+
+    .reveal-up { transform: translateY(50px); }
+    .reveal.show { opacity: 1; transform: translate(0,0); }
+
+    @media (max-width: 767px) {
+        .profile-top,
+        .profile-body {
+            padding-left: 22px;
+            padding-right: 22px;
+        }
+
+        .profile-top h2 {
+            font-size: 1.85rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="profile-page">
+  <div class="container">
+    <div class="profile-shell">
+      <div class="profile-top reveal reveal-up show">
+        <span class="profile-badge">
+            <i class="bi bi-heart-pulse"></i>
+            Doctor Account
+        </span>
+        <h2>Profile Management</h2>
+        <p>View and update your doctor profile, picture, consultation details, and account security settings.</p>
+      </div>
+
+      <div class="profile-body">
+        {% if not edit_mode and not password_mode %}
+          <div class="row g-4 mb-4">
+            <div class="col-lg-4">
+              <div class="profile-card text-center reveal reveal-up">
+                {% if doctor.photo %}
+                  <img src="{{ doctor.photo.url }}" alt="{{ doctor.name }}" class="doctor-avatar mb-3">
+                {% else %}
+                  <div class="doctor-avatar-placeholder mb-3">{{ doctor.name|slice:":1" }}</div>
+                {% endif %}
+                <h4 class="fw-bold mb-1">Dr. {{ doctor.name }}</h4>
+                <p class="text-muted mb-0">{{ doctor.specialist }}</p>
+              </div>
+            </div>
+
+            <div class="col-lg-8">
+              <div class="row g-4">
+                <div class="col-md-4">
+                  <div class="summary-box reveal reveal-up">
+                    <h4>{{ total_appointments }}</h4>
+                    <p>Total Appointments</p>
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="summary-box reveal reveal-up">
+                    <h4>{{ online_appointments }}</h4>
+                    <p>Online Appointments</p>
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="summary-box reveal reveal-up">
+                    <h4>{{ completed_appointments }}</h4>
+                    <p>Completed Visits</p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="profile-card mt-4 reveal reveal-up">
+                <h4 class="section-title">
+                    <span class="title-icon"><i class="bi bi-person-vcard"></i></span>
+                    Professional Information
+                </h4>
+
+                <div class="info-list">
+                    <p><strong>Hospital:</strong> {{ doctor.hospital_name }}</p>
+                    <p><strong>Location:</strong> {{ doctor.location }}</p>
+                    <p><strong>Contact:</strong> {{ doctor.contact }}</p>
+                    <p><strong>Consultancy Fee:</strong> {{ doctor.consultancy_fee }}</p>
+                    <p><strong>Email:</strong> {{ request.user.email|default:"-" }}</p>
+                    <p class="mb-0"><strong>About:</strong> {{ doctor.about }}</p>
+                </div>
+
+                <div class="mt-4 d-flex gap-3 flex-wrap">
+                  <a href="{% url 'doctor_profile' %}?edit=1" class="btn-profile-main">
+                    <i class="bi bi-pencil-square"></i>
+                    Edit Profile
+                  </a>
+                  <a href="{% url 'doctor_profile' %}?password=1" class="btn-profile-outline">
+                    <i class="bi bi-key"></i>
+                    Change Password
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        {% elif edit_mode %}
+          <div class="profile-card reveal reveal-up">
+            <h4 class="section-title">
+                <span class="title-icon"><i class="bi bi-pencil-square"></i></span>
+                Edit Profile
+            </h4>
+            <form method="post" enctype="multipart/form-data">
+              {% csrf_token %}
+              <div class="row g-4">
+                <div class="col-md-6">
+                  <label class="form-label">{{ profile_form.name.label }}</label>
+                  {{ profile_form.name }}
+                  {% if profile_form.name.errors %}<small class="field-error">{{ profile_form.name.errors|striptags }}</small>{% endif %}
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">{{ profile_form.specialist.label }}</label>
+                  {{ profile_form.specialist }}
+                  {% if profile_form.specialist.errors %}<small class="field-error">{{ profile_form.specialist.errors|striptags }}</small>{% endif %}
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">{{ profile_form.hospital_name.label }}</label>
+                  {{ profile_form.hospital_name }}
+                  {% if profile_form.hospital_name.errors %}<small class="field-error">{{ profile_form.hospital_name.errors|striptags }}</small>{% endif %}
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">{{ profile_form.location.label }}</label>
+                  {{ profile_form.location }}
+                  {% if profile_form.location.errors %}<small class="field-error">{{ profile_form.location.errors|striptags }}</small>{% endif %}
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">{{ profile_form.contact.label }}</label>
+                  {{ profile_form.contact }}
+                  {% if profile_form.contact.errors %}<small class="field-error">{{ profile_form.contact.errors|striptags }}</small>{% endif %}
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">{{ profile_form.consultancy_fee.label }}</label>
+                  {{ profile_form.consultancy_fee }}
+                  {% if profile_form.consultancy_fee.errors %}<small class="field-error">{{ profile_form.consultancy_fee.errors|striptags }}</small>{% endif %}
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">{{ profile_form.username.label }}</label>
+                  {{ profile_form.username }}
+                  {% if profile_form.username.errors %}<small class="field-error">{{ profile_form.username.errors|striptags }}</small>{% endif %}
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">{{ profile_form.email.label }}</label>
+                  {{ profile_form.email }}
+                  {% if profile_form.email.errors %}<small class="field-error">{{ profile_form.email.errors|striptags }}</small>{% endif %}
+                </div>
+                <div class="col-md-12">
+                  <label class="form-label">{{ profile_form.about.label }}</label>
+                  {{ profile_form.about }}
+                  {% if profile_form.about.errors %}<small class="field-error">{{ profile_form.about.errors|striptags }}</small>{% endif %}
+                </div>
+                <div class="col-md-12">
+                  <label class="form-label">{{ profile_form.photo.label }}</label>
+                  {{ profile_form.photo }}
+                  {% if profile_form.photo.errors %}<small class="field-error">{{ profile_form.photo.errors|striptags }}</small>{% endif %}
+                </div>
+              </div>
+
+              <div class="mt-4 d-flex gap-3 flex-wrap">
+                <button type="submit" name="save_profile" class="btn-profile-main">
+                    <i class="bi bi-check2-circle"></i>
+                    Save Changes
+                </button>
+                <a href="{% url 'doctor_profile' %}" class="btn-profile-outline">
+                    <i class="bi bi-x-circle"></i>
+                    Cancel
+                </a>
+              </div>
+            </form>
+          </div>
+
+        {% elif password_mode %}
+          <div class="profile-card reveal reveal-up">
+            <h4 class="section-title">
+                <span class="title-icon"><i class="bi bi-key"></i></span>
+                Change Password
+            </h4>
+            <form method="post">
+              {% csrf_token %}
+              <div class="row g-4">
+                <div class="col-md-12">
+                  <label class="form-label">{{ password_form.current_password.label }}</label>
+                  {{ password_form.current_password }}
+                  {% if password_form.current_password.errors %}<small class="field-error">{{ password_form.current_password.errors|striptags }}</small>{% endif %}
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">{{ password_form.new_password.label }}</label>
+                  {{ password_form.new_password }}
+                  {% if password_form.new_password.errors %}<small class="field-error">{{ password_form.new_password.errors|striptags }}</small>{% endif %}
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">{{ password_form.confirm_password.label }}</label>
+                  {{ password_form.confirm_password }}
+                  {% if password_form.confirm_password.errors %}<small class="field-error">{{ password_form.confirm_password.errors|striptags }}</small>{% endif %}
+                </div>
+              </div>
+
+              <div class="mt-4 d-flex gap-3 flex-wrap">
+                <button type="submit" name="change_password" class="btn-profile-main">
+                    <i class="bi bi-check2-circle"></i>
+                    Update Password
+                </button>
+                <a href="{% url 'doctor_profile' %}" class="btn-profile-outline">
+                    <i class="bi bi-x-circle"></i>
+                    Cancel
+                </a>
+              </div>
+            </form>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const doctorProfileReveal = document.querySelectorAll('.reveal');
+
+    function doctorProfileRevealOnScroll() {
+        const triggerBottom = window.innerHeight * 0.9;
+        doctorProfileReveal.forEach((el, index) => {
+            const top = el.getBoundingClientRect().top;
+            if (top < triggerBottom) {
+                setTimeout(() => el.classList.add('show'), index * 80);
+            }
+        });
+    }
+
+    window.addEventListener('scroll', doctorProfileRevealOnScroll);
+    window.addEventListener('load', doctorProfileRevealOnScroll);
+</script>
+{% endblock %}

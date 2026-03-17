@@ -1,0 +1,435 @@
+{% extends 'hms/base.html' %}
+{% block title %}Admin Profile{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --primary: #0f172a;
+        --secondary: #1d4ed8;
+        --accent: #38bdf8;
+        --muted: #64748b;
+        --border: #e6edf5;
+        --soft: #f8fbff;
+        --white: #ffffff;
+        --shadow-sm: 0 10px 24px rgba(15, 23, 42, 0.06);
+        --shadow-md: 0 18px 40px rgba(15, 23, 42, 0.09);
+        --shadow-lg: 0 25px 60px rgba(15, 23, 42, 0.14);
+        --transition: all 0.35s ease;
+    }
+
+    .profile-page {
+        padding: 40px 0 70px;
+    }
+
+    .profile-shell {
+        background: rgba(255,255,255,0.98);
+        border: 1px solid var(--border);
+        border-radius: 30px;
+        box-shadow: var(--shadow-lg);
+        overflow: hidden;
+    }
+
+    .profile-top {
+        position: relative;
+        overflow: hidden;
+        background:
+            linear-gradient(135deg, rgba(15, 23, 42, 0.94) 0%, rgba(30, 64, 175, 0.86) 55%, rgba(56, 189, 248, 0.76) 100%),
+            url('https://images.unsplash.com/photo-1579684453423-f84349ef60b0?auto=format&fit=crop&w=1600&q=80') center/cover no-repeat;
+        color: #ffffff;
+        padding: 46px 40px;
+        isolation: isolate;
+    }
+
+    .profile-top::before,
+    .profile-top::after {
+        content: "";
+        position: absolute;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.08);
+        z-index: -1;
+    }
+
+    .profile-top::before {
+        width: 220px;
+        height: 220px;
+        top: -70px;
+        right: -60px;
+    }
+
+    .profile-top::after {
+        width: 150px;
+        height: 150px;
+        bottom: -45px;
+        left: -25px;
+    }
+
+    .profile-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 14px;
+        border-radius: 999px;
+        background: rgba(255,255,255,0.14);
+        border: 1px solid rgba(255,255,255,0.16);
+        font-size: 13px;
+        font-weight: 700;
+        margin-bottom: 14px;
+        backdrop-filter: blur(10px);
+    }
+
+    .profile-top h2 {
+        margin: 0 0 10px;
+        font-size: 2.1rem;
+        font-weight: 900;
+        letter-spacing: -0.4px;
+    }
+
+    .profile-top p {
+        margin: 0;
+        color: rgba(255,255,255,0.92);
+        line-height: 1.85;
+        max-width: 760px;
+    }
+
+    .profile-body {
+        padding: 36px;
+        background: linear-gradient(to bottom right, #ffffff, #fbfdff);
+    }
+
+    .profile-card {
+        background: #f8fbff;
+        border: 1px solid #e8eef7;
+        border-radius: 24px;
+        padding: 26px;
+        box-shadow: var(--shadow-sm);
+        transition: var(--transition);
+        max-width: 980px;
+        margin: 0 auto;
+    }
+
+    .profile-card:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-md);
+    }
+
+    .section-title {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 1.2rem;
+        font-weight: 800;
+        color: #0f172a;
+        margin-bottom: 18px;
+    }
+
+    .title-icon {
+        width: 42px;
+        height: 42px;
+        border-radius: 14px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #dbeafe, #e0f2fe);
+        color: #1d4ed8;
+        font-size: 18px;
+        box-shadow: var(--shadow-sm);
+    }
+
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+    }
+
+    .info-box {
+        background: rgba(255,255,255,0.88);
+        border: 1px solid #e8eef7;
+        border-radius: 18px;
+        padding: 18px;
+    }
+
+    .info-box .label {
+        color: #64748b;
+        font-size: 0.9rem;
+        margin-bottom: 6px;
+        font-weight: 600;
+    }
+
+    .info-box .value {
+        color: #0f172a;
+        font-weight: 800;
+        line-height: 1.7;
+        word-break: break-word;
+    }
+
+    .form-label {
+        font-weight: 700;
+        color: #334155;
+        margin-bottom: 8px;
+    }
+
+    .profile-body .form-control,
+    .profile-body input,
+    .profile-body select,
+    .profile-body textarea {
+        min-height: 52px;
+        border-radius: 14px;
+        border: 1px solid #dbe3ee;
+        background: #fbfdff;
+        box-shadow: none;
+        width: 100%;
+        padding: 12px 14px;
+        transition: var(--transition);
+    }
+
+    .profile-body .form-control:focus,
+    .profile-body input:focus,
+    .profile-body select:focus,
+    .profile-body textarea:focus {
+        background: #ffffff;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.08);
+        outline: none;
+    }
+
+    .btn-profile-main {
+        min-height: 52px;
+        padding: 12px 22px;
+        border: none;
+        border-radius: 14px;
+        background: linear-gradient(135deg, #1d4ed8, #38bdf8);
+        color: #ffffff;
+        font-weight: 700;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        transition: var(--transition);
+        box-shadow: 0 12px 24px rgba(29, 78, 216, 0.18);
+    }
+
+    .btn-profile-main:hover {
+        color: #ffffff;
+        transform: translateY(-2px);
+    }
+
+    .btn-profile-outline {
+        min-height: 52px;
+        padding: 12px 22px;
+        border-radius: 14px;
+        border: 1px solid #dbe3ee;
+        background: #ffffff;
+        color: #0f172a;
+        font-weight: 700;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        transition: var(--transition);
+    }
+
+    .btn-profile-outline:hover {
+        color: #0f172a;
+        background: #f8fafc;
+        transform: translateY(-2px);
+    }
+
+    .field-error {
+        color: #dc2626;
+        margin-top: 6px;
+        display: block;
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+
+    .reveal {
+        opacity: 0;
+        transition: all 0.9s ease;
+    }
+
+    .reveal-up { transform: translateY(50px); }
+
+    .reveal.show {
+        opacity: 1;
+        transform: translate(0,0);
+    }
+
+    @media (max-width: 767px) {
+        .profile-top,
+        .profile-body {
+            padding-left: 22px;
+            padding-right: 22px;
+        }
+
+        .profile-top h2 {
+            font-size: 1.85rem;
+        }
+
+        .info-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="profile-page">
+    <div class="container">
+        <div class="profile-shell">
+            <div class="profile-top reveal reveal-up show">
+                <span class="profile-badge">
+                    <i class="bi bi-shield-check"></i>
+                    Administrator Account
+                </span>
+                <h2>Profile Management</h2>
+                <p>Manage your admin account information, update profile details, and change password securely.</p>
+            </div>
+
+            <div class="profile-body">
+                {% if not edit_mode and not password_mode %}
+                    <div class="profile-card reveal reveal-up">
+                        <h4 class="section-title">
+                            <span class="title-icon"><i class="bi bi-person-vcard"></i></span>
+                            Account Information
+                        </h4>
+
+                        <div class="info-grid">
+                            <div class="info-box">
+                                <div class="label">Username</div>
+                                <div class="value">{{ request.user.username }}</div>
+                            </div>
+                            <div class="info-box">
+                                <div class="label">Email</div>
+                                <div class="value">{{ request.user.email|default:"-" }}</div>
+                            </div>
+                            <div class="info-box">
+                                <div class="label">First Name</div>
+                                <div class="value">{{ request.user.first_name|default:"-" }}</div>
+                            </div>
+                            <div class="info-box">
+                                <div class="label">Last Name</div>
+                                <div class="value">{{ request.user.last_name|default:"-" }}</div>
+                            </div>
+                        </div>
+
+                        <div class="mt-4 d-flex gap-3 flex-wrap">
+                            <a href="{% url 'admin_profile' %}?edit=1" class="btn-profile-main">
+                                <i class="bi bi-pencil-square"></i>
+                                Edit Profile
+                            </a>
+                            <a href="{% url 'admin_profile' %}?password=1" class="btn-profile-outline">
+                                <i class="bi bi-key"></i>
+                                Change Password
+                            </a>
+                        </div>
+                    </div>
+
+                {% elif edit_mode %}
+                    <div class="profile-card reveal reveal-up">
+                        <h4 class="section-title">
+                            <span class="title-icon"><i class="bi bi-pencil-square"></i></span>
+                            Edit Profile
+                        </h4>
+                        <form method="post">
+                            {% csrf_token %}
+                            <div class="row g-4">
+                                <div class="col-md-6">
+                                    <label class="form-label">{{ profile_form.username.label }}</label>
+                                    {{ profile_form.username }}
+                                    {% if profile_form.username.errors %}<small class="field-error">{{ profile_form.username.errors|striptags }}</small>{% endif %}
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">{{ profile_form.email.label }}</label>
+                                    {{ profile_form.email }}
+                                    {% if profile_form.email.errors %}<small class="field-error">{{ profile_form.email.errors|striptags }}</small>{% endif %}
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">{{ profile_form.first_name.label }}</label>
+                                    {{ profile_form.first_name }}
+                                    {% if profile_form.first_name.errors %}<small class="field-error">{{ profile_form.first_name.errors|striptags }}</small>{% endif %}
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">{{ profile_form.last_name.label }}</label>
+                                    {{ profile_form.last_name }}
+                                    {% if profile_form.last_name.errors %}<small class="field-error">{{ profile_form.last_name.errors|striptags }}</small>{% endif %}
+                                </div>
+                            </div>
+
+                            <div class="mt-4 d-flex gap-3 flex-wrap">
+                                <button type="submit" name="save_profile" class="btn-profile-main">
+                                    <i class="bi bi-check2-circle"></i>
+                                    Save Changes
+                                </button>
+                                <a href="{% url 'admin_profile' %}" class="btn-profile-outline">
+                                    <i class="bi bi-x-circle"></i>
+                                    Cancel
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+
+                {% elif password_mode %}
+                    <div class="profile-card reveal reveal-up">
+                        <h4 class="section-title">
+                            <span class="title-icon"><i class="bi bi-key"></i></span>
+                            Change Password
+                        </h4>
+                        <form method="post">
+                            {% csrf_token %}
+                            <div class="row g-4">
+                                <div class="col-md-12">
+                                    <label class="form-label">{{ password_form.current_password.label }}</label>
+                                    {{ password_form.current_password }}
+                                    {% if password_form.current_password.errors %}<small class="field-error">{{ password_form.current_password.errors|striptags }}</small>{% endif %}
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">{{ password_form.new_password.label }}</label>
+                                    {{ password_form.new_password }}
+                                    {% if password_form.new_password.errors %}<small class="field-error">{{ password_form.new_password.errors|striptags }}</small>{% endif %}
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">{{ password_form.confirm_password.label }}</label>
+                                    {{ password_form.confirm_password }}
+                                    {% if password_form.confirm_password.errors %}<small class="field-error">{{ password_form.confirm_password.errors|striptags }}</small>{% endif %}
+                                </div>
+                            </div>
+
+                            <div class="mt-4 d-flex gap-3 flex-wrap">
+                                <button type="submit" name="change_password" class="btn-profile-main">
+                                    <i class="bi bi-check2-circle"></i>
+                                    Update Password
+                                </button>
+                                <a href="{% url 'admin_profile' %}" class="btn-profile-outline">
+                                    <i class="bi bi-x-circle"></i>
+                                    Cancel
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const profileReveal = document.querySelectorAll('.reveal');
+
+    function profileRevealOnScroll() {
+        const triggerBottom = window.innerHeight * 0.9;
+        profileReveal.forEach((el, index) => {
+            const top = el.getBoundingClientRect().top;
+            if (top < triggerBottom) {
+                setTimeout(() => el.classList.add('show'), index * 80);
+            }
+        });
+    }
+
+    window.addEventListener('scroll', profileRevealOnScroll);
+    window.addEventListener('load', profileRevealOnScroll);
+</script>
+{% endblock %}

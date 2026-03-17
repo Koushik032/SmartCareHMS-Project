@@ -1,0 +1,448 @@
+{% extends 'hms/base.html' %}
+{% block title %}Appointment History{% endblock %}
+
+{% block content %}
+<style>
+    .history-page {
+        padding: 34px 0 70px;
+    }
+
+    .history-hero {
+        background:
+            linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(29, 78, 216, 0.84) 55%, rgba(56, 189, 248, 0.74) 100%),
+            url('https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&w=1600&q=80') center/cover no-repeat;
+        color: #ffffff;
+        border-radius: 30px;
+        padding: 56px 40px;
+        margin-bottom: 30px;
+        box-shadow: 0 20px 50px rgba(15, 23, 42, 0.14);
+        position: relative;
+        overflow: hidden;
+        isolation: isolate;
+    }
+
+    .history-hero::before,
+    .history-hero::after {
+        content: "";
+        position: absolute;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.08);
+        z-index: -1;
+    }
+
+    .history-hero::before {
+        width: 220px;
+        height: 220px;
+        top: -70px;
+        right: -60px;
+    }
+
+    .history-hero::after {
+        width: 150px;
+        height: 150px;
+        bottom: -45px;
+        left: -25px;
+    }
+
+    .history-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 16px;
+        border-radius: 999px;
+        background: rgba(255,255,255,0.14);
+        border: 1px solid rgba(255,255,255,0.16);
+        font-size: 13px;
+        font-weight: 700;
+        margin-bottom: 16px;
+    }
+
+    .history-hero h2 {
+        font-size: 2.2rem;
+        font-weight: 900;
+        margin-bottom: 10px;
+    }
+
+    .history-hero p {
+        color: rgba(255,255,255,0.9);
+        margin-bottom: 0;
+        line-height: 1.85;
+        max-width: 760px;
+    }
+
+    .summary-card,
+    .history-table-card {
+        background: #ffffff;
+        border: 1px solid #e7edf5;
+        border-radius: 24px;
+        box-shadow: 0 16px 36px rgba(15, 23, 42, 0.08);
+    }
+
+    .summary-card {
+        padding: 24px 20px;
+        text-align: center;
+        height: 100%;
+        transition: 0.35s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .summary-card::after {
+        content: "";
+        position: absolute;
+        right: -30px;
+        bottom: -30px;
+        width: 90px;
+        height: 90px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(56,189,248,0.12), transparent 70%);
+    }
+
+    .summary-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 22px 44px rgba(15, 23, 42, 0.12);
+    }
+
+    .summary-icon {
+        width: 56px;
+        height: 56px;
+        border-radius: 16px;
+        margin: 0 auto 14px;
+        background: linear-gradient(135deg, #dbeafe, #e0f2fe);
+        color: #1d4ed8;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 22px;
+    }
+
+    .summary-card h3 {
+        font-size: 2rem;
+        font-weight: 800;
+        color: #1d4ed8;
+        margin-bottom: 8px;
+    }
+
+    .summary-card p {
+        margin-bottom: 0;
+        color: #64748b;
+        font-weight: 600;
+    }
+
+    .history-table-card {
+        padding: 28px;
+    }
+
+    .section-title {
+        font-size: 1.5rem;
+        font-weight: 800;
+        color: #0f172a;
+        margin-bottom: 8px;
+    }
+
+    .section-subtitle {
+        color: #64748b;
+        margin-bottom: 24px;
+        line-height: 1.8;
+    }
+
+    .history-table {
+        margin-bottom: 0;
+        vertical-align: middle;
+    }
+
+    .history-table thead th {
+        background: #f8fafc;
+        color: #0f172a;
+        font-weight: 700;
+        border-bottom: none;
+        padding: 14px 12px;
+        white-space: nowrap;
+    }
+
+    .history-table tbody tr {
+        transition: 0.3s ease;
+    }
+
+    .history-table tbody tr:hover {
+        background: #f8fbff;
+    }
+
+    .history-table tbody td {
+        padding: 14px 12px;
+        color: #475569;
+        border-color: #eef2f7;
+    }
+
+    .status-badge,
+    .mode-badge,
+    .urgency-badge {
+        display: inline-block;
+        padding: 7px 12px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    .status-booked {
+        background: #dbeafe;
+        color: #1d4ed8;
+    }
+
+    .status-completed {
+        background: #dcfce7;
+        color: #166534;
+    }
+
+    .status-cancelled {
+        background: #fee2e2;
+        color: #b91c1c;
+    }
+
+    .status-missed {
+        background: #fef3c7;
+        color: #b45309;
+    }
+
+    .mode-badge {
+        background: #eff6ff;
+        color: #1d4ed8;
+    }
+
+    .urgency-normal {
+        background: #e2e8f0;
+        color: #334155;
+    }
+
+    .urgency-urgent {
+        background: #fde68a;
+        color: #92400e;
+    }
+
+    .urgency-emergency {
+        background: #fecaca;
+        color: #b91c1c;
+    }
+
+    .btn-cancel-modern,
+    .btn-prescription-modern {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 38px;
+        padding: 8px 14px;
+        border-radius: 10px;
+        text-decoration: none;
+        font-weight: 700;
+        transition: 0.25s ease;
+        white-space: nowrap;
+    }
+
+    .btn-cancel-modern {
+        background: #dc2626;
+        color: #ffffff;
+    }
+
+    .btn-cancel-modern:hover {
+        color: #ffffff;
+        background: #b91c1c;
+    }
+
+    .btn-prescription-modern {
+        background: linear-gradient(135deg, #1d4ed8, #38bdf8);
+        color: #ffffff;
+    }
+
+    .btn-prescription-modern:hover {
+        color: #ffffff;
+        opacity: 0.96;
+    }
+
+    .empty-state {
+        text-align: center;
+        color: #64748b;
+        padding: 34px 10px;
+    }
+
+    .empty-state-icon {
+        width: 72px;
+        height: 72px;
+        border-radius: 20px;
+        margin: 0 auto 14px;
+        background: linear-gradient(135deg, #dbeafe, #e0f2fe);
+        color: #1d4ed8;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 30px;
+    }
+
+    .reveal {
+        opacity: 0;
+        transition: all 0.9s ease;
+    }
+
+    .reveal-up {
+        transform: translateY(45px);
+    }
+
+    .reveal.show {
+        opacity: 1;
+        transform: translate(0, 0);
+    }
+
+    @media (max-width: 991px) {
+        .history-hero {
+            padding: 40px 24px;
+        }
+
+        .history-hero h2 {
+            font-size: 1.9rem;
+        }
+    }
+</style>
+
+<section class="section-space history-page">
+  <div class="container">
+
+    <div class="history-hero reveal reveal-up show">
+      <span class="history-chip">
+        <i class="bi bi-clock-history"></i>
+        Patient Portal
+      </span>
+      <h2>Appointment History</h2>
+      <p>
+        Review your complete appointment history, including doctor details, consultation type,
+        urgency level, booking status, and symptoms submitted during appointment booking.
+      </p>
+    </div>
+
+    <div class="row g-4 mb-4">
+      <div class="col-md-4">
+        <div class="summary-card reveal reveal-up">
+          <div class="summary-icon"><i class="bi bi-calendar2-check"></i></div>
+          <h3>{{ total_appointments }}</h3>
+          <p>Total Appointments</p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="summary-card reveal reveal-up">
+          <div class="summary-icon"><i class="bi bi-check2-circle"></i></div>
+          <h3>{{ completed_count }}</h3>
+          <p>Completed Records</p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="summary-card reveal reveal-up">
+          <div class="summary-icon"><i class="bi bi-x-circle"></i></div>
+          <h3>{{ cancelled_count }}</h3>
+          <p>Cancelled Records</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="history-table-card reveal reveal-up">
+      <h3 class="section-title">Your Appointment Records</h3>
+      <p class="section-subtitle">
+        All your bookings and consultation records are shown below in a structured medical history table.
+      </p>
+
+      <div class="table-responsive">
+        <table class="table history-table">
+          <thead>
+            <tr>
+              <th>Doctor Name</th>
+              <th>Consultancy Fee</th>
+              <th>Appointment Date</th>
+              <th>Appointment Time</th>
+              <th>Status</th>
+              <th>Mode</th>
+              <th>Category</th>
+              <th>Urgency</th>
+              <th>Symptoms</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for a in appointments %}
+            <tr>
+              <td>Dr. {{ a.doctor.name }}</td>
+              <td>{{ a.consultancy_fee }}</td>
+              <td>{{ a.appointment_date }}</td>
+              <td>{{ a.appointment_time }}</td>
+              <td>
+                {% if a.display_status == 'Booked' %}
+                  <span class="status-badge status-booked">{{ a.display_status }}</span>
+                {% elif a.display_status == 'Completed' %}
+                  <span class="status-badge status-completed">{{ a.display_status }}</span>
+                {% elif a.display_status == 'Missed' %}
+                  <span class="status-badge status-missed">{{ a.display_status }}</span>
+                {% else %}
+                  <span class="status-badge status-cancelled">{{ a.display_status }}</span>
+                {% endif %}
+              </td>
+              <td>
+                <span class="mode-badge">{{ a.appointment_mode }}</span>
+              </td>
+              <td>{{ a.problem_category }}</td>
+              <td>
+                {% if a.urgency_level == 'Emergency' %}
+                  <span class="urgency-badge urgency-emergency">{{ a.urgency_level }}</span>
+                {% elif a.urgency_level == 'Urgent' %}
+                  <span class="urgency-badge urgency-urgent">{{ a.urgency_level }}</span>
+                {% else %}
+                  <span class="urgency-badge urgency-normal">{{ a.urgency_level }}</span>
+                {% endif %}
+              </td>
+              <td>{{ a.symptoms|truncatewords:8 }}</td>
+              <td>
+                {% if a.has_prescription %}
+                  <a href="{% url 'patient_view_prescription' a.id %}" class="btn-prescription-modern">
+                    View Prescription
+                  </a>
+                {% elif a.can_cancel %}
+                  <a href="{% url 'patient_cancel_appointment' a.id %}" class="btn-cancel-modern">
+                    Cancel
+                  </a>
+                {% else %}
+                  <span class="text-muted fw-semibold">No Action</span>
+                {% endif %}
+              </td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="10">
+                <div class="empty-state">
+                  <div class="empty-state-icon">
+                    <i class="bi bi-calendar-x"></i>
+                  </div>
+                  No appointments found in your history.
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<script>
+    const historyReveal = document.querySelectorAll('.reveal');
+
+    function historyRevealOnScroll() {
+        const triggerBottom = window.innerHeight * 0.9;
+        historyReveal.forEach((el, index) => {
+            const top = el.getBoundingClientRect().top;
+            if (top < triggerBottom) {
+                setTimeout(() => el.classList.add('show'), index * 70);
+            }
+        });
+    }
+
+    window.addEventListener('scroll', historyRevealOnScroll);
+    window.addEventListener('load', historyRevealOnScroll);
+</script>
+{% endblock %}
